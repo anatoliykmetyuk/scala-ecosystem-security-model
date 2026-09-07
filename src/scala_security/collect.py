@@ -70,6 +70,24 @@ def pom_dependencies(text: str) -> list[dict[str, JSON]]:
                 "optional": opt == "true" if opt else None if inherited else False,
             }
         )
+    # Explicit active build plugins/extensions are build inputs, not runtime dependencies.
+    # pluginManagement alone does not activate a plugin.
+    for location, default_group in (
+        ("./build/plugins/plugin", "org.apache.maven.plugins"),
+        ("./build/extensions/extension", ""),
+    ):
+        for dep in root.findall(location):
+            group = dep.findtext("groupId") or default_group
+            artifact = dep.findtext("artifactId")
+            if group and artifact:
+                result.append(
+                    {
+                        "package_name": expand(group + ":" + artifact),
+                        "requirements": expand(dep.findtext("version") or ""),
+                        "kind": "build",
+                        "optional": False,
+                    }
+                )
     return result
 
 

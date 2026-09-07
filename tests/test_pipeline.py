@@ -455,3 +455,19 @@ def test_unresolved_ownership_stays_unattributed(tmp_path):
     collector.reconcile_ownership()
     collector.package({"name": "g:shared_3", "repository_url": "https://github.com/unrelated/repo"})
     assert db.execute("SELECT project FROM artifacts").fetchone()[0] is None
+
+
+def test_active_pom_build_inputs_are_included():
+    from scala_security.collect import pom_dependencies
+
+    pom = """<project><build>
+      <plugins><plugin><artifactId>maven-compiler-plugin</artifactId><version>3.14.0</version></plugin></plugins>
+      <extensions><extension><groupId>g</groupId><artifactId>extension</artifactId><version>1</version></extension></extensions>
+      <pluginManagement><plugins><plugin><artifactId>inactive-plugin</artifactId><version>1</version></plugin></plugins></pluginManagement>
+    </build></project>"""
+    found = pom_dependencies(pom)
+    assert {d["package_name"] for d in found} == {
+        "org.apache.maven.plugins:maven-compiler-plugin",
+        "g:extension",
+    }
+    assert all(d["kind"] == "build" and d["optional"] is False for d in found)
