@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sqlite3
 from pathlib import Path
@@ -62,6 +63,11 @@ def render(db: sqlite3.Connection, destination: Path) -> None:
                 "sources": sources,
             }
         )
+    text = (Path(__file__).parent / "templates" / "report.html").read_text()
+    db.execute(
+        "INSERT OR REPLACE INTO metadata VALUES(?,?)",
+        ("report_template_sha256", hashlib.sha256(text.encode()).hexdigest()),
+    )
     metadata = dict(db.execute("SELECT key,value FROM metadata"))
     gaps = db.execute("SELECT count(*) FROM gaps").fetchone()[0]
     model = {
@@ -85,7 +91,6 @@ def render(db: sqlite3.Connection, destination: Path) -> None:
             for t in ("artifacts", "versions", "edges", "fallout")
         },
     }
-    text = (Path(__file__).parent / "templates" / "report.html").read_text()
     text = text.replace(
         "__DATA__",
         json.dumps(model, separators=(",", ":"), ensure_ascii=False).replace("<", "\\u003c"),
