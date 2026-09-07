@@ -22,7 +22,7 @@ def allowed(edge: Edge, depth: int) -> bool:
     scopes = {"compile", "runtime"}
     if depth == 0:
         scopes |= {"test", "build", "development", "provided"}
-    return edge.scope in scopes and edge.optional is False and edge.exact
+    return edge.scope in scopes and (depth == 0 or edge.optional is False) and edge.exact
 
 
 def paths(db: sqlite3.Connection, roots: list[str], max_hops: int = 3) -> dict[str, list[int]]:

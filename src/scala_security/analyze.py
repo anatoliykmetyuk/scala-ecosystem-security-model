@@ -111,7 +111,7 @@ def validate(db: sqlite3.Connection) -> dict[str, int]:
         ).fetchall()
         assert 1 <= len(path) <= 3
         for i, edge in enumerate(path):
-            assert edge["exact"] and edge["optional"] == 0
+            assert edge["exact"] and (i == 0 or edge["optional"] == 0)
             assert edge["scope"] in (
                 {"compile", "runtime", "test", "provided", "build", "development"}
                 if i == 0

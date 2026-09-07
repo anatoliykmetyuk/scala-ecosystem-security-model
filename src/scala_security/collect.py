@@ -385,7 +385,7 @@ class Collector:
                             depth < 2
                             and name in relevant
                             and is_exact
-                            and optional is False
+                            and (depth == 0 or optional is False)
                             and scope in scopes
                         ):
                             frontier.add(target)

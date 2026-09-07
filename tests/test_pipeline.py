@@ -471,3 +471,22 @@ def test_active_pom_build_inputs_are_included():
         "g:extension",
     }
     assert all(d["kind"] == "build" and d["optional"] is False for d in found)
+
+
+def test_optional_declarations_count_for_root_but_do_not_propagate(tmp_path):
+    db = fixture_db(tmp_path / "db.sqlite")
+    db.execute("UPDATE edges SET optional=1 WHERE source='g:a@3'")
+    db.execute(
+        "INSERT INTO edges(source,target,scope,optional,exact) VALUES('g:b_3@1','g:c_3@1','compile',0,1)"
+    )
+    analyze(db)
+    assert validate(db)["fallout"] == 3
+    db.execute("UPDATE edges SET optional=1 WHERE source='g:b_3@1'")
+    analyze(db)
+    assert validate(db)["fallout"] == 2
+    assert db.execute(
+        "SELECT 1 FROM fallout WHERE target='scala/b' AND dependant='java/a'"
+    ).fetchone()
+    assert not db.execute(
+        "SELECT 1 FROM fallout WHERE target='scala/c' AND dependant='java/a'"
+    ).fetchone()
