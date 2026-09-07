@@ -5,7 +5,6 @@ matrix:
   jvm:
     scala:
     - '2.13'
-    - '3'
 selection_policy:
   max_projects: 100
   max_per_main_section: 10
@@ -3020,3 +3019,7 @@ provenance:
   migration: Offline selection from the previously frozen source-ranked candidate
     pool and saved overview HTML; no source requests were made.
   previous_seed_projects: 580
+universe: seed
+max_artifacts_per_project: 20
+artifact_selection: First 20 expanded coordinates in lexicographic order before availability
+  checks; no backfill.

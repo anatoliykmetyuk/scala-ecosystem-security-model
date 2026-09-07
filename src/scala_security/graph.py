@@ -26,8 +26,13 @@ def allowed(edge: Edge, depth: int) -> bool:
 
 
 def paths(
-    db: sqlite3.Connection, roots: list[str], max_hops: int = 3, targets: set[str] | None = None
+    db: sqlite3.Connection,
+    roots: list[str],
+    max_hops: int = 3,
+    targets: set[str] | None = None,
+    within: set[str] | None = None,
 ) -> dict[str, list[int]]:
+    roots = [root for root in roots if within is None or root.rsplit("@", 1)[0] in within]
     queue = deque((root, []) for root in roots)
     visited = set(roots)
     found: dict[str, list[int]] = {}
@@ -40,6 +45,8 @@ def paths(
                                  JOIN artifacts a ON a.id=v.artifact WHERE e.source=? ORDER BY e.target,e.scope,e.id""",
             (source,),
         ):
+            if within is not None and row["artifact"] not in within:
+                continue
             edge = Edge(
                 row["id"],
                 source,

@@ -116,6 +116,9 @@ def seed_document(
 ) -> dict[str, JSON]:
     return {
         "schema": 2,
+        "universe": "seed",
+        "max_artifacts_per_project": 20,
+        "artifact_selection": "First 20 expanded coordinates in lexicographic order before availability checks; no backfill.",
         "selected_at": selected_at,
         "source": INDEX + "/awesome",
         "matrix": matrix,

@@ -27,9 +27,15 @@ def analyze(db: sqlite3.Connection) -> None:
     targets = (
         {r[0] for r in db.execute("SELECT artifact FROM target_artifacts")} if restricted else None
     )
+    closed = (
+        db.execute("SELECT 1 FROM metadata WHERE key='universe' AND value='seed'").fetchone()
+        is not None
+    )
     scoring_seconds = traversal_seconds = 0.0
     seeds = {r[0] for r in db.execute("SELECT id FROM projects WHERE seed=1")}
     for project in db.execute("SELECT * FROM projects").fetchall():
+        if closed and not project["seed"]:
+            continue
         phase_start = time.monotonic()
         observations = {
             r["kind"]: obj(json.loads(r["payload"]))
@@ -67,7 +73,9 @@ def analyze(db: sqlite3.Connection) -> None:
                 (project["id"], project["latest"]),
             )
         ]
-        for target, path in paths(db, roots, targets=targets).items():
+        for target, path in paths(
+            db, roots, targets=targets, within=targets if closed else None
+        ).items():
             if target not in seeds or target == project["id"]:
                 continue
             db.execute("INSERT OR IGNORE INTO fallout VALUES(?,?)", (target, project["id"]))

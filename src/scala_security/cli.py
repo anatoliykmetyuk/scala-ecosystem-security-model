@@ -53,6 +53,8 @@ def main() -> None:
                     {
                         "projects": len(config.projects),
                         "modules": config.module_count,
+                        "universe": "seed",
+                        "max_artifacts_per_project": 20,
                         "matrix": config.matrix,
                         "candidate_coordinates": len(
                             {a for p in config.projects for a in config.coordinates(p)}

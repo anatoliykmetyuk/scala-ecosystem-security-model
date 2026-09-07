@@ -228,25 +228,22 @@ def test_offline_collection_to_preview(tmp_path):
     def handler(request):
         path = request.url.path
         if path.endswith("/artifacts"):
-            return httpx.Response(200, json=[{"groupId": "g", "artifactId": "c_3", "version": "1"}])
-        if path.endswith("/versions/latest"):
-            artifact = "c_3" if "/scala/c/" in path else "b_3"
-            return httpx.Response(
-                200, json=[{"groupId": "g", "artifactId": artifact, "version": "1"}]
-            )
-        if path.endswith("/dependent_packages"):
             return httpx.Response(
                 200,
                 json=[
                     {
-                        "name": "g:b_3",
-                        "repository_url": "https://github.com/scala/b",
-                        "repo_metadata": {"stargazers_count": 100},
+                        "groupId": "g",
+                        "artifactId": "c_2.13" if "/scala/c/" in path else "b_2.13",
+                        "version": "1",
                     }
-                ]
-                if "g:c_3/" in path and request.url.params.get("page") == "1"
-                else [],
+                ],
             )
+        if path.endswith("/versions/latest"):
+            artifact = "c_2.13" if "/scala/c/" in path else "b_2.13"
+            return httpx.Response(
+                200, json=[{"groupId": "g", "artifactId": artifact, "version": "1"}]
+            )
+        assert not path.endswith("/dependent_packages"), "No reverse discovery allowed"
         if "/versions/1" in path:
             return httpx.Response(
                 200,
@@ -254,14 +251,14 @@ def test_offline_collection_to_preview(tmp_path):
                     "number": "1",
                     "dependencies": [
                         {
-                            "package_name": "g:c_3",
+                            "package_name": "g:c_2.13",
                             "requirements": "1",
                             "kind": "compile",
                             "optional": False,
                         }
                     ],
                 }
-                if "g:b_3/" in path
+                if "g:b_2.13/" in path
                 else {"number": "1", "dependencies": []},
             )
         if path.endswith(".pom"):
@@ -273,12 +270,16 @@ def test_offline_collection_to_preview(tmp_path):
         {
             "schema": 2,
             "matrix": DEFAULT_MATRIX,
-            "projects": [{"repository": "scala/c", "categories": ["testing"], "modules": ["g:c"]}],
+            "projects": [
+                {"repository": f"scala/{name}", "categories": ["testing"], "modules": [f"g:{name}"]}
+                for name in ("b", "c")
+            ],
         }
     )
     Collector(db, Fetcher(tmp_path / "evidence", httpx.MockTransport(handler)), config).run(
         config.projects
     )
+    db.execute("UPDATE projects SET stars=100")
     analyze(db)
     assert validate(db)["fallout"] == 1
     render(db, tmp_path / "preview.html")
@@ -351,7 +352,7 @@ def test_seed_selection_uses_all_variants_and_filters_java(tmp_path):
         return httpx.Response(
             200,
             json=[
-                {"groupId": "g", "artifactId": "good_3", "version": "2"},
+                {"groupId": "g", "artifactId": "good_2.13", "version": "2"},
                 {"groupId": "g", "artifactId": "good_2.12", "version": "1"},
             ],
         )

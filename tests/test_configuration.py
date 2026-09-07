@@ -32,7 +32,6 @@ def document(repo="scala/subject"):
 def test_matrix_expansion_and_module_extraction():
     assert expand(["org.scala-graph:graph-core"], DEFAULT_MATRIX) == [
         "org.scala-graph:graph-core_2.13",
-        "org.scala-graph:graph-core_3",
     ]
     assert modules_for(
         [
@@ -85,7 +84,7 @@ def test_invalid_schema_and_project_limits():
     with pytest.raises(ValueError, match="Duplicate repository"):
         parse_config(d)
     d = document()
-    d["projects"][0]["artifacts"] = ["g:subject_3"]
+    d["projects"][0]["artifacts"] = ["g:subject_2.13"]
     with pytest.raises(ValueError, match="Expanded artifact"):
         parse_config(d)
     with pytest.raises(ValueError, match="schema 2"):
@@ -103,18 +102,18 @@ def test_runtime_checks_published_coordinates_and_limits_seed_roots(tmp_path):
         urls.append(str(request.url))
         versions = [
             {"groupId": "g", "artifactId": name, "version": "2"}
-            for name in ("subject_3", "subject_2.12", "subject_sjs1_3", "other_3")
+            for name in ("subject_2.13", "subject_2.12", "subject_sjs1_3", "other_3")
         ]
         return httpx.Response(200, json=versions)
 
     config = parse_config(document())
     db = connect(tmp_path / "db.sqlite")
     collector = Collector(db, Fetcher(tmp_path / "evidence", httpx.MockTransport(handler)), config)
-    assert collector.seed(config.projects[0]) == ["g:subject_3"]
-    assert collector.roots() == ["g:subject_3@2"]
+    assert collector.seed(config.projects[0]) == ["g:subject_2.13"]
+    assert collector.roots() == ["g:subject_2.13@2"]
     assert {
         tuple(row) for row in db.execute("SELECT artifact,published FROM coordinate_checks")
-    } == {("g:subject_2.13", 0), ("g:subject_3", 1)}
+    } == {("g:subject_2.13", 1)}
     assert len(urls) == 2
 
 
@@ -184,3 +183,58 @@ def test_committed_seeds_and_offline_plan(monkeypatch, capsys):
     monkeypatch.setattr("sys.argv", ["scala-security", "plan", "--seeds", str(path)])
     main()
     assert '"projects": 100' in capsys.readouterr().out
+
+
+def test_coordinate_cap_is_deterministic():
+    d = document()
+    d["projects"][0]["modules"] = [f"g:module{i:02}" for i in reversed(range(35))]
+    config = parse_config(d)
+    assert config.coordinates(config.projects[0]) == [f"g:module{i:02}_2.13" for i in range(20)]
+
+
+def test_closed_universe_excludes_external_consumers_and_intermediates(tmp_path):
+    from scala_security.graph import paths
+
+    db = fixture_db(tmp_path / "db.sqlite")
+    db.execute("INSERT INTO metadata VALUES('seed_schema','2')")
+    db.execute("INSERT INTO metadata VALUES('universe','seed')")
+    db.executemany("INSERT INTO target_artifacts VALUES(?)", [("g:b_3",), ("g:c_3",)])
+    analyze(db)
+    assert set(map(tuple, db.execute("SELECT * FROM fallout"))) == {("scala/c", "scala/b")}
+    assert validate(db)["fallout"] == 1
+    # An excluded B coordinate cannot bridge a path from A to C.
+    db.execute("UPDATE edges SET target='g:b_3@2' WHERE source='g:a@3'")
+    assert "scala/c" in paths(db, ["g:a@3"])
+    assert paths(db, ["g:a@3"], within={"g:a", "g:c_3"}) == {}
+
+
+def test_forward_never_fetches_external_coordinates(tmp_path):
+    db = connect(tmp_path / "db.sqlite")
+    db.execute("INSERT INTO projects(id,seed) VALUES('scala/a',1)")
+    db.execute("INSERT INTO artifacts(id,project) VALUES('g:a_2.13','scala/a')")
+    db.execute("INSERT INTO versions VALUES('g:a_2.13@1','g:a_2.13','1',0)")
+    requests = []
+
+    def handler(request):
+        requests.append(str(request.url))
+        assert "external" not in str(request.url)
+        if request.url.path.endswith(".pom"):
+            return httpx.Response(200, text="<project/>")
+        return httpx.Response(
+            200,
+            json={
+                "dependencies": [
+                    {
+                        "package_name": "g:external",
+                        "requirements": "1",
+                        "kind": "compile",
+                        "optional": False,
+                    }
+                ]
+            },
+        )
+
+    collector = Collector(db, Fetcher(tmp_path / "evidence", httpx.MockTransport(handler)))
+    collector.forward(["g:a_2.13@1"], {"g:a_2.13"})
+    assert len(requests) == 2
+    assert db.execute("SELECT count(*) FROM edges").fetchone()[0] == 0

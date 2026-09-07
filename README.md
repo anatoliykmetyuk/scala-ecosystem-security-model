@@ -25,7 +25,7 @@ Optionally set `ECOSYSTEMS_CONTACT_EMAIL` to an email you authorize sending to e
 
 This single command reads **[config/seeds.yaml](config/seeds.yaml)**, creates a fresh evidence directory and SQLite snapshot, collects dependencies and score inputs, calculates and validates results, then generates **`output/preview.html`**. Open that file directly in a browser. It embeds the required data and needs no API connection or local server to view.
 
-This is a substantial Maven-wide crawl, not a quick build: published coordinates matching the configured modules and matrix are queried, followed by reverse discovery through three hops and version-specific verification. Runtime depends on index size and API response times. Progress is printed by phase and batch. HTTP failures and unresolved declarations are recorded as gaps, not silently converted to zero scores. The preview reports the gap count.
+This pilot traverses only selected seed coordinates, for at most three hops. It does not run Maven-wide reverse discovery. The JVM Scala 2.13 matrix and a hard cap of 20 candidate coordinates per project currently produce 803 candidates across 100 projects. Historical dependency versions can still require multiple requests per coordinate, so this is not a total request cap. HTTP failures and unresolved declarations are recorded as gaps.
 
 Each run is retained under `output/runs/<UTC timestamp>/`:
 
@@ -61,7 +61,7 @@ The editable YAML uses schema 2: repositories, main-section categories, source r
 schema: 2
 matrix:
   jvm:
-    scala: ['2.13', '3']
+    scala: ['2.13']
 projects:
   - repository: scala-graph/scala-graph
     categories: [Computer Science]
@@ -69,7 +69,7 @@ projects:
       - org.scala-graph:graph-core
 ```
 
-This expands `graph-core` into JVM coordinates ending in `_2.13` and `_3`. On a rebuild, the collector intersects these candidates with the published Scaladex inventory before reverse lookup. Missing variants are recorded in `coordinate_checks`; an unavailable inventory never becomes an assumed publication. Generated artifact names live in SQLite, not the seed YAML. Unsuffixed artifacts and full-compiler-version cross-builds are outside this binary-version matrix. Other platforms are disabled; the schema supports explicit `scala_js` / `scala_native` entries with `versions` and `scala` lists if intentionally enabled later.
+This expands `graph-core` into `graph-core_2.13`. Coordinates are sorted lexicographically and capped at 20 per project before checking publication availability, with no backfill. This is a deterministic cost limit, not a ranking by downstream value. The YAML explicitly records `universe: seed`, `max_artifacts_per_project: 20` and the selection rule. Modules beyond the cap remain editable in the YAML but are not collected. Missing coordinates are recorded in SQLite. External projects and excluded coordinates cannot contribute exposure or bridge dependency paths. Projects whose latest release has no selected coordinates are reported as gaps, without substituting an older release.
 
 The seed contains at most 100 distinct projects, with at most ten allocated to any main Awesome Scala section. Selection cycles through main sections in overview order; each section interleaves its child-category candidates by source rank, skipping repositories already selected. Child categories do not receive independent final quotas. The current file was revised offline from previously captured candidates and overview HTML; its provenance retains the source snapshot date. Ordinary rebuilds keep the selected projects and modules fixed.
 

@@ -1,3 +1,10 @@
+# Current pilot scope (supersedes broader discovery tasks below)
+
+- [x] Closed seed universe: only selected seed coordinates may be roots, intermediates or targets; only seed projects contribute exposed Value. No Maven-wide reverse discovery. Retain the three-hop limit and exact intermediate versions.
+- [x] JVM Scala 2.13 only. Hard cap of 20 expanded coordinates per project, lexicographic order before publication checks, no backfill. Current offline plan: 100 projects, 803 candidate coordinates.
+- [x] Label seed-only exposure and the artifact cap in the generated preview; document limitations and test collection boundaries offline.
+- [ ] Data fetching remains stopped until requested. No refreshed real-data report has been generated for this scope.
+
 # Requested changes
 
 Implementation authorized on 2026-09-07: complete the tasks below, starting with the project foundation.

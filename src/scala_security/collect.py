@@ -302,7 +302,9 @@ class Collector:
         return project, selected, packages
 
     def roots(self) -> list[str]:
-        projects = [r[0] for r in self.db.execute("SELECT id FROM projects ORDER BY id")]
+        projects = [
+            r[0] for r in self.db.execute("SELECT id FROM projects WHERE seed=1 ORDER BY id")
+        ]
         roots: list[str] = []
         for start in range(0, len(projects), 120):
             for project, latest, packages in parallel(self.release, projects[start : start + 120]):
@@ -394,7 +396,7 @@ class Collector:
                             string(dep.get("package_name")),
                             string(dep.get("requirements")),
                         )
-                        if not name or ":" not in name:
+                        if not name or ":" not in name or name not in relevant:
                             continue
                         self.package({"name": name})
                         target = name + "@" + requirement
@@ -491,15 +493,15 @@ class Collector:
             "INSERT OR REPLACE INTO metadata VALUES(?,?)",
             ("target_matrix", json.dumps(self.config.matrix)),
         )
+        self.db.execute("INSERT OR REPLACE INTO metadata VALUES('universe','seed')")
+        self.db.execute("INSERT OR REPLACE INTO metadata VALUES('max_artifacts_per_project','20')")
         start = time.monotonic()
         targets: list[str] = []
         for seed in seeds:
             targets.extend(self.seed(seed))
         print(f"{len(seeds)} seed projects, {len(targets)} target artifacts", flush=True)
         self.reconcile_ownership()
-        phase_start = time.monotonic()
-        relevant = self.discover(targets)
-        self.timing("reverse_discovery_seconds", phase_start)
+        relevant = set(targets)
         phase_start = time.monotonic()
         roots = self.roots()
         self.timing("release_resolution_seconds", phase_start)
