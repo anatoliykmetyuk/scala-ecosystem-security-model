@@ -56,6 +56,20 @@ def test_report_interactions_and_math(tmp_path: Path) -> None:
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(report.as_uri())
         assert page.locator("math").count() >= 9
+        panels = page.locator("details.calculation")
+        assert panels.count() == 3
+        for panel, symbol in zip(panels.all(), ("R", "S", "V")):
+            assert panel.get_attribute("open") is None
+            assert not panel.locator("math").first.is_visible()
+            panel.locator("summary").click()
+            assert panel.locator("math").first.is_visible()
+            assert symbol in panel.locator(".symbols").inner_text()
+            assert panel.evaluate(
+                "el => Boolean(el.querySelector('.symbols').compareDocumentPosition(el.querySelector('math')) & Node.DOCUMENT_POSITION_FOLLOWING)"
+            )
+            panel.locator("summary").click()
+            assert not panel.locator("math").first.is_visible()
+
         assert "0.20" in page.locator(".metrics").inner_text()
         assert "0.50" in page.locator(".metrics").inner_text()
         assert page.locator("math").filter(has_text="0.3333").count() >= 1

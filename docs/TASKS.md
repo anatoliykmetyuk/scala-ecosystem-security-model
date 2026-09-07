@@ -33,7 +33,7 @@ Implementation, collection and real-report verification are complete. See [PILOT
 - [x] Provide `scripts/rebuild.sh` to collect, analyze, validate and generate a standalone preview; document the from-scratch workflow and explicit cache reuse in README.
 - [x] Provide the offline `scala-security plan` command without constructing an HTTP client. Report uncapped candidates separately from the selected-entry upper bound.
 - [x] Implement the two-column preview, prominent repository links opening new tabs, and secondary raw-evidence links.
-- [x] Explain Maintenance and Security inputs separately, with rendered mathematical formulas, substituted values, coverage and unknown-score explanations.
+- [x] Explain Maintenance and Security inputs separately, with rendered mathematical formulas, substituted values, coverage and unknown-score explanations. Define symbols before use and keep Maintenance, Security and Exposed Value calculations in collapsed disclosure panels.
 - [x] Display dependants ranked by provisional Value with star inputs and expandable/collapsible exact-version dependency paths.
 - [x] Remove scope and weight switches. Display seed-only exposure, the artifact cap and the three-hop limit.
 - [x] Test offline report generation, browser interactions, formulas and responsive light/dark layouts using fixtures.
