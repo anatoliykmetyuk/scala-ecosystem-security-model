@@ -104,8 +104,8 @@ def parse_config(raw: object) -> SeedConfig:
         raise ValueError("A nonempty seed-wide matrix is required")
     expand(["validation:module"], matrix)
     projects = rows(data.get("projects"))
-    if not projects or len(projects) > 100:
-        raise ValueError("Seeds must contain between 1 and 100 projects")
+    if not projects or len(projects) > 380:
+        raise ValueError("Seeds must contain between 1 and 380 projects")
     raw_projects = data.get("projects")
     if not isinstance(raw_projects, list) or len(projects) != len(raw_projects):
         raise ValueError("Every project must be a mapping")
@@ -125,12 +125,20 @@ def parse_config(raw: object) -> SeedConfig:
         if not project.get("modules") or not expand(project["modules"], matrix):
             raise ValueError(f"No modules configured for {repo}")
         if not isinstance(project.get("categories"), list) or not project["categories"]:
-            raise ValueError(f"Main-section categories required for {repo}")
-        section = project.get("selected_from")
-        if isinstance(section, str):
+            raise ValueError(f"Subsection categories required for {repo}")
+        selected = project.get("selected_from", project["categories"])
+        if (
+            not isinstance(selected, list)
+            or not selected
+            or len(set(map(str, selected))) != len(selected)
+        ):
+            raise ValueError("selected_from must list unique subsections")
+        for section in selected:
+            if not isinstance(section, str):
+                raise ValueError("Subsections must be strings")
             allocations[section] = allocations.get(section, 0) + 1
-            if allocations[section] > 10:
-                raise ValueError(f"More than ten projects allocated to main section: {section}")
+            if allocations[section] > 5:
+                raise ValueError(f"More than five projects selected from subsection: {section}")
         modules = module_names(project)
         if len(set(modules)) != len(modules):
             raise ValueError(f"Duplicate modules for {repo}")

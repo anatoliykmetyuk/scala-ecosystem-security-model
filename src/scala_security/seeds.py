@@ -52,60 +52,38 @@ def main_sections(html: str) -> dict[str, list[str]]:
 
 
 def choose_projects(
-    candidates: list[dict[str, JSON]], sections: dict[str, list[str]], limit: int = 100
+    candidates: list[dict[str, JSON]], sections: dict[str, list[str]]
 ) -> list[dict[str, JSON]]:
-    """Round-robin sections, then source-ranked child categories, with explicit caps."""
-    if not 1 <= limit <= 100:
-        raise ValueError("Project limit must be between 1 and 100")
-    candidates = [p for p in candidates if not excluded_repository(string(p["repository"]))]
-    queues: dict[str, list[dict[str, JSON]]] = {}
-    for section, children in sections.items():
-        child_queues = []
-        for child in children:
-            ranked = []
-            for project in candidates:
-                ranks = [
-                    int(str(s["rank"]))
-                    for s in rows(project.get("selection"))
-                    if s.get("category") == child
-                ]
-                if ranks:
-                    ranked.append((min(ranks), string(project["repository"]), project))
-            child_queues.append([p for _, _, p in sorted(ranked, key=lambda r: (r[0], r[1]))])
-        queues[section] = [
-            q[i]
-            for i in range(max(map(len, child_queues), default=0))
-            for q in child_queues
-            if i < len(q)
-        ]
-    chosen: list[dict[str, JSON]] = []
-    seen: set[str] = set()
-    quotas = dict.fromkeys(sections, 0)
-    while len(chosen) < limit:
-        progress = False
-        for section, queue in queues.items():
-            if quotas[section] >= 10:
-                continue
-            while queue and string(queue[0]["repository"]) in seen:
-                queue.pop(0)
-            if not queue:
-                continue
-            project = dict(queue.pop(0))
+    """Take the first five eligible repositories independently in each subsection."""
+    chosen: dict[str, dict[str, JSON]] = {}
+    for child in dict.fromkeys(c for children in sections.values() for c in children):
+        ranked = []
+        for project in candidates:
             repo = string(project["repository"])
-            seen.add(repo)
-            children = {string(s.get("category")) for s in rows(project.get("selection"))}
-            project["categories"] = [
-                name for name, subs in sections.items() if children.intersection(subs)
+            if excluded_repository(repo):
+                continue
+            ranks = [
+                int(str(s["rank"]))
+                for s in rows(project.get("selection"))
+                if s.get("category") == child
             ]
-            project["selected_from"] = section
-            chosen.append(project)
-            quotas[section] += 1
-            progress = True
-            if len(chosen) == limit:
+            if ranks:
+                ranked.append((min(ranks), repo, project))
+        seen: set[str] = set()
+        for _, repo, project in sorted(ranked, key=lambda r: (r[0], r[1])):
+            if repo in seen:
+                continue
+            seen.add(repo)
+            if repo not in chosen:
+                chosen[repo] = dict(project, categories=[], selected_from=[])
+            categories = chosen[repo]["categories"]
+            selected = chosen[repo]["selected_from"]
+            assert isinstance(categories, list) and isinstance(selected, list)
+            categories.append(child)
+            selected.append(child)
+            if len(seen) == 5:
                 break
-        if not progress:
-            break
-    return chosen
+    return list(chosen.values())
 
 
 def seed_document(
@@ -123,9 +101,9 @@ def seed_document(
         "source": INDEX + "/awesome",
         "matrix": matrix,
         "selection_policy": {
-            "max_projects": 100,
-            "max_per_main_section": 10,
-            "rule": "Round-robin main sections in overview order; within each section, interleave child-category lists in overview order by source rank; skip duplicate repositories; stop at 100 projects or exhaustion. Candidate pool is up to 10 eligible entries per child category.",
+            "max_projects": 5 * len({c for children in sections.values() for c in children}),
+            "max_per_subsection": 5,
+            "rule": "First five eligible projects per subsection in captured source order, then deduplicate repositories across subsections. A shared project occupies a slot in each selecting subsection; no backfill after deduplication.",
             "sections": [{"name": name, "subcategories": subs} for name, subs in sections.items()],
         },
         "projects": projects,
@@ -147,7 +125,7 @@ def select(fetch: Fetcher, destination: Path) -> None:
     for category in categories:
         count, page = 0, 1
         seen: set[str] = set()
-        while count < 10:
+        while count < 5:
             url = f"{INDEX}/awesome/{category}?page={page}"
             text = fetch.text(url)
             if not text:
@@ -211,7 +189,7 @@ def select(fetch: Fetcher, destination: Path) -> None:
                 assert isinstance(cats, list) and isinstance(selections, list)
                 cats.append(category)
                 selections.append({"category": category, "rank": rank, "source": url})
-                if count == 10:
+                if count == 5:
                     break
             page += 1
         print(f"Seeds: {category}: {count} eligible; {len(projects)} unique projects", flush=True)

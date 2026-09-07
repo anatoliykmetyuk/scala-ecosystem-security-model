@@ -366,7 +366,7 @@ def test_seed_selection_uses_all_variants_and_filters_java(tmp_path):
     config = yaml.safe_load((tmp_path / "seeds.yaml").read_text())
     assert [p["repository"] for p in config["projects"]] == ["scala/good"]
     assert config["projects"][0]["modules"] == ["g:good"]
-    assert config["projects"][0]["categories"] == ["Quality"]
+    assert config["projects"][0]["categories"] == ["testing"]
     assert config["matrix"] == DEFAULT_MATRIX
     assert config["exclusions"][0]["project"] == "java/only"
 

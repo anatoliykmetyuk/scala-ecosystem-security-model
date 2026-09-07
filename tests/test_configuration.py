@@ -76,8 +76,8 @@ def test_excluded_projects_cannot_reenter(repo):
 
 def test_invalid_schema_and_project_limits():
     d = document()
-    d["projects"] *= 101
-    with pytest.raises(ValueError, match="100"):
+    d["projects"] *= 381
+    with pytest.raises(ValueError, match="380"):
         parse_config(d)
     d = document()
     d["projects"] *= 2
@@ -154,9 +154,12 @@ def test_selection_uses_main_sections_and_caps_projects():
     ]
     candidates += [{"repository": "zio/zio", "selection": [{"category": "child-0", "rank": 0}]}]
     chosen = choose_projects(candidates, groups)
-    assert len(chosen) == 100 and len({p["repository"] for p in chosen}) == 100
-    assert len({p["selected_from"] for p in chosen}) == 14
-    assert all(sum(p["selected_from"] == g for p in chosen) <= 10 for g in groups)
+    assert len(chosen) == 70 and len({p["repository"] for p in chosen}) == 70
+    selections = [p["selected_from"] for p in chosen]
+    assert all(isinstance(c, list) for c in selections)
+    selected_lists = [c for c in selections if isinstance(c, list)]
+    assert len({str(c) for selected in selected_lists for c in selected}) == 14
+    assert all(sum(f"child-{i}" in selected for selected in selected_lists) == 5 for i in range(14))
     assert not any(excluded_repository(string(p["repository"])) for p in chosen)
     assert chosen == choose_projects(candidates, groups)
 
@@ -168,7 +171,7 @@ def test_committed_seeds_and_offline_plan(monkeypatch, capsys):
     path = Path(__file__).resolve().parents[1] / "config/seeds.yaml"
     raw = yaml.safe_load(path.read_text())
     config = parse_config(raw)
-    assert len(config.projects) == 100
+    assert len(config.projects) == 279
     assert config.matrix == DEFAULT_MATRIX
     assert not any(
         "artifacts" in p or excluded_repository(string(p["repository"])) for p in config.projects
@@ -182,7 +185,7 @@ def test_committed_seeds_and_offline_plan(monkeypatch, capsys):
     monkeypatch.setattr(cli, "Fetcher", forbidden)
     monkeypatch.setattr("sys.argv", ["scala-security", "plan", "--seeds", str(path)])
     main()
-    assert '"projects": 100' in capsys.readouterr().out
+    assert '"projects": 279' in capsys.readouterr().out
 
 
 def test_coordinate_cap_is_deterministic():
@@ -238,3 +241,26 @@ def test_forward_never_fetches_external_coordinates(tmp_path):
     collector.forward(["g:a_2.13@1"], {"g:a_2.13"})
     assert len(requests) == 2
     assert db.execute("SELECT count(*) FROM edges").fetchone()[0] == 0
+
+
+def test_subsections_deduplicate_without_backfill():
+    candidates: list[dict[str, JSON]] = [
+        {
+            "repository": f"scala/p{i}",
+            "selection": [{"category": c, "rank": i + 1} for c in ("a", "b")],
+        }
+        for i in range(8)
+    ]
+    chosen = choose_projects(candidates, {"Main": ["a", "b"]})
+    assert len(chosen) == 5
+    assert all(p["selected_from"] == ["a", "b"] for p in chosen)
+    assert [p["repository"] for p in chosen] == [f"scala/p{i}" for i in range(5)]
+
+
+def test_reject_overfull_subsection():
+    d = document()
+    d["projects"] = [
+        {"repository": f"scala/p{i}", "categories": ["a"], "modules": [f"g:p{i}"]} for i in range(6)
+    ]
+    with pytest.raises(ValueError, match="five"):
+        parse_config(d)

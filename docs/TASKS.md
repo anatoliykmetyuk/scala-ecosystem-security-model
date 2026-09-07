@@ -2,8 +2,9 @@
 
 Maintain [CONSTRAINTS.md](CONSTRAINTS.md) in the same change as any selection, collection or traversal constraint adjustment. It records both enforced limits and unset caps.
 
+- [x] Select up to five eligible projects per subsection (76 captured subsections), then deduplicate without backfill. Replaces main-section quotas and the 100-project cap; new ceiling 380. Reselected offline from saved evidence.
 - [x] Closed seed universe: only selected seed coordinates may be roots, intermediates or targets; only seed projects contribute exposed Value. No Maven-wide reverse discovery. Retain the three-hop limit and exact intermediate versions.
-- [x] JVM Scala 2.13 only. Hard cap of 20 expanded coordinates per project, lexicographic order before publication checks, no backfill. Current offline plan: 100 projects, 803 candidate coordinates.
+- [x] JVM Scala 2.13 only. Hard cap of 20 expanded coordinates per project, lexicographic order before publication checks, no backfill. Current offline plan: 279 projects, 1,773 candidate coordinates.
 - [x] Label seed-only exposure and the artifact cap in the generated preview; document limitations and test collection boundaries offline.
 - [ ] Data fetching remains stopped until requested. No refreshed real-data report has been generated for this scope.
 
