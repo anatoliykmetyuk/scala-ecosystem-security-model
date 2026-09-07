@@ -73,6 +73,11 @@ def test_report_interactions_and_math(tmp_path: Path) -> None:
         assert "0.20" in page.locator(".metrics").inner_text()
         assert "0.50" in page.locator(".metrics").inner_text()
         assert page.locator("math").filter(has_text="0.3333").count() >= 1
+        for slug in ("metric-contributors", "metric-contributor-absence-factor"):
+            source = page.locator(f'.symbols a[href="https://www.chaoss.community/kb/{slug}/"]')
+            assert source.count() == 1
+            assert source.get_attribute("target") == "_blank"
+        assert "not prescribed by CHAOSS" in (panels.first.text_content() or "")
         assert page.locator("select").count() == 0
         assert "jvm · Scala 2.13, 3" in page.locator("#matrix").inner_text()
         assert "Maximum 3 dependency hops" in page.locator("header").inner_text()

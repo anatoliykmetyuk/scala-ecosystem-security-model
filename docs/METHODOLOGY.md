@@ -73,3 +73,9 @@ Raw API commit responses may contain public author identities; the report displa
 ## Validation
 
 The validation command runs Ruff, ty and deterministic offline tests, including mocked collection through SQLite analysis and HTML generation. Regression cases cover version consistency, historical reverse discovery, three hops, source categories/eligibility, caches/pagination, POM interpretation, score coverage, Java consumers and browser interactions. Database checks verify foreign keys, score bounds, exposure sums, root release identity and every retained path's continuity, scope and depth. Tests establish implementation properties, not empirical validation of the provisional health model.
+
+## Metric attribution
+
+CHAOSS [Contributors](https://www.chaoss.community/kb/metric-contributors/) informs the human-author input, restricted here to apparent commit-author records rather than all contribution types. The absence-factor input follows [CHAOSS Contributor Absence Factor](https://www.chaoss.community/kb/metric-contributor-absence-factor/), applied to observed human commits. Push recency, normalization thresholds, component weights and the aggregate Maintenance score are pilot-defined, not official CHAOSS scores.
+
+Security inputs come from [OpenSSF Scorecard checks](https://github.com/ossf/scorecard/blob/main/docs/checks.md). This pilot defines its own weighted aggregate. Provisional Value and Exposed Value are also pilot-defined. Calculation panels link the external concepts directly and label these adaptations.
