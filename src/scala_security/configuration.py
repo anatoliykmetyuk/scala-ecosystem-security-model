@@ -16,6 +16,9 @@ def excluded_repository(repo: str) -> bool:
     return repo.lower() in EXCLUDED_REPOSITORIES or bool(ZIO_REPOSITORY.search(repo))
 
 
+ARTIFACT_CAP = 10
+ARTIFACT_SELECTION = "Published matrix coordinates ranked by dependent_packages_count descending; unknown counts last; coordinate-name ties; top 10."
+
 DEFAULT_MATRIX: dict[str, JSON] = {"jvm": {"scala": ["2.13"]}}
 
 
@@ -29,7 +32,7 @@ class SeedConfig:
         return sum(len(module_names(project)) for project in self.projects)
 
     def coordinates(self, project: dict[str, JSON]) -> list[str]:
-        return expand(project["modules"], self.matrix)[:20]
+        return expand(project["modules"], self.matrix)
 
 
 def module_names(project: dict[str, JSON]) -> list[str]:
@@ -97,8 +100,8 @@ def parse_config(raw: object) -> SeedConfig:
         raise ValueError("Expected seed schema 2 with a shared matrix and unsuffixed modules")
     if data.get("universe", "seed") != "seed":
         raise ValueError("Only the closed seed universe is supported")
-    if data.get("max_artifacts_per_project", 20) != 20:
-        raise ValueError("The pilot requires at most 20 artifacts per project")
+    if data.get("max_artifacts_per_project", ARTIFACT_CAP) != ARTIFACT_CAP:
+        raise ValueError("The pilot requires at most 10 artifacts per project")
     matrix = obj(data.get("matrix"))
     if not matrix:
         raise ValueError("A nonempty seed-wide matrix is required")

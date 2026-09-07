@@ -1,8 +1,8 @@
 schema: 2
 universe: seed
-max_artifacts_per_project: 20
-artifact_selection: First 20 expanded coordinates in lexicographic order before availability
-  checks; no backfill.
+max_artifacts_per_project: 10
+artifact_selection: Published matrix coordinates ranked by dependent_packages_count
+  descending; unknown counts last; coordinate-name ties; top 10.
 selected_at: '2026-09-07T13:13:37.255635+00:00'
 source: https://index.scala-lang.org/awesome
 matrix:

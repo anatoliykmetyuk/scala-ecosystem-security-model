@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from urllib.parse import quote
 from xml.etree import ElementTree as ET
 
-from .configuration import SeedConfig
+from .configuration import ARTIFACT_CAP, ARTIFACT_SELECTION, SeedConfig
 from .data import JSON, number, obj, repo_name, rows, string
 from .http import Fetcher, parallel, query, stream
 from .seeds import INDEX, coordinates
@@ -216,6 +216,54 @@ class Collector:
                 "INSERT OR REPLACE INTO coordinate_checks VALUES(?,?,?)",
                 (project, name, int(name in published)),
             )
+        counts: dict[str, int] = {}
+        ranking_url = query(
+            BASE + "/packages/lookup",
+            repository_url="https://github.com/" + project,
+            sort="dependent_packages_count",
+            order="desc",
+        )
+        if len(artifacts) > ARTIFACT_CAP:
+            for record in self.fetch.pages(ranking_url):
+                name = string(record.get("name"))
+                raw = record.get("dependent_packages_count")
+                if obj(record.get("registry")).get("name") != "repo1.maven.org":
+                    continue
+                if (
+                    name in artifacts
+                    and isinstance(raw, int)
+                    and not isinstance(raw, bool)
+                    and raw >= 0
+                ):
+                    counts[name] = max(counts.get(name, 0), raw)
+            missing = set(artifacts) - counts.keys()
+            if missing:
+                self.gap(
+                    "artifact_selection",
+                    project,
+                    f"{len(missing)} candidate counts unknown; sorted after known counts",
+                )
+        ranked = sorted(
+            artifacts, key=lambda name: (name not in counts, -counts.get(name, 0), name)
+        )
+        self.db.executemany(
+            "INSERT OR REPLACE INTO artifact_selection VALUES(?,?,?,?,?,?,?)",
+            [
+                (
+                    project,
+                    name,
+                    counts.get(name),
+                    int(i < ARTIFACT_CAP),
+                    i + 1,
+                    ranking_url if len(artifacts) > ARTIFACT_CAP else None,
+                    ARTIFACT_SELECTION
+                    if len(artifacts) > ARTIFACT_CAP
+                    else "All published candidates fit; ranking metadata not requested",
+                )
+                for i, name in enumerate(ranked)
+            ],
+        )
+        artifacts = ranked[:ARTIFACT_CAP]
         for name in artifacts:
             self.claims.setdefault(name, set()).add(project)
             self.package({"name": name}, project)
@@ -494,7 +542,14 @@ class Collector:
             ("target_matrix", json.dumps(self.config.matrix)),
         )
         self.db.execute("INSERT OR REPLACE INTO metadata VALUES('universe','seed')")
-        self.db.execute("INSERT OR REPLACE INTO metadata VALUES('max_artifacts_per_project','20')")
+        self.db.execute(
+            "INSERT OR REPLACE INTO metadata VALUES(?,?)",
+            ("max_artifacts_per_project", str(ARTIFACT_CAP)),
+        )
+        self.db.execute(
+            "INSERT OR REPLACE INTO metadata VALUES(?,?)",
+            ("artifact_selection", ARTIFACT_SELECTION),
+        )
         start = time.monotonic()
         targets: list[str] = []
         for seed in seeds:

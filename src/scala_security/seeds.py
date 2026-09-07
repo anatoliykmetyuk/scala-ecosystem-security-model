@@ -9,7 +9,14 @@ from pathlib import Path
 import yaml
 from bs4 import BeautifulSoup
 
-from .configuration import DEFAULT_MATRIX, excluded_repository, modules_for, parse_config
+from .configuration import (
+    ARTIFACT_CAP,
+    ARTIFACT_SELECTION,
+    DEFAULT_MATRIX,
+    excluded_repository,
+    modules_for,
+    parse_config,
+)
 from .data import JSON, obj, rows, string
 from .http import Fetcher, parallel
 
@@ -95,8 +102,8 @@ def seed_document(
     return {
         "schema": 2,
         "universe": "seed",
-        "max_artifacts_per_project": 20,
-        "artifact_selection": "First 20 expanded coordinates in lexicographic order before availability checks; no backfill.",
+        "max_artifacts_per_project": ARTIFACT_CAP,
+        "artifact_selection": ARTIFACT_SELECTION,
         "selected_at": selected_at,
         "source": INDEX + "/awesome",
         "matrix": matrix,

@@ -54,12 +54,15 @@ def main() -> None:
                         "projects": len(config.projects),
                         "modules": config.module_count,
                         "universe": "seed",
-                        "max_artifacts_per_project": 20,
+                        "max_artifacts_per_project": 10,
                         "matrix": config.matrix,
+                        "selected_coordinate_upper_bound": sum(
+                            min(10, len(config.coordinates(p))) for p in config.projects
+                        ),
                         "candidate_coordinates": len(
                             {a for p in config.projects for a in config.coordinates(p)}
                         ),
-                        "note": "Offline expansion only; published-coordinate availability is checked during collection.",
+                        "note": "Uncapped offline candidates; final top 10 selection requires publication checks and dependent-package counts during collection.",
                     },
                     indent=2,
                 )

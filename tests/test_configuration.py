@@ -188,11 +188,11 @@ def test_committed_seeds_and_offline_plan(monkeypatch, capsys):
     assert '"projects": 279' in capsys.readouterr().out
 
 
-def test_coordinate_cap_is_deterministic():
+def test_offline_coordinates_remain_uncapped_for_metadata_ranking():
     d = document()
     d["projects"][0]["modules"] = [f"g:module{i:02}" for i in reversed(range(35))]
     config = parse_config(d)
-    assert config.coordinates(config.projects[0]) == [f"g:module{i:02}_2.13" for i in range(20)]
+    assert config.coordinates(config.projects[0]) == [f"g:module{i:02}_2.13" for i in range(35)]
 
 
 def test_closed_universe_excludes_external_consumers_and_intermediates(tmp_path):
@@ -263,4 +263,67 @@ def test_reject_overfull_subsection():
         {"repository": f"scala/p{i}", "categories": ["a"], "modules": [f"g:p{i}"]} for i in range(6)
     ]
     with pytest.raises(ValueError, match="five"):
+        parse_config(d)
+
+
+@pytest.mark.parametrize("missing_metadata", [False, True])
+def test_artifact_selection_ranks_published_candidates_across_pages(tmp_path, missing_metadata):
+    d = document()
+    d["projects"][0]["modules"] = [f"g:m{i:02}" for i in range(25)]
+    config = parse_config(d)
+    requested = []
+
+    def handler(request):
+        requested.append(str(request.url))
+        if request.url.path.endswith("/artifacts"):
+            return httpx.Response(
+                200, json=[{"groupId": "g", "artifactId": f"m{i:02}_2.13"} for i in range(24)]
+            )
+        assert request.url.path.endswith("/packages/lookup")
+        if missing_metadata:
+            return httpx.Response(404)
+        page = int(request.url.params["page"])
+        records = [
+            {
+                "name": f"g:m{i:02}_2.13",
+                "dependent_packages_count": i,
+                "registry": {"name": "repo1.maven.org"},
+            }
+            for i in range(23)
+        ]
+        # An excluded coordinate cannot win, even with the highest count.
+        records.append(
+            {
+                "name": "g:m24_2.13",
+                "dependent_packages_count": 9999,
+                "registry": {"name": "repo1.maven.org"},
+            }
+        )
+        return httpx.Response(
+            200, json=records[:12] if page == 1 else records[12:] if page == 2 else []
+        )
+
+    db = connect(tmp_path / "db.sqlite")
+    collector = Collector(db, Fetcher(tmp_path / "evidence", httpx.MockTransport(handler)), config)
+    selected = collector.seed(config.projects[0])
+    assert selected == (
+        [f"g:m{i:02}_2.13" for i in range(10)]
+        if missing_metadata
+        else [f"g:m{i:02}_2.13" for i in range(22, 12, -1)]
+    )
+    assert db.execute("SELECT count(*) FROM target_artifacts").fetchone()[0] == 10
+    assert db.execute("SELECT count(*) FROM artifact_selection").fetchone()[0] == 24
+    assert (
+        db.execute(
+            "SELECT dependent_packages_count FROM artifact_selection WHERE artifact='g:m23_2.13'"
+        ).fetchone()[0]
+        is None
+    )
+    assert not any("dependent_packages?" in url or "/versions/" in url for url in requested)
+
+
+def test_reject_old_artifact_cap():
+    d = document()
+    d["max_artifacts_per_project"] = 20
+    with pytest.raises(ValueError, match="10 artifacts"):
         parse_config(d)

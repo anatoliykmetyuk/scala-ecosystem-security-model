@@ -50,6 +50,9 @@ def connect(path: Path) -> sqlite3.Connection:
     CREATE INDEX IF NOT EXISTS artifacts_project ON artifacts(project);
     CREATE TABLE IF NOT EXISTS target_artifacts(artifact TEXT PRIMARY KEY REFERENCES artifacts(id));
     CREATE TABLE IF NOT EXISTS coordinate_checks(project TEXT REFERENCES projects(id), artifact TEXT, published INTEGER NOT NULL, PRIMARY KEY(project,artifact));
+    CREATE TABLE IF NOT EXISTS artifact_selection(project TEXT REFERENCES projects(id), artifact TEXT,
+      dependent_packages_count INTEGER, selected INTEGER NOT NULL, rank INTEGER NOT NULL,
+      source TEXT, reason TEXT NOT NULL, PRIMARY KEY(project,artifact));
     CREATE TABLE IF NOT EXISTS versions(id TEXT PRIMARY KEY, artifact TEXT NOT NULL REFERENCES artifacts(id),
       number TEXT NOT NULL, fetched INTEGER NOT NULL DEFAULT 0);
     CREATE TABLE IF NOT EXISTS edges(id INTEGER PRIMARY KEY, source TEXT REFERENCES versions(id),
