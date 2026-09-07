@@ -44,7 +44,7 @@ def connect(path: Path) -> sqlite3.Connection:
     db.executescript("""
     CREATE TABLE IF NOT EXISTS metadata(key TEXT PRIMARY KEY, value TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS projects(id TEXT PRIMARY KEY, stars INTEGER, seed INTEGER NOT NULL DEFAULT 0,
-      categories TEXT NOT NULL DEFAULT '[]', latest TEXT, source TEXT);
+      categories TEXT NOT NULL DEFAULT '[]', latest TEXT, source TEXT, stars_observed TEXT);
     CREATE TABLE IF NOT EXISTS artifacts(id TEXT PRIMARY KEY, project TEXT REFERENCES projects(id),
       latest TEXT, published TEXT, source TEXT);
     CREATE INDEX IF NOT EXISTS artifacts_project ON artifacts(project);
@@ -70,4 +70,5 @@ def connect(path: Path) -> sqlite3.Connection:
       exposure REAL NOT NULL, dependants INTEGER NOT NULL, unvalued INTEGER NOT NULL, candidate INTEGER NOT NULL);
     CREATE TABLE IF NOT EXISTS requests(url TEXT PRIMARY KEY, cache_path TEXT, status INTEGER, retrieved_at TEXT);
     """)
+    db.execute("INSERT OR IGNORE INTO metadata VALUES('schema_version','1')")
     return db

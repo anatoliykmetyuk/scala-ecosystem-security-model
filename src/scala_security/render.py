@@ -19,6 +19,10 @@ def render(db: sqlite3.Connection, destination: Path) -> None:
     edges = db.execute(
         "SELECT * FROM edges WHERE id IN (SELECT edge FROM path_steps) ORDER BY id"
     ).fetchall()
+    versions = sorted({e[side] for e in edges for side in ("source", "target")})
+    version_ids = {v: i for i, v in enumerate(versions)}
+    evidence_urls = sorted({e["evidence"] for e in edges if e["evidence"]})
+    evidence_ids = {v: i for i, v in enumerate(evidence_urls)}
     edge_ids = {e["id"]: i for i, e in enumerate(edges)}
     targets: list[dict[str, JSON]] = []
     for (
@@ -62,7 +66,17 @@ def render(db: sqlite3.Connection, destination: Path) -> None:
     gaps = db.execute("SELECT count(*) FROM gaps").fetchone()[0]
     model = {
         "projects": [list(p) for p in people],
-        "edges": [[e["source"], e["target"], e["scope"], e["evidence"]] for e in edges],
+        "edges": [
+            [
+                version_ids[e["source"]],
+                version_ids[e["target"]],
+                e["scope"],
+                evidence_ids.get(e["evidence"]),
+            ]
+            for e in edges
+        ],
+        "versions": versions,
+        "evidence_urls": evidence_urls,
         "targets": targets,
         "metadata": metadata,
         "gaps": gaps,

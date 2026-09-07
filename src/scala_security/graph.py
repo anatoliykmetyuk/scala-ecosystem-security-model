@@ -35,7 +35,7 @@ def paths(db: sqlite3.Connection, roots: list[str], max_hops: int = 3) -> dict[s
             continue
         for row in db.execute(
             """SELECT e.*, a.project FROM edges e JOIN versions v ON v.id=e.target
-                                 JOIN artifacts a ON a.id=v.artifact WHERE e.source=? ORDER BY e.id""",
+                                 JOIN artifacts a ON a.id=v.artifact WHERE e.source=? ORDER BY e.target,e.scope,e.id""",
             (source,),
         ):
             edge = Edge(

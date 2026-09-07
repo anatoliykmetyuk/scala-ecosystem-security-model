@@ -9,8 +9,10 @@ import shutil
 import subprocess
 import threading
 import time
-from collections.abc import Callable, Iterable
-from concurrent.futures import ThreadPoolExecutor
+import uuid
+import zlib
+from collections.abc import Callable, Iterable, Iterator
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import TypeVar
@@ -27,6 +29,20 @@ U = TypeVar("U")
 def parallel(fn: Callable[[T], U], items: Iterable[T], workers: int = 24) -> list[U]:
     with ThreadPoolExecutor(max_workers=workers) as pool:
         return list(pool.map(fn, items))
+
+
+def stream(fn: Callable[[T], U], items: Iterable[T], workers: int = 24) -> Iterator[U]:
+    """Keep a bounded work queue full without waiting for the slowest batch member."""
+    iterator = iter(items)
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        pending = {pool.submit(fn, item) for _, item in zip(range(workers), iterator)}
+        while pending:
+            done, pending = wait(pending, return_when=FIRST_COMPLETED)
+            for future in done:
+                yield future.result()
+                item = next(iterator, None)
+                if item is not None:
+                    pending.add(pool.submit(fn, item))
 
 
 def query(url: str, **params: object) -> str:
@@ -48,7 +64,7 @@ class Fetcher:
         )
         token = (
             subprocess.run(["gh", "auth", "token"], capture_output=True, text=True).stdout.strip()
-            if shutil.which("gh")
+            if transport is None and shutil.which("gh")
             else ""
         )
         self.github_token = token
@@ -67,7 +83,7 @@ class Fetcher:
                 try:
                     with gzip.open(path, "rt") as f:
                         return obj(json.load(f))
-                except (OSError, ValueError, EOFError):
+                except (OSError, ValueError, EOFError, zlib.error):
                     path.rename(path.with_suffix(".corrupt"))
                     self.failures.append((url, "Corrupt cached response preserved and refetched"))
             result: dict[str, JSON] = {
@@ -92,7 +108,7 @@ class Fetcher:
                     time.sleep(min(10, 2**attempt))
                 except httpx.HTTPError as error:
                     result.update(status=0, body="", error=str(error))
-            temporary = path.with_suffix(".tmp")
+            temporary = path.with_suffix(f".{uuid.uuid4().hex}.tmp")
             with gzip.open(temporary, "wt") as f:
                 json.dump(result, f, separators=(",", ":"))
             temporary.replace(path)

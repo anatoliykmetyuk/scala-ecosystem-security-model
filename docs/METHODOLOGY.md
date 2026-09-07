@@ -40,7 +40,7 @@ This does not implement full Maven mediation, dependency exclusions, parent/BOM 
 
 ## Value and exposure
 
-For stars s, provisional Value is `min(1, ln(1+s) / ln(100001))`. Unknown stars remain unknown; observed zero stars yield Value zero. Exposure is the sum of Value across distinct qualifying dependant repositories. It is not the target's own star count. Missing-valued dependants are counted separately, not implicitly scored zero. This is a visibility proxy, not measured revenue or usage.
+For stars s, provisional Value is `min(1, ln(1+s) / ln(100001))`. For consumer star counts, the freshest available package repository metadata is preferred; equal or absent timestamps use the maximum observed count as a deterministic tie-breaker. Seed repository observations can replace that count. Unknown stars remain unknown; observed zero stars yield Value zero. Exposure is the sum of Value across distinct qualifying dependant repositories. It is not the target's own star count. Missing-valued dependants are counted separately, not implicitly scored zero. This is a visibility proxy, not measured revenue or usage.
 
 Only seed projects are health-assessed. A review candidate has at least one observed dependant and an available Maintenance or Security score below 0.50. Candidates are ranked by exposure, with repository name as deterministic tie-breaker. Other seed projects remain inspectable after the candidate ranking. No scope or weighting switches are exposed.
 

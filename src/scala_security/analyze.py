@@ -52,7 +52,7 @@ def analyze(db: sqlite3.Connection) -> None:
             r[0]
             for r in db.execute(
                 """SELECT v.id FROM versions v JOIN artifacts a ON a.id=v.artifact
-          WHERE a.project=? AND v.number=? AND v.fetched=1""",
+          WHERE a.project=? AND v.number=? AND v.fetched=1 ORDER BY v.id""",
                 (project["id"], project["latest"]),
             )
         ]

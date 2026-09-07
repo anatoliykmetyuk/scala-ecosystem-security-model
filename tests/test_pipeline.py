@@ -370,3 +370,47 @@ def test_ambiguous_ownership_reconciled(tmp_path):
         db.execute("SELECT project FROM artifacts WHERE id='g:shared_3'").fetchone()[0]
         == "scala/new"
     )
+
+
+def test_concurrent_collectors_write_cache_atomically(tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+
+    transport = httpx.MockTransport(lambda r: httpx.Response(200, json={"ok": True}))
+    left, right = Fetcher(tmp_path, transport), Fetcher(tmp_path, transport)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        futures = [pool.submit(f.json, "https://example.test/shared") for f in (left, right)]
+        assert all(f.result() == {"ok": True} for f in futures)
+    assert left.json("https://example.test/shared") == {"ok": True}
+    assert not list(tmp_path.glob("*.tmp"))
+
+
+def test_corrupt_cache_recovers(tmp_path):
+    fetch = Fetcher(tmp_path, httpx.MockTransport(lambda r: httpx.Response(200, json={"ok": True})))
+    url = "https://example.test/broken"
+    fetch.path(url).write_bytes(b"partial")
+    assert fetch.json(url) == {"ok": True}
+    assert list(tmp_path.glob("*.corrupt"))
+
+
+def test_star_selection_does_not_depend_on_fetch_completion_order(tmp_path):
+    metadata = [
+        {"stargazers_count": 80, "last_synced_at": "2026-08-01"},
+        {"stargazers_count": 50, "last_synced_at": "2026-09-01"},
+    ]
+    for i, observations in enumerate((metadata, list(reversed(metadata)))):
+        collector = Collector(
+            connect(tmp_path / f"{i}.sqlite"),
+            Fetcher(tmp_path / f"e{i}", httpx.MockTransport(lambda r: httpx.Response(200))),
+        )
+        for j, m in enumerate(observations):
+            collector.package(
+                {
+                    "name": f"g:artifact{j}",
+                    "repository_url": "https://github.com/scala/a",
+                    "repo_metadata": m,
+                }
+            )
+        assert (
+            collector.db.execute("SELECT stars FROM projects WHERE id='scala/a'").fetchone()[0]
+            == 50
+        )

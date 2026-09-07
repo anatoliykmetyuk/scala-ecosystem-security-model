@@ -11,7 +11,7 @@ from urllib.parse import quote
 from xml.etree import ElementTree as ET
 
 from .data import JSON, number, obj, repo_name, rows, string
-from .http import Fetcher, parallel, query
+from .http import Fetcher, parallel, query, stream
 from .seeds import INDEX, coordinates
 
 BASE = "https://packages.ecosyste.ms/api/v1"
@@ -110,7 +110,8 @@ def compact_package(package: dict[str, JSON]) -> dict[str, JSON]:
         if k in package
     }
     result["repo_metadata"] = {
-        "stargazers_count": obj(package.get("repo_metadata")).get("stargazers_count")
+        "stargazers_count": obj(package.get("repo_metadata")).get("stargazers_count"),
+        "last_synced_at": obj(package.get("repo_metadata")).get("last_synced_at"),
     }
     return result
 
@@ -133,9 +134,14 @@ class Collector:
             self.db.execute(
                 "INSERT OR IGNORE INTO projects(id,stars) VALUES(?,?)", (project, stars)
             )
-            self.db.execute(
-                "UPDATE projects SET stars=coalesce(stars,?) WHERE id=?", (stars, project)
-            )
+            observed = string(obj(data.get("repo_metadata")).get("last_synced_at"))
+            if stars is not None:
+                self.db.execute(
+                    """UPDATE projects SET stars=?,stars_observed=?,source=? WHERE id=?
+                    AND (stars_observed IS NULL OR stars_observed<? OR
+                    (stars_observed=? AND (stars IS NULL OR stars<?)))""",
+                    (stars, observed, package_url(name), project, observed, observed, stars),
+                )
         self.db.execute(
             """INSERT INTO artifacts(id,project,latest,published,source) VALUES(?,?,?,?,?)
           ON CONFLICT(id) DO UPDATE SET project=coalesce(artifacts.project,excluded.project),
@@ -200,26 +206,24 @@ class Collector:
             frontier = set()
             # Historical intermediate relationships are necessary when current consumers use older releases.
             latest = "true" if depth == 2 else "false"
-            for start in range(0, len(pending), 120):
-                batch = pending[start : start + 120]
 
-                def reverse(name: str) -> tuple[str, list[dict[str, JSON]]]:
-                    return name, self.fetch.pages(
-                        query(package_url(name) + "/dependent_packages", latest=latest),
-                        compact_package,
-                    )
-
-                for target, dependants in parallel(reverse, batch):
-                    for package in dependants:
-                        name = self.package(package)
-                        if name:
-                            possible.add(name)
-                            frontier.add(name)
-                self.db.commit()
-                print(
-                    f"Reverse hop {depth + 1}: {min(start + 120, len(pending))}/{len(pending)} artifacts; {len(possible)} discovered",
-                    flush=True,
+            def reverse(name: str) -> tuple[str, list[dict[str, JSON]]]:
+                return name, self.fetch.pages(
+                    query(package_url(name) + "/dependent_packages", latest=latest), compact_package
                 )
+
+            for count, (target, dependants) in enumerate(stream(reverse, pending), 1):
+                for package in dependants:
+                    name = self.package(package)
+                    if name:
+                        possible.add(name)
+                        frontier.add(name)
+                if count % 120 == 0 or count == len(pending):
+                    self.db.commit()
+                    print(
+                        f"Reverse hop {depth + 1}: {count}/{len(pending)} artifacts; {len(possible)} discovered",
+                        flush=True,
+                    )
         return visited | possible
 
     def release(self, project: str) -> tuple[str, list[dict[str, JSON]], list[dict[str, JSON]]]:
@@ -299,7 +303,12 @@ class Collector:
         )
         data = self.fetch.json(package_url(name) + "/versions/" + quote(version, safe=""))
         pom = self.fetch.text(pom_url)
-        return key, dependencies(data, pom), pom_url, bool(data or pom)
+        return (
+            key,
+            dependencies(data, pom),
+            pom_url if pom else package_url(name) + "/versions/" + quote(version, safe=""),
+            bool(data or pom),
+        )
 
     def forward(self, roots: list[str], relevant: set[str]) -> None:
         frontier = set(roots)

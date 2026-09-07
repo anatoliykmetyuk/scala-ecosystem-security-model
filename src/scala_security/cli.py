@@ -5,7 +5,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 from datetime import datetime, timezone
+from importlib.metadata import version
 from pathlib import Path
 
 import yaml
@@ -52,6 +54,25 @@ def main() -> None:
             ("seed_sha256", hashlib.sha256(seed_bytes).hexdigest()),
         )
         db.execute("INSERT INTO metadata VALUES(?,?)", ("snapshot_id", stamp))
+        db.execute(
+            "INSERT INTO metadata VALUES(?,?)",
+            ("model_version", version("scala-ecosystem-security-model")),
+        )
+        revision = subprocess.run(
+            ["git", "rev-parse", "HEAD"], capture_output=True, text=True
+        ).stdout.strip()
+        db.execute("INSERT INTO metadata VALUES(?,?)", ("code_revision", revision or "unavailable"))
+        dirty = subprocess.run(
+            ["git", "status", "--porcelain"], capture_output=True, text=True
+        ).stdout.strip()
+        db.execute("INSERT INTO metadata VALUES(?,?)", ("code_dirty", str(bool(dirty)).lower()))
+        source = Path(__file__).parent
+        source_hash = hashlib.sha256()
+        for file in sorted(source.rglob("*")):
+            if file.suffix in (".py", ".html"):
+                source_hash.update(str(file.relative_to(source)).encode())
+                source_hash.update(file.read_bytes())
+        db.execute("INSERT INTO metadata VALUES(?,?)", ("source_sha256", source_hash.hexdigest()))
         fetch = Fetcher(args.reuse_cache or run / "evidence")
         Collector(db, fetch).run(rows(obj(yaml.safe_load(seed_bytes)).get("projects")))
         analyze(db)
