@@ -320,7 +320,6 @@ source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "httpx" },
-    { name = "packaging" },
     { name = "pyyaml" },
 ]
 
@@ -337,7 +336,6 @@ dev = [
 requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.13" },
     { name = "httpx", specifier = ">=0.28" },
-    { name = "packaging", specifier = ">=24" },
     { name = "pyyaml", specifier = ">=6" },
 ]
 

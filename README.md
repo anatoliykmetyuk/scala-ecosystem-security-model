@@ -15,6 +15,8 @@ uv run playwright install chromium
 On Linux, browser tests may require `uv run playwright install --with-deps chromium`.
 Optional: sign into `gh auth login` to use authenticated public GitHub metadata requests during seed selection. Credentials are never stored in evidence or generated output. The normal rebuild uses the already-frozen seed configuration.
 
+Optionally set `ECOSYSTEMS_CONTACT_EMAIL` to an email you authorize sending to ecosyste.ms for its polite request pool. It is sent only to ecosyste.ms hosts and is not stored in evidence.
+
 ## Rebuild from scratch
 
 ```sh
@@ -31,6 +33,7 @@ Each run is retained under `output/runs/<UTC timestamp>/`:
 - `snapshot.sqlite`: normalized collected entities, observations, calculated scores, fallout paths, rankings, gaps and request provenance.
 - `evidence/`: URL-addressed gzip-compressed HTTP responses, unless explicitly reusing another directory.
 - `validation.json`: verified table/path counts.
+- `measurements.json`: phase timings and database, compressed evidence and preview sizes. Cache-backed runs measure replay plus missing requests, not a fresh crawl.
 
 `output/latest-database.txt` points to the database behind the most recently generated preview. A failed rebuild does not overwrite the previous preview.
 

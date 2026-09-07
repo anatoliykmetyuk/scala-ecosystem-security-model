@@ -120,6 +120,7 @@ class Collector:
     def __init__(self, db: sqlite3.Connection, fetch: Fetcher) -> None:
         self.db, self.fetch = db, fetch
         self.claims: dict[str, set[str]] = {}
+        self.unresolved_owners: set[str] = set()
 
     def gap(self, stage: str, subject: str, reason: str) -> None:
         self.db.execute("INSERT OR IGNORE INTO gaps VALUES(?,?,?)", (stage, subject, reason))
@@ -129,6 +130,10 @@ class Collector:
         if not name:
             return ""
         project = project or repo_name(data.get("repository_url"))
+        if name in self.unresolved_owners:
+            project = ""
+        if not project and "repository_url" in data:
+            self.gap("mapping", name, "No supported GitHub repository URL in package metadata")
         if project:
             stars = number(obj(data.get("repo_metadata")).get("stargazers_count"))
             self.db.execute(
@@ -186,6 +191,7 @@ class Collector:
             owner = repo_name(raw.get("repository_url"))
             if owner not in self.claims[name]:
                 owner = ""
+                self.unresolved_owners.add(name)
             self.db.execute("UPDATE artifacts SET project=? WHERE id=?", (owner or None, name))
             self.gap(
                 "ownership",
@@ -411,6 +417,13 @@ class Collector:
                     )
         self.db.commit()
 
+    def timing(self, key: str, start: float) -> None:
+        self.db.execute(
+            "INSERT OR REPLACE INTO metadata VALUES(?,?)",
+            (key, str(time.monotonic() - start)),
+        )
+        self.db.commit()
+
     def run(self, seeds: list[dict[str, JSON]]) -> None:
         start = time.monotonic()
         targets: list[str] = []
@@ -418,10 +431,18 @@ class Collector:
             targets.extend(self.seed(seed))
         print(f"{len(seeds)} seed projects, {len(targets)} target artifacts", flush=True)
         self.reconcile_ownership()
+        phase_start = time.monotonic()
         relevant = self.discover(targets)
+        self.timing("reverse_discovery_seconds", phase_start)
+        phase_start = time.monotonic()
         roots = self.roots()
+        self.timing("release_resolution_seconds", phase_start)
+        phase_start = time.monotonic()
         self.forward(roots, relevant)
+        self.timing("forward_collection_seconds", phase_start)
+        phase_start = time.monotonic()
         self.enrich()
+        self.timing("health_collection_seconds", phase_start)
         for url, reason in self.fetch.failures:
             self.gap("fetch", url, reason)
         for url in sorted(self.fetch.used):

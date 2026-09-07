@@ -3,7 +3,11 @@ name = "scala-ecosystem-security-model"
 version = "0.2.0"
 description = "Reproducible Scala ecosystem security assessment"
 requires-python = ">=3.12"
-dependencies = ["httpx>=0.28", "pyyaml>=6", "beautifulsoup4>=4.13", "packaging>=24"]
+dependencies = [
+    "httpx>=0.28",
+    "pyyaml>=6",
+    "beautifulsoup4>=4.13",
+]
 
 [build-system]
 requires = ["hatchling"]

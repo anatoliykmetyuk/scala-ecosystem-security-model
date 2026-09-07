@@ -5,6 +5,7 @@ from __future__ import annotations
 import gzip
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import threading
@@ -68,6 +69,7 @@ class Fetcher:
             else ""
         )
         self.github_token = token
+        self.contact_email = os.environ.get("ECOSYSTEMS_CONTACT_EMAIL", "").strip()
         self.locks = [threading.Lock() for _ in range(256)]
         self.failures: list[tuple[str, str]] = []
         self.used: set[str] = set()
@@ -92,12 +94,15 @@ class Fetcher:
             }
             for attempt in range(3):
                 try:
-                    response = self.client.get(
-                        url,
-                        headers={"Authorization": "Bearer " + self.github_token}
-                        if urlsplit(url).hostname == "api.github.com" and self.github_token
-                        else {},
-                    )
+                    hostname = urlsplit(url).hostname or ""
+                    headers = {}
+                    if hostname == "api.github.com" and self.github_token:
+                        headers["Authorization"] = "Bearer " + self.github_token
+                    if self.contact_email and (
+                        hostname == "ecosyste.ms" or hostname.endswith(".ecosyste.ms")
+                    ):
+                        headers["From"] = self.contact_email
+                    response = self.client.get(url, headers=headers)
                     result.update(
                         status=response.status_code,
                         body=response.text,

@@ -27,7 +27,9 @@ def value(stars: float | None) -> float | None:
 def age(date: object, now: datetime) -> int | None:
     try:
         parsed = datetime.fromisoformat(string(date).replace("Z", "+00:00"))
-        return max(0, (now - parsed.replace(tzinfo=timezone.utc)).days)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return max(0, (now - parsed).days)
     except ValueError:
         return None
 
@@ -148,6 +150,17 @@ def health(
         if security is None
         else "Unavailable checks are excluded; the remaining weights are renormalized."
     )
+    for label, observed_age in (("Repository", repo_age), ("Commit", commit_age)):
+        if observed_age is None:
+            mn += f" {label} observation date is unavailable."
+        elif observed_age > 90:
+            mn += f" {label} evidence is {observed_age} days old and is excluded from weighted inputs."
+    if scan_age is None:
+        sn += " No usable scan date is available."
+    elif scan_age > 90:
+        sn += f" The scan is {scan_age} days old, exceeding the 90-day limit."
+    if security_coverage < 0.6:
+        sn += f" Usable check weight is {security_coverage:.0%}, below the 60% minimum."
     return Health(
         maintenance,
         security,

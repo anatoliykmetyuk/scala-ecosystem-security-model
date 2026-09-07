@@ -115,6 +115,10 @@ def select(fetch: Fetcher, destination: Path) -> None:
                     break
             page += 1
         print(f"Seeds: {category}: {count} eligible; {len(projects)} unique projects", flush=True)
+    if fetch.failures:
+        raise RuntimeError(
+            "Seed source requests failed; refusing to replace the frozen cohort with incomplete evidence"
+        )
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(
         yaml.safe_dump(

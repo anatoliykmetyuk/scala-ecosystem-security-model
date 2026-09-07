@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import subprocess
+import time
 from datetime import datetime, timezone
 from importlib.metadata import version
 from pathlib import Path
@@ -89,11 +90,32 @@ def main() -> None:
     if args.command != "validate":
         from .render import render
 
+        render_start = time.monotonic()
         render(db, args.output / "preview.html")
+        db.execute(
+            "INSERT OR REPLACE INTO metadata VALUES(?,?)",
+            ("render_seconds", str(time.monotonic() - render_start)),
+        )
+        db.commit()
         (args.output / "latest-database.txt").write_text(
             str(Path(db.execute("PRAGMA database_list").fetchone()[2]).resolve())
         )
-    print(json.dumps(metrics, indent=2))
+    measurements = {
+        "seconds": {
+            row[0]: float(row[1])
+            for row in db.execute("SELECT key,value FROM metadata WHERE key LIKE '%_seconds'")
+        },
+        "database_bytes": Path(db.execute("PRAGMA database_list").fetchone()[2]).stat().st_size,
+        "evidence_bytes": sum(
+            path.stat().st_size
+            for row in db.execute("SELECT cache_path FROM requests")
+            if (path := Path(row[0])).exists()
+        ),
+    }
+    if args.command != "validate":
+        measurements["preview_bytes"] = (args.output / "preview.html").stat().st_size
+    (run / "measurements.json").write_text(json.dumps(measurements, indent=2))
+    print(json.dumps({"counts": metrics, "measurements": measurements}, indent=2))
     db.close()
 
 

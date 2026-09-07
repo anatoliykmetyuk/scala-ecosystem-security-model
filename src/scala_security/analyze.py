@@ -20,8 +20,10 @@ def analyze(db: sqlite3.Connection) -> None:
     db.executescript(
         "DELETE FROM path_steps; DELETE FROM fallout; DELETE FROM ranking; DELETE FROM scores;"
     )
+    scoring_seconds = traversal_seconds = 0.0
     seeds = {r[0] for r in db.execute("SELECT id FROM projects WHERE seed=1")}
     for project in db.execute("SELECT * FROM projects").fetchall():
+        phase_start = time.monotonic()
         observations = {
             r["kind"]: obj(json.loads(r["payload"]))
             for r in db.execute("SELECT * FROM observations WHERE project=?", (project["id"],))
@@ -46,8 +48,10 @@ def analyze(db: sqlite3.Connection) -> None:
                 json.dumps(result.payload()) if result else "{}",
             ),
         )
+        scoring_seconds += time.monotonic() - phase_start
         if not project["latest"]:
             continue
+        phase_start = time.monotonic()
         roots = [
             r[0]
             for r in db.execute(
@@ -64,15 +68,25 @@ def analyze(db: sqlite3.Connection) -> None:
                 "INSERT INTO path_steps VALUES(?,?,?,?)",
                 [(target, project["id"], i, e) for i, e in enumerate(path)],
             )
+        traversal_seconds += time.monotonic() - phase_start
+    phase_start = time.monotonic()
     db.execute("""INSERT INTO ranking
       SELECT p.id,coalesce(sum(s.value),0),count(f.dependant),count(f.dependant)-count(s.value),
        CASE WHEN count(f.dependant)>0 AND (own.maintenance<0.5 OR own.security<0.5) THEN 1 ELSE 0 END
       FROM projects p JOIN scores own ON own.project=p.id
       LEFT JOIN fallout f ON f.target=p.id LEFT JOIN scores s ON s.project=f.dependant
       WHERE p.seed=1 GROUP BY p.id""")
-    db.execute(
+    db.executemany(
         "INSERT OR REPLACE INTO metadata VALUES(?,?)",
-        ("analysis_seconds", str(time.monotonic() - start)),
+        [
+            (key, str(seconds))
+            for key, seconds in (
+                ("analysis_seconds", time.monotonic() - start),
+                ("scoring_seconds", scoring_seconds),
+                ("traversal_seconds", traversal_seconds),
+                ("aggregation_seconds", time.monotonic() - phase_start),
+            )
+        ],
     )
     db.commit()
 

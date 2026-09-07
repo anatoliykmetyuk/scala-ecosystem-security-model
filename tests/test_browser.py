@@ -25,8 +25,7 @@ def test_report_interactions_and_math(tmp_path: Path) -> None:
         assert page.locator("math").count() >= 3
         assert page.locator("select").count() == 0
         assert "Maximum 3 dependency hops" in page.locator("header").inner_text()
-        toggle = page.get_by_role("button", name="Show path").first
-        toggle.click()
+        page.locator(".beneficiary-head .number").first.click()
         assert page.locator(".path").first.is_visible()
         page.get_by_role("button", name="Hide path").first.click()
         assert not page.locator(".path").first.is_visible()

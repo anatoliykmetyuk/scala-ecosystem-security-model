@@ -67,6 +67,10 @@ def test_fallout_latest_crossbuild_and_java_consumer(tmp_path):
         db.execute("SELECT count(*) FROM ranking WHERE project=?", ("java/a",)).fetchone()[0] == 0
     )
     assert validate(db)["fallout"] == 2
+    assert (
+        float(db.execute("SELECT value FROM metadata WHERE key='traversal_seconds'").fetchone()[0])
+        >= 0
+    )
     render(db, tmp_path / "preview.html")
     html = (tmp_path / "preview.html").read_text()
     assert "<math " in html and "Show path" in html
@@ -384,10 +388,11 @@ def test_concurrent_collectors_write_cache_atomically(tmp_path):
     assert not list(tmp_path.glob("*.tmp"))
 
 
-def test_corrupt_cache_recovers(tmp_path):
+@pytest.mark.parametrize("payload", [b"partial", b"\x1f\x8b\x08\x00" + b"\0" * 6 + b"\xff" * 10])
+def test_corrupt_cache_recovers(tmp_path, payload):
     fetch = Fetcher(tmp_path, httpx.MockTransport(lambda r: httpx.Response(200, json={"ok": True})))
     url = "https://example.test/broken"
-    fetch.path(url).write_bytes(b"partial")
+    fetch.path(url).write_bytes(payload)
     assert fetch.json(url) == {"ok": True}
     assert list(tmp_path.glob("*.corrupt"))
 
@@ -414,3 +419,39 @@ def test_star_selection_does_not_depend_on_fetch_completion_order(tmp_path):
             collector.db.execute("SELECT stars FROM projects WHERE id='scala/a'").fetchone()[0]
             == 50
         )
+
+
+def test_contact_header_scoped_to_ecosystems(tmp_path, monkeypatch):
+    monkeypatch.setenv("ECOSYSTEMS_CONTACT_EMAIL", "contact@example.test")
+    observed = {}
+
+    def handle(request):
+        observed[request.url.host] = request.headers.get("from")
+        return httpx.Response(200, json=[])
+
+    fetch = Fetcher(tmp_path, httpx.MockTransport(handle))
+    for host in ("packages.ecosyste.ms", "api.github.com", "ecosyste.ms.example.test"):
+        fetch.json("https://" + host + "/items")
+    assert observed == {
+        "packages.ecosyste.ms": "contact@example.test",
+        "api.github.com": None,
+        "ecosyste.ms.example.test": None,
+    }
+
+
+def test_unresolved_ownership_stays_unattributed(tmp_path):
+    fetch = Fetcher(
+        tmp_path / "evidence",
+        httpx.MockTransport(
+            lambda r: httpx.Response(
+                200, json={"repository_url": "https://github.com/unrelated/repo"}
+            )
+        ),
+    )
+    db = connect(tmp_path / "db.sqlite")
+    collector = Collector(db, fetch)
+    collector.package({"name": "g:shared_3"}, "scala/old")
+    collector.claims = {"g:shared_3": {"scala/old", "scala/new"}}
+    collector.reconcile_ownership()
+    collector.package({"name": "g:shared_3", "repository_url": "https://github.com/unrelated/repo"})
+    assert db.execute("SELECT project FROM artifacts").fetchone()[0] is None
