@@ -88,7 +88,7 @@ def render(db: sqlite3.Connection, destination: Path) -> None:
         "gaps": gaps,
         "counts": {
             t: db.execute(f"SELECT count(*) FROM {t}").fetchone()[0]
-            for t in ("artifacts", "versions", "edges", "fallout")
+            for t in ("artifacts", "target_artifacts", "versions", "edges", "fallout")
         },
     }
     text = text.replace(
