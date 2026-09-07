@@ -121,3 +121,26 @@ The shell scripts resolve the repository root themselves, so they can be invoked
 - `output/`: ignored generated results and evidence. The earlier `pilot/` output is retained locally and ignored.
 
 Website deployment is out of scope. The GitHub repository is private; CI validates the code and does not publish the report.
+
+## Publish the reviewed report
+
+The public site is https://anatoliikmt.me/scala-ecosystem-security-model/.
+It inherits the account website's custom domain; the account website remains unchanged.
+
+After generating and reviewing `output/preview.html`, run:
+
+```sh
+./scripts/publish.sh
+```
+
+The script must run on `main` with no pre-existing staged changes. It copies the
+reviewed report to `site/index.html`, commits the publication files and pushes
+`main`. GitHub Actions then deploys only `site/` to GitHub Pages. No collection,
+Python runtime, database or evidence cache is deployed. An optional first argument
+selects a different reviewed HTML file. Track deployment with
+`gh run list --workflow publish.yml`.
+
+Source changes alone do not republish the report. Regenerate, review and invoke
+the publishing script when the report should change. The workflow also supports
+manual dispatch to redeploy the already committed report. To roll back, restore
+the desired earlier `site/index.html`, commit it and push `main`.

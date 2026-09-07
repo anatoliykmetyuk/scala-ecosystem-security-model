@@ -65,4 +65,4 @@ These steps were completed using an explicit cache-backed collection run and a f
 
 The user explicitly granted blanket, unlimited permission on 2026-09-07 to commit and push work on this project. This overrides the earlier requirement for separate permission for each commit or push. Continue to omit AI attribution from commit messages and authors.
 
-Website deployment and hosting remain out of scope. Do not set up Cloudflare, GitHub Pages or deployment workflows. The private source repository, validation-only CI and local standalone preview remain in scope.
+The user authorized public repository visibility and GitHub Pages publishing on 2026-09-07. Publish only the reviewed static report through GitHub Actions. The account website and its custom domain configuration remain unchanged.
