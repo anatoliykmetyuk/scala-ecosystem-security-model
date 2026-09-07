@@ -1,73 +1,47 @@
-# Current pilot scope (supersedes broader discovery tasks below)
+# Implementation status and remaining work
 
-Maintain [CONSTRAINTS.md](CONSTRAINTS.md) in the same change as any selection, collection or traversal constraint adjustment. It records both enforced limits and unset caps.
+Last reviewed: 2026-09-07.
 
-- [x] Select up to five eligible projects per subsection (76 captured subsections), then deduplicate without backfill. Replaces main-section quotas and the 100-project cap; new ceiling 380. Reselected offline from saved evidence.
-- [x] Closed seed universe: only selected seed coordinates may be roots, intermediates or targets; only seed projects contribute exposed Value. No Maven-wide reverse discovery. Retain the three-hop limit and exact intermediate versions.
-- [x] JVM Scala 2.13 only; cap ten published coordinates per project ranked by dependent_packages_count descending, unknown last, coordinate-name ties. Save selection evidence; keep plots uncapped. Offline plan: 279 projects, 2,596 distinct uncapped candidates, at most 1,297 selected entries pending metadata collection.
-- [x] Label seed-only exposure and the artifact cap in the generated preview; document limitations and test collection boundaries offline.
-- [ ] Data fetching remains stopped until requested. No refreshed real-data report has been generated for this scope.
+The current implementation is complete and validated offline. The remaining work is collection under the current constraints, followed by validation and inspection of the resulting real-data report. Data fetching is stopped until requested; no completed snapshot or report under this scope is claimed.
 
-# Requested changes
+[CONSTRAINTS.md](CONSTRAINTS.md) is the maintained register of dimensions and limits. Update it together with configuration, implementation, documentation and relevant tests whenever a constraint changes.
 
-Implementation authorized on 2026-09-07: complete the tasks below, starting with the project foundation.
+## Current scope
 
-## Commit and push authorization
+- Frozen seed: 279 unique Scala projects, selected from the first five eligible entries in each of 76 Awesome Scala subsections, then deduplicated without backfill. The selection ceiling is 380 projects. The current seed was reselected offline from previously captured source data.
+- Matrix: JVM, Scala 2.13 only. The YAML stores unsuffixed module families separately from the shared matrix.
+- Artifact selection: at most 10 published coordinates per project, ranked by `dependent_packages_count` descending. Unknown counts follow known counts, including zero; ties use coordinate name. Projects with ten or fewer eligible coordinates retain all of them without a ranking-metadata request. Save counts, ranks, decisions and source references in SQLite.
+- Offline expansion: 2,596 distinct uncapped candidate coordinates, or 2,606 project–artifact entries. The selected-entry upper bound is 1,297; actual selection requires publication and ranking metadata. Artifact inventory plots remain uncapped.
+- Closed seed universe: only selected seed coordinates may be roots, intermediates or targets. Only seed repositories contribute exposed Value. Collect forward dependencies and derive dependants locally; do not invoke Maven-wide reverse discovery.
+- Maximum path length: three dependency edges. This is not a separate cap on historical versions or HTTP requests.
+- Start from each project's latest release overall. If it has no selected matrix coordinates, record a gap rather than substitute an older release. Follow actual intermediate versions without upgrading them. A target matches any version of its selected coordinates.
+- Direct compile, runtime, test, build, development and provided dependencies are eligible. Subsequent edges must be compile/runtime with confirmed nonoptional declarations. Unresolved declarations do not establish verified paths.
+- Rank exposure using the sum of provisional Value across distinct qualifying seed dependants. No scope or exposure-weight switches. Global dependent-package counts select artifacts; they are not the final seed-only exposed Value.
 
-The user explicitly granted blanket, unlimited permission on 2026-09-07 to commit and push work on this project. This overrides the earlier requirement for separate permission for each commit or push. During implementation, commit and push as needed without asking again, including the GitHub Actions validation workflow. Continue to omit AI attribution from commit messages and authors. This authorization does not change the exclusion of website deployment; implementation is now authorized.
+## Completed implementation
 
-Website deployment and hosting are out of scope for this implementation. Do not set up Cloudflare, GitHub Pages, or website deployment scripts/workflows. Local standalone preview generation remains in scope, as do the explicitly requested private GitHub source repository and validation-only GitHub Actions workflow.
+- [x] Initialize Git and a private upstream GitHub repository, with an appropriate `.gitignore` for environments, caches and generated data.
+- [x] Organize sources under `src/`, tests under `tests/`, documentation under `docs/`, configuration under `config/` and shell entry points under `scripts/`.
+- [x] Manage Python and dependencies through uv, `pyproject.toml` and the committed lockfile.
+- [x] Provide one validation command covering Ruff linting/formatting, ty type checking and offline automated tests. Run the same checks in GitHub Actions.
+- [x] Implement deterministic subsection selection, Scala eligibility checks, repository deduplication, compact seed configuration and shared matrix expansion.
+- [x] Implement publication checks and the ten-artifact ranking cap with auditable selection evidence and explicit unknown counts.
+- [x] Implement forward collection inside the closed seed universe, exact-version traversal, three-hop limits and repository-deduplicated fallout.
+- [x] Cover the A/B/C version-consistency example below and current selection/traversal boundaries with regression tests.
+- [x] Replace large derived JSON snapshots/results with normalized SQLite storage and compressed raw HTTP evidence. Preserve provenance, missing-data semantics and explicit fresh versus cached collection.
+- [x] Retain SQLite aggregation and version-aware graph traversal without introducing NumPy or Parquet into the model pipeline.
+- [x] Provide `scripts/rebuild.sh` to collect, analyze, validate and generate a standalone preview; document the from-scratch workflow and explicit cache reuse in README.
+- [x] Provide the offline `scala-security plan` command without constructing an HTTP client. Report uncapped candidates separately from the selected-entry upper bound.
+- [x] Implement the two-column preview, prominent repository links opening new tabs, and secondary raw-evidence links.
+- [x] Explain Maintenance and Security inputs separately, with rendered mathematical formulas, substituted values, coverage and unknown-score explanations.
+- [x] Display dependants ranked by provisional Value with star inputs and expandable/collapsible exact-version dependency paths.
+- [x] Remove scope and weight switches. Display seed-only exposure, the artifact cap and the three-hop limit.
+- [x] Test offline report generation, browser interactions, formulas and responsive light/dark layouts using fixtures.
+- [x] Validate the current implementation locally: 47 tests, Ruff and ty pass. Upstream CI for commit `a35ac63` passed.
 
-## First implementation task: project foundation
+## Version-consistency acceptance example
 
-Complete this before implementing the other changes below.
-
-- [x] Initialize a Git repository at the project root. Commits and pushes are authorized under the blanket permission above.
-- [x] Set up a proper Python project using uv, with dependencies and development tools declared in `pyproject.toml`, a reproducible `uv.lock`, and a uv-managed local virtual environment. Document setup and commands using uv rather than relying on globally installed packages or Codex-specific runtimes.
-- [x] Organize application code under `src/` as an importable package, automated tests under `tests/`, and project documentation under `docs/`. Keep the entry-point README, project configuration, and lockfile at the root. Keep seed YAML configuration separate from generated data. Update imports, command entry points, tests, rebuild scripts, and documentation links to match the structure. Move this task document into the documentation structure as part of the reorganization.
-- [x] Add `.gitignore` rules for the virtual environment, Python bytecode, tool/test caches, build artifacts, generated data snapshots/databases, fetched evidence caches, generated results/previews, and local temporary files. Preserve existing source material and partner-supplied inputs; distinguish those from regenerable collected data. Keep source templates, seed configuration, code, tests, and dependency declarations eligible for version control.
-- [x] Add Ruff to the development dependencies and validation pipeline for linting and formatting checks, alongside the automated test suite. Ruff is a linter/formatter, not a static type checker; do not claim these checks provide static type checking. Provide a documented validation command and run it after the structural migration.
-
-- [x] Add Astral's `ty` as a uv-managed development dependency and run `uv run ty check` in the documented validation pipeline alongside Ruff and automated tests. During refactoring, add meaningful function annotations and typed domain structures so type checking covers the model and pipeline effectively, rather than relying on pervasive `Any` or blanket suppressions. Configure type checking in the project and resolve reported issues.
-
-## Remaining implementation tasks
-
-- [x] Extend automated tests alongside the refactor: deterministic fixtures for API pagination, caching/fresh collection, POM interpretation, project/artifact mapping, and the SQLite-backed end-to-end rebuild through preview generation. Cover all-variant reverse discovery, version-consistent fallout, the three-hop boundary, repository deduplication, Scala-only candidate eligibility with Java dependants permitted, score calculations/missing evidence, and the agreed A/B/C acceptance example. Verify redesigned preview interactions and formula rendering. Keep CI tests offline.
-- [x] Add a `scripts/` directory with a shell entry point for validation/testing and a shell entry point for reconstructing the data and generating the preview. The validation script must run Ruff linting, Ruff formatting checks, ty type checking, and automated tests through the uv-managed environment, and return a nonzero exit status on any failure. Make scripts independent of the caller's working directory and document their exact invocation in README. Reuse the previously specified self-contained rebuild workflow rather than introducing a second implementation.
-- [x] Create a private GitHub repository named `scala-ecosystem-security-model` and configure it as this project's upstream remote. User has authorized creation of this private repository and granted blanket permission to commit and push. Resolve the owner from available account/project context, asking only if ownership is ambiguous.
-- [x] Add a GitHub Actions validation workflow that installs uv, uses the committed lockfile to reproduce development dependencies, and invokes the same validation script used locally: Ruff linting/format checks, ty, and automated tests. Configure it for pushes and pull requests. Keep routine CI validation independent of live ecosystem API access and large generated caches/snapshots by using deterministic test fixtures where needed. Committing and pushing this workflow is authorized under the blanket permission above.
-
-
-- [x] Render score formulas as proper mathematical notation using LaTeX-compatible rendering or equivalent, rather than plain text. Apply this to both general formulas and calculations with substituted values. Match the preview's light/dark themes, typography, and responsive layout. Keep the generated preview self-contained and functional offline by bundling required rendering resources or rendering formulas during generation, without runtime CDN dependencies.
-- [x] Redesign the preview's selected-component details while retaining the two-column layout: component ranking on the left, selected-component details on the right. Provide prominent GitHub repository links for each displayed project; open repository links in a new browser tab. Preserve raw evidence/API links with secondary visual emphasis.
-- [x] Split observed evidence into separate Maintenance and Security sections. In each section, explain the observed inputs in human-readable language and connect them directly to the score. Show both the general formula and the calculation with actual values and weights substituted, ending in the resulting score. Explain missing/stale evidence, coverage thresholds, renormalization, and any applicable overrides when they affect the calculation; do not display a fabricated numeric calculation for an unknown score.
-- [x] Replace the beneficiary dropdown and primary 'Observed dependency path' section with an 'Exposed Value' section listing all qualifying dependants immediately, ranked by individual provisional Value. Show each dependant's Value score and input star count, retaining explicit unknown-value handling. Repository names link to GitHub in new tabs. A separate row/card toggle expands the exact version-specific dependency path establishing that dependant's membership in the selected project's fallout; toggling it again hides the path. Keep paths collapsed initially and preserve the current path-inspection detail. Ensure repository-link clicks navigate without also toggling the card.
-- [x] Refactor snapshot and result storage from large JSON documents to SQLite. Use normalized tables for projects/repositories, artifacts, versions, dependency edges, observations, scores, exposure, rankings, and supporting paths. Store repository metadata and security evidence once and reference them instead of duplicating them across artifacts/results. Retain auditable raw responses in compressed evidence files with request metadata and references from SQLite. Preserve snapshot identity, collection timestamps, provenance, and explicit missing-data semantics.
-- [x] Adapt collection, analysis, validation, and preview generation to SQLite. Use indexed lookups and SQL joins, deduplication, aggregation, and ranking where appropriate; retain explicit version-aware graph traversal and avoid loading the entire evidence dataset into memory. Generate a compact standalone preview from the database with an explicit embedded-data size budget. Integrate this storage refactor into the self-contained rebuild command and README instructions.
-- [ ] Do not introduce NumPy or Parquet for this refactor. The agreed initial approach is SQLite plus version-aware graph traversal; numerical vectorization is not currently justified. Measure collection, traversal, scoring time, and storage size on the expanded cohort before claiming performance improvements or adding further optimization dependencies.
-- [x] Provide a self-contained, single rebuild command (for example a shell script) that reads the separate seed YAML configuration, collects a fresh data snapshot, runs analysis and validation, and generates a ready-to-open standalone `preview.html`. Keep all required generation code in the project, including the preview wrapper, with no dependency on a Codex-installed helper. Make fresh collection versus cache reuse explicit so a requested fresh snapshot does not silently reuse old responses or cached failures.
-- [x] Document the complete from-scratch workflow in README: prerequisites and dependency installation if needed, location and structure of the editable seed YAML, the exact rebuild command and working directory, fresh versus cached operation, generated snapshot/evidence/results locations, and how to open the completed preview. A user should be able to reproduce the pipeline without this conversation or manual intermediate generation steps.
-- [x] Replace manually hard-coded seed selection with at most 100 eligible Scala projects across the main Awesome Scala sections, allocating at most ten per main section using the documented round-robin of source-ranked child lists. Apply Scala-project eligibility and Maven availability checks before filling each category's quota; include all eligible entries where fewer than 10 exist. Do not filter selection to Scala 2.13 or use random sampling. Deduplicate repositories across categories while retaining their category memberships.
-- [x] Freeze the selected projects and categories in an explicit configuration file such as `seeds.yaml`, which becomes the collector's seed input. Record source URLs, snapshot date, selection/ranking rule, and reasons for exclusions or any explicit adjustments. Document the methodology as a curated, prominence-based assessment cohort, not a statistically representative sample. Scaladex's default ranking uses stars adjusted by Scala code percentage; our maintenance/security formulas do not use stars, but the provisional Value metric does. Selection does not imply absence of bias or justify ecosystem-wide statistical generalizations. Resolve only the configured module families and seed-wide matrix for fallout analysis, as amended below.
-- [x] Remove the dependency-scope switch. Always include build and test dependencies alongside runtime and compile-time dependencies in the default analysis and visualization.
-- [x] Remove the exposure-weights switch from the preview. Always calculate exposure and rank candidates using provisional Value: for each distinct qualifying dependant, Value = min(1, log(1 + stars) / log(100001)); sum those dependant Values for the assessed project's fallout. Use the dependants' stars, not the assessed project's stars. Preserve explicit handling of missing star data rather than treating it as an observed zero. Equal weighting is no longer a user-selectable analysis mode.
-- [x] Include transitive dependencies in that analysis, including supporting libraries brought in through test frameworks or build tools. For example, project → test framework → supporting library must count the supporting library as a transitive dependency of the project. Preserve this behavior where already supported and address limits that prevent the intended coverage.
-- [x] Restrict analysis subjects, seed selection, health assessment, and intervention rankings to Scala projects. Java projects are outside the target ecosystem regardless of their maintenance/security health. Remove Java-only candidates such as junit-team/junit4, hamcrest/javahamcrest, and java-diff-utils/java-diff-utils, and remove Java-only seeds. Introduce explicit, evidence-backed Scala-project classification using artifact/build and repository evidence; handle mixed-language and uncertain repositories explicitly rather than relying solely on the repository's primary language or a Maven artifact suffix.
-- [x] Keep downstream value coverage separate from Scala-only subject eligibility. A Java project that depends directly or transitively on a Scala project may contribute its value to that Scala project's downstream exposure, but must not become a health/ranking subject or a starting sample for candidate analysis. Preserve dependency paths needed to establish that exposure.
-- [x] Replace seed-only dependant exposure with discovery of Maven-wide dependants of each Scala analysis subject, mapped to repositories and deduplicated. Use ecosyste.ms reverse package lookup as the starting mechanism, including all published artifact variants belonging to the subject. Its documented `dependent_packages?latest=true` endpoint returns direct latest-version dependants; a live probe for Cats succeeded. Discover transitive dependants and validate version-specific paths from each dependant's latest version rather than assuming a chain of latest-only reverse lookups proves the relationship. Report index/mapping coverage gaps instead of claiming complete Maven coverage without validation.
-- [x] Retain a maximum of three dependency hops as the agreed performance limit. Declare this prominently in the preview header or summary statistics as well as the methodology, making clear that exposure is limited to that depth.
-- [x] Preserve version-specific traversal: start each project's own analysis at its latest version, then follow the actual dependency versions it declares without upgrading intermediate dependencies to latest. Thus A latest → B v1 may yield different transitive dependencies than an independent analysis starting at B latest v2.
-
-## Fallout semantics and acceptance criterion
-
-- [x] Determine dependant eligibility from the project's latest release overall, not independently from the latest release of each historical cross-build artifact. Example: project A published Scala 2.12 artifact version 1, then Scala 3 artifact version 2; treat the 2.12/version-1 line as discontinued for A's current dependency footprint and use release 2. Retain variants belonging to the current project release, but do not count obsolete lines just because they remain the latest release of their artifact. The reverse API's per-artifact `latest=true` results require this additional project-level filtering. Add this example as a regression test. This restriction applies to the dependant's starting release only: the target project still matches any artifact/version, and intermediate dependency versions remain the actual versions declared along the path.
-
-- [x] Updated coordinate scope: seed schema 2 lists unsuffixed module coordinates once and defines a shared matrix. Currently permit only JVM, Scala 2.13 and Scala 3. Resolve matrix combinations against the published inventory before reverse queries; record absent combinations and unavailable evidence. Match any release version within selected target coordinates, without separate reverse queries for each release. Apply the target-coordinate restriction to path qualification as well as discovery.
-
-
-Calculate each Scala target project's fallout independently. A dependant counts when its latest release has a dependency path of at most three hops to any version of the target project. Along that path, use the actual intermediate dependency versions, not their latest releases. Reverse lookup returns projects that depend on the queried package; package-level reverse results are discovery candidates, not proof of a version-consistent transitive path. Deduplicate qualifying dependants by project/repository.
-
-Required example for implementation and regression testing:
+Assume A, B and C and all path coordinates are in the selected universe:
 
 - A latest depends on B v1.
 - B latest is v2 and depends on C.
@@ -75,14 +49,20 @@ Required example for implementation and regression testing:
 - C's fallout includes B but excludes A.
 - B's fallout includes A because A latest depends on a version of B.
 
-Do not infer that fallout is transitively closed at the project level: B being in C's fallout and A being in B's fallout does not alone place A in C's fallout.
+Project-level fallout is not transitively closed. B being in C's fallout and A being in B's fallout does not alone place A in C's fallout.
 
-## Final live-run verification
+## Remaining collection and verification work
 
-The seed and source refactor is implemented and validated offline. The current YAML contains 100 projects, unsuffixed modules and a JVM Scala 2.13/3 matrix. The oversized crawl remains stopped and its evidence is preserved. The user explicitly requested no data fetch during this change; no new pilot snapshot or completed report is claimed.
+These steps depend on a real collection run. Offline tests do not establish live API coverage, final artifact selections or runtime.
 
-- [x] Correct the selector, freeze the revised cohort of at most 100 projects, document the main-section quotas and matrix, and add regression coverage. Update README and methodology.
-- [x] Add an offline `scala-security plan` command that validates seeds and reports candidate expansion without constructing an HTTP client.
+- [ ] Collect the full frozen cohort under the current constraints, preserving existing evidence and recording whether the run is fresh or explicitly cache-backed. Fetch publication/ranking metadata, selected dependency versions and health evidence.
+- [ ] Validate the resulting SQLite database, including selection limits, seed-only path membership, version consistency, exposure sums and missing-data handling. Investigate failures and material coverage gaps before claiming completion.
+- [ ] Generate the actual standalone report from that database and inspect rankings, evidence, formulas, repository links, expanded paths and responsive light/dark layouts using real data.
+- [ ] Record actual collection, traversal and scoring timings, storage sizes, selected coordinate/version counts and coverage gaps. Do not promise a runtime based solely on the coordinate cap.
+- [ ] Update final documentation and snapshot status with the observed results. Commit and push any resulting source/documentation changes and confirm CI passes for those changes.
 
-- [ ] Finish collection for the full frozen cohort, validate the resulting SQLite database, generate the actual report, and inspect its interactions and light/dark responsive layouts.
-- [ ] Record actual phase timings, storage sizes and coverage gaps for the expanded cohort, then commit final documentation and confirm upstream CI passes.
+## Authorization and exclusions from scope
+
+The user explicitly granted blanket, unlimited permission on 2026-09-07 to commit and push work on this project. This overrides the earlier requirement for separate permission for each commit or push. Continue to omit AI attribution from commit messages and authors.
+
+Website deployment and hosting remain out of scope. Do not set up Cloudflare, GitHub Pages or deployment workflows. The private source repository, validation-only CI and local standalone preview remain in scope.
