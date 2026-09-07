@@ -38,4 +38,4 @@ When changing a constraint:
 3. Run `uv run scala-security plan` to refresh the offline counts reported here. Candidate counts are not observed publication counts or request estimates.
 4. Record whether a real snapshot has been rebuilt under the changed constraints. Existing reports retain their original scope until rebuilt.
 
-Current snapshot status: no real-data report has been rebuilt under these constraints. Data collection remains stopped pending a user request.
+Current snapshot status: collection and report verification completed on 2026-09-07. The final snapshot selected 1,297 coordinates. See [PILOT-RUN.md](PILOT-RUN.md) for cache provenance, measured timings and known coverage gaps.

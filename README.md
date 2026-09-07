@@ -4,6 +4,8 @@ A reproducible assessment of a frozen, curated Scala cohort. It ranks projects w
 
 See **[Current pilot constraints](docs/CONSTRAINTS.md)** for the maintained platform/version dimensions, project and artifact caps, traversal universe, hop limit and limits that are not separately capped.
 
+The completed cache-backed pilot and its coverage limitations are documented in **[PILOT-RUN.md](docs/PILOT-RUN.md)**. Its local report is `output/preview.html`.
+
 ## Setup
 
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then from this repository:

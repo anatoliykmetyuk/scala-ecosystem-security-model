@@ -2,7 +2,7 @@
 
 Last reviewed: 2026-09-07.
 
-The current implementation is complete and validated offline. The remaining work is collection under the current constraints, followed by validation and inspection of the resulting real-data report. Data fetching is stopped until requested; no completed snapshot or report under this scope is claimed.
+Implementation, collection and real-report verification are complete. See [PILOT-RUN.md](PILOT-RUN.md) for final snapshot identity, measured runtime, coverage limitations and verification. No collection process remains running.
 
 [CONSTRAINTS.md](CONSTRAINTS.md) is the maintained register of dimensions and limits. Update it together with configuration, implementation, documentation and relevant tests whenever a constraint changes.
 
@@ -51,15 +51,15 @@ Assume A, B and C and all path coordinates are in the selected universe:
 
 Project-level fallout is not transitively closed. B being in C's fallout and A being in B's fallout does not alone place A in C's fallout.
 
-## Remaining collection and verification work
+## Completed collection and verification work
 
-These steps depend on a real collection run. Offline tests do not establish live API coverage, final artifact selections or runtime.
+These steps were completed using an explicit cache-backed collection run and a final replay after reviewing transient failures. Known source gaps remain documented.
 
-- [ ] Collect the full frozen cohort under the current constraints, preserving existing evidence and recording whether the run is fresh or explicitly cache-backed. Fetch publication/ranking metadata, selected dependency versions and health evidence.
-- [ ] Validate the resulting SQLite database, including selection limits, seed-only path membership, version consistency, exposure sums and missing-data handling. Investigate failures and material coverage gaps before claiming completion.
-- [ ] Generate the actual standalone report from that database and inspect rankings, evidence, formulas, repository links, expanded paths and responsive light/dark layouts using real data.
-- [ ] Record actual collection, traversal and scoring timings, storage sizes, selected coordinate/version counts and coverage gaps. Do not promise a runtime based solely on the coordinate cap.
-- [ ] Update final documentation and snapshot status with the observed results. Commit and push any resulting source/documentation changes and confirm CI passes for those changes.
+- [x] Collect the full frozen cohort under the current constraints, preserving existing evidence and recording whether the run is fresh or explicitly cache-backed. Fetch publication/ranking metadata, selected dependency versions and health evidence.
+- [x] Validate the resulting SQLite database, including selection limits, seed-only path membership, version consistency, exposure sums and missing-data handling. Investigate failures and material coverage gaps before claiming completion.
+- [x] Generate the actual standalone report from that database and inspect rankings, evidence, formulas, repository links, expanded paths and responsive light/dark layouts using real data.
+- [x] Record actual collection, traversal and scoring timings, storage sizes, selected coordinate/version counts and coverage gaps. Do not promise a runtime based solely on the coordinate cap.
+- [x] Update final documentation and snapshot status with the observed results. Commit and push any resulting source/documentation changes and confirm CI passes for those changes.
 
 ## Authorization and exclusions from scope
 
