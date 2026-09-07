@@ -1,6 +1,8 @@
 # Scala ecosystem security model
 
-A reproducible assessment of a frozen, curated Scala cohort. It ranks projects with low observed maintenance or security scores by the summed Value of their verified Maven dependants, up to three dependency hops. Java projects may contribute downstream Value but are not assessment subjects.
+A reproducible assessment of a frozen, curated Scala cohort. It ranks projects with low observed maintenance or security scores by the summed Value of their verified Maven dependants, up to three dependency hops. The current pilot counts only dependants within its frozen seed universe.
+
+See **[Current pilot constraints](docs/CONSTRAINTS.md)** for the maintained platform/version dimensions, project and artifact caps, traversal universe, hop limit and limits that are not separately capped.
 
 ## Setup
 

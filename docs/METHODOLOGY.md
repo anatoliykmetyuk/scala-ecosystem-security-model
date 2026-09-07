@@ -1,5 +1,7 @@
 # Methodology
 
+Current dimensions and limits are maintained in [CONSTRAINTS.md](CONSTRAINTS.md). Update that register whenever the implemented scope changes.
+
 ## Population and curated selection
 
 The assessment subjects are the explicit repositories in `config/seeds.yaml`. Selection is capped at 100 distinct repositories, with at most ten allocated to each main section of the Awesome Scala overview. Main sections are visited in overview order, one project per section per round. Within a section, its child-category lists are interleaved by source rank and overview order; already-selected repositories are skipped. Each child list contributes up to ten eligible candidates to that selection pool, not ten guaranteed seeds. Smaller sections can contribute fewer projects. This is a curated prominence-based cohort, not a random or statistically representative population sample.
