@@ -39,7 +39,7 @@ function ranking(){
  document.getElementById('ranking').innerHTML=data.targets.map((t,i)=>{
   const p=data.projects[t.project];
   if(!(p[0]+' '+t.categories.join(' ')).toLowerCase().includes(query))return '';
-  return `<li><button class="rank-button" data-index="${i}" aria-pressed="${i===selected}"><span class="rank-line"><span class="repo-name">${i+1}. ${escapeText(p[0])}</span><span class="number">${fmt(t.exposure)}</span></span><span class="category">${t.candidate?'Review candidate':'Other seed'} · ${t.dependants.length} dependants</span><div class="bar" style="width:${t.exposure/max*100}%"></div></button></li>`;
+  return `<li><button class="rank-button" data-index="${i}" aria-pressed="${i===selected}"><span class="rank-line"><span class="repo-name">${i+1}. ${escapeText(p[0])}</span><span class="number">${fmt(t.exposure)}</span></span><span class="category">M=${fmt(t.health.maintenance)} · S=${fmt(t.health.security)} · ${t.dependants.length} dependants</span><div class="bar" style="width:${t.exposure/max*100}%"></div></button></li>`;
  }).join('');
  document.querySelectorAll('.rank-button').forEach(b=>b.onclick=()=>{selected=Number(b.dataset.index);ranking();detail()});
 }
