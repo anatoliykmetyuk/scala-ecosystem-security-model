@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Scala ecosystem security model</title>
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#fff,#181818);--fg:light-dark(#202124,#f1f1f1);--muted:light-dark(#565b64,#b7bbc3);--line:light-dark(#ddd,#414141);--accent:light-dark(#175ca6,#82baff);--selected:light-dark(#eef4fa,#253342)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif}main{max-width:1440px;margin:auto;padding:32px}h1{font-size:28px;margin:0 0 8px}h2{font-size:24px;margin:0 0 14px;overflow-wrap:anywhere}h3{font-size:20px;margin:24px 0 12px}p{margin:8px 0 16px}a{color:var(--accent);overflow-wrap:anywhere}button,input{font:inherit;color:inherit}button{cursor:pointer}input{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:9px;width:100%}.meta,.secondary{color:var(--muted);font-size:14px}.layout{display:grid;grid-template-columns:minmax(240px,1fr) minmax(0,2fr);gap:36px;margin-top:28px}section,aside{min-width:0}.ranking{list-style:none;padding:0}.rank-button{width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:13px 10px;border-radius:4px}.rank-button[aria-pressed=true]{background:var(--selected)}.rank-line{display:flex;justify-content:space-between;gap:12px}.repo-name{overflow-wrap:anywhere}.bar{height:4px;background:var(--accent);margin-top:9px}.metrics{display:flex;flex-wrap:wrap;gap:22px;border-bottom:1px solid var(--line);padding-bottom:16px}.metrics strong{display:block;font-size:24px;font-variant-numeric:tabular-nums}.metrics span{font-size:14px;color:var(--muted)}.evidence{padding-left:22px}.formula{overflow-x:auto;padding:10px 0;font-size:18px}math{font-family:math;font-size:1.1em}table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px 5px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;overflow-wrap:anywhere}.source-links{display:flex;gap:16px;flex-wrap:wrap;margin:14px 0}.beneficiaries{list-style:none;padding:0}.beneficiary{border-bottom:1px solid var(--line);padding:10px 0}.beneficiary-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.beneficiary-head a{flex:1;min-width:120px}.path-toggle{border:1px solid var(--line);border-radius:4px;background:transparent;padding:6px 10px}.path{padding:12px 0 2px 20px;overflow-wrap:anywhere}.path li{margin-bottom:12px}.number{font-variant-numeric:tabular-nums;white-space:nowrap}.empty{padding:20px 0;color:var(--muted)}footer{margin-top:40px;border-top:1px solid var(--line);padding-top:16px}.category{display:block;color:var(--muted);font-size:13px;margin-top:4px}[hidden]{display:none!important}button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media(max-width:760px){main{padding:18px}.layout{grid-template-columns:1fr;gap:22px}.ranking{max-height:330px;overflow-y:auto}h1{font-size:24px}.metrics{gap:18px}table{font-size:13px}.formula{font-size:16px}}
+</style>
+</head>
+<body><main>
+<header><h1>Scala ecosystem security model</h1><p class="meta" id="summary"></p><p class="meta">Build and test dependencies included · Maximum 3 dependency hops · Provisional Value weights</p><p class="meta" id="coverage"></p></header>
+<div class="layout"><aside aria-label="Ranked Scala projects"><label for="search">Find a Scala project</label><input id="search" type="search" placeholder="Repository or category"><p class="secondary" id="rank-note"></p><ol id="ranking" class="ranking"></ol></aside><section id="detail" aria-live="polite"></section></div>
+<footer class="secondary">A curated assessment cohort. Low scores identify evidence for review, not confirmed vulnerabilities. Source data: ecosyste.ms (CC BY-SA 4.0), Scaladex, Maven Central POMs and OpenSSF Scorecard. Snapshot and calculation details are available in the accompanying methodology.</footer>
+</main>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+'use strict';
+const data=JSON.parse(document.getElementById('data').textContent);
+const escapeText=x=>String(x??'unknown').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=x=>x==null?'unknown':Number(x).toFixed(2);
+const link=(url,label)=>/^https:\/\//.test(url||'')?`<a href="${escapeText(url)}" target="_blank" rel="noopener noreferrer">${escapeText(label)}</a>`:escapeText(label);
+const repo=id=>link('https://github.com/'+id,id);
+const math=body=>`<div class="formula"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">${body}</math></div>`;
+const n=x=>`<mn>${escapeText(x)}</mn>`;
+const frac=(a,b)=>`<mfrac><mrow>${a}</mrow><mrow>${b}</mrow></mfrac>`;
+const terms=items=>items.map(([v,w])=>n(w)+'<mo>×</mo>'+n(v)).join('<mo>+</mo>');
+let selected=0;
+document.getElementById('summary').textContent=`${data.targets.length} frozen Scala seed projects · ${data.counts.artifacts.toLocaleString()} artifacts · ${data.counts.fallout.toLocaleString()} verified project relationships · Snapshot ${data.metadata.collected_at}`;
+document.getElementById('coverage').textContent=`${data.gaps.toLocaleString()} recorded evidence/discovery gaps. Exposure reflects verified paths in the available index; missing relationships are not proof of no usage.`;
+document.getElementById('rank-note').textContent='Review candidates first, ranked by exposed Value. Other seed projects follow.';
+function ranking(){
+ const query=document.getElementById('search').value.toLowerCase();
+ const max=Math.max(...data.targets.map(t=>t.exposure),1);
+ document.getElementById('ranking').innerHTML=data.targets.map((t,i)=>{
+  const p=data.projects[t.project];
+  if(!(p[0]+' '+t.categories.join(' ')).toLowerCase().includes(query))return '';
+  return `<li><button class="rank-button" data-index="${i}" aria-pressed="${i===selected}"><span class="rank-line"><span class="repo-name">${i+1}. ${escapeText(p[0])}</span><span class="number">${fmt(t.exposure)}</span></span><span class="category">${t.candidate?'Review candidate':'Other seed'} · ${t.dependants.length} dependants</span><div class="bar" style="width:${t.exposure/max*100}%"></div></button></li>`;
+ }).join('');
+ document.querySelectorAll('.rank-button').forEach(b=>b.onclick=()=>{selected=Number(b.dataset.index);ranking();detail()});
+}
+function maintenance(h){
+ let calculation='';
+ if(h.archived)calculation=math('<mi>M</mi><mo>=</mo><mn>0</mn>');
+ else if(h.maintenance!=null)calculation=math('<mi>M</mi><mo>=</mo>'+frac(terms(h.parts.map(p=>[p.value.toFixed(4),p.weight])),h.parts.map(p=>n(p.weight)).join('<mo>+</mo>'))+'<mo>≈</mo>'+n(fmt(h.maintenance)));
+ return `<h3>Maintenance</h3><ul class="evidence"><li>Last repository push: ${h.push_days==null?'unknown':h.push_days+' days before the snapshot'}.</li><li>Past-year apparent human author records: ${escapeText(h.humans)} (recognized bots excluded).</li><li>Contributor absence factor: ${escapeText(h.absence_factor)} author records account for at least half of the observed human commits.</li><li>Usable maintenance evidence covers ${Math.round(h.maintenance_coverage*100)}% of planned weight.</li></ul><p>${escapeText(h.maintenance_note)}</p><p class="secondary">Weights: push recency 0.25, human authors 0.35, contributor absence factor 0.40. Only fresh, available terms enter the calculation.</p>${math('<mi>R</mi><mo>=</mo><mi>max</mi><mo>(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>−</mo>'+frac('<mi>days</mi>','<mn>365</mn>')+'<mo>)</mo>')}${math('<mi>H</mi><mo>=</mo><mi>min</mi><mo>(</mo><mn>1</mn><mo>,</mo>'+frac('<mi>authors</mi>','<mn>5</mn>')+'<mo>)</mo><mspace width="1em"/><mi>C</mi><mo>=</mo><mi>min</mi><mo>(</mo><mn>1</mn><mo>,</mo>'+frac('<mi>absence factor</mi>','<mn>3</mn>')+'<mo>)</mo>')}${h.parts.map(part=>{const raw=part.name==='Push recency'?h.push_days:part.name==='Human author records'?h.humans:h.absence_factor;return '<p class="secondary">'+escapeText(part.name)+': observed input '+escapeText(raw)+'</p>'+math('<mi>x</mi><mo>=</mo>'+n(Number(part.value).toFixed(4)))}).join('')}${math('<mi>M</mi><mo>=</mo>'+frac('<munder><mo>∑</mo><mi>observed</mi></munder><msub><mi>w</mi><mi>i</mi></msub><msub><mi>x</mi><mi>i</mi></msub>','<munder><mo>∑</mo><mi>observed</mi></munder><msub><mi>w</mi><mi>i</mi></msub>'))}${calculation}`;
+}
+function security(h){
+ const valid=h.checks.filter(c=>c.score!=null);
+ const calc=h.security==null?'':math('<mi>S</mi><mo>=</mo>'+frac(terms(valid.map(c=>[(c.score/10).toFixed(2),c.weight])),valid.map(c=>n(c.weight)).join('<mo>+</mo>'))+'<mo>≈</mo>'+n(fmt(h.security)));
+ return `<h3>Security</h3><p>Scorecard scan: ${escapeText(h.scan_date||'unknown')}. Usable checks cover ${Math.round(h.security_coverage*100)}% of planned weight.</p><table><thead><tr><th>Practice</th><th>Score / 10</th><th>Weight</th><th>Observed evidence</th></tr></thead><tbody>${h.checks.map(c=>`<tr><td>${escapeText(c.name.replaceAll('-',' '))}</td><td>${fmt(c.score)}</td><td>${c.weight}</td><td>${escapeText(c.reason)}</td></tr>`).join('')}</tbody></table><p>${escapeText(h.security_note)}</p>${math('<mi>S</mi><mo>=</mo>'+frac('<munder><mo>∑</mo><mi>observed</mi></munder><msub><mi>w</mi><mi>j</mi></msub><mo>×</mo><mfrac><msub><mi>s</mi><mi>j</mi></msub><mn>10</mn></mfrac>','<munder><mo>∑</mo><mi>observed</mi></munder><msub><mi>w</mi><mi>j</mi></msub>'))}${calc}`;
+}
+function detail(){
+ const t=data.targets[selected];if(!t){document.getElementById('detail').textContent='No seed projects available.';return}
+ const p=data.projects[t.project],h=t.health;
+ document.getElementById('detail').innerHTML=`<h2>${repo(p[0])}</h2><p class="secondary">${escapeText(t.categories.join(' · '))}</p><div class="metrics"><div><span>Maintenance</span><strong>${fmt(h.maintenance)}</strong></div><div><span>Security</span><strong>${fmt(h.security)}</strong></div><div><span>Exposed Value</span><strong>${fmt(t.exposure)}</strong></div><div><span>Dependants</span><strong>${t.dependants.length}</strong></div></div>${maintenance(h)}<div class="source-links secondary">${link(t.sources.repository,'Raw repository evidence')} ${link(t.sources.commits,'Raw commit evidence')}</div>${security(h)}<div class="source-links secondary">${link(t.sources.scorecard,'Raw security evidence')}</div><h3>Exposed Value</h3><p>Each distinct dependant contributes once. ${t.unvalued} dependants have unknown Value and are excluded from the numeric sum.</p>${math('<mi>V</mi><mo>=</mo><mi>min</mi><mo>(</mo><mn>1</mn><mo>,</mo>'+frac('<mi>ln</mi><mo>(</mo><mn>1</mn><mo>+</mo><mi>stars</mi><mo>)</mo>','<mi>ln</mi><mo>(</mo><mn>100001</mn><mo>)</mo>')+'<mo>)</mo><mspace width="1em"/><mi>E</mi><mo>=</mo><munder><mo>∑</mo><mi>dependants</mi></munder><mi>V</mi>')}<ul class="beneficiaries">${t.dependants.map(([pi,path],i)=>{const d=data.projects[pi];return `<li class="beneficiary"><div class="beneficiary-head"><span>${i+1}.</span>${repo(d[0])}<span class="number">Value ${fmt(d[2])}</span><span class="secondary">${d[1]==null?'Unknown stars':d[1].toLocaleString()+' stars'}</span><button class="path-toggle" aria-expanded="false" aria-controls="path-${i}">Show path</button></div><ol class="path" id="path-${i}" hidden>${path.map(ei=>{const e=data.edges[ei];return `<li><div>${escapeText(e[0])}</div><div>↓ ${escapeText(e[2])} ${link(e[3],'POM evidence')}</div><div>${escapeText(e[1])}</div></li>`}).join('')}</ol></li>`}).join('')}</ul>${t.dependants.length?'':'<p class="empty">No qualifying paths were observed. Check collection gaps before interpreting this as no dependants.</p>'}`;
+ document.querySelectorAll('.path-toggle').forEach(button=>button.onclick=()=>{const open=button.getAttribute('aria-expanded')==='true';button.setAttribute('aria-expanded',String(!open));button.textContent=open?'Show path':'Hide path';document.getElementById(button.getAttribute('aria-controls')).hidden=open});
+}
+document.getElementById('search').oninput=ranking;ranking();detail();
+</script></body></html>

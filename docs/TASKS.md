@@ -1,10 +1,10 @@
 # Requested changes
 
-Collect tasks here. Do not implement until the user instructs us to execute them.
+Implementation authorized on 2026-09-07: complete the tasks below, starting with the project foundation.
 
 ## Commit and push authorization
 
-The user explicitly granted blanket, unlimited permission on 2026-09-07 to commit and push work on this project. This overrides the earlier requirement for separate permission for each commit or push. During implementation, commit and push as needed without asking again, including the GitHub Actions validation workflow. Continue to omit AI attribution from commit messages and authors. This authorization does not change the exclusion of website deployment or the instruction to wait for the user to start implementation.
+The user explicitly granted blanket, unlimited permission on 2026-09-07 to commit and push work on this project. This overrides the earlier requirement for separate permission for each commit or push. During implementation, commit and push as needed without asking again, including the GitHub Actions validation workflow. Continue to omit AI attribution from commit messages and authors. This authorization does not change the exclusion of website deployment ; implementation is now authorized.
 
 Website deployment and hosting are out of scope for this implementation. Do not set up Cloudflare, GitHub Pages, or website deployment scripts/workflows. Local standalone preview generation remains in scope, as do the explicitly requested private GitHub source repository and validation-only GitHub Actions workflow.
 
@@ -12,13 +12,13 @@ Website deployment and hosting are out of scope for this implementation. Do not 
 
 Complete this before implementing the other changes below.
 
-- [ ] Initialize a Git repository at the project root. Commits and pushes are authorized under the blanket permission above.
-- [ ] Set up a proper Python project using uv, with dependencies and development tools declared in `pyproject.toml`, a reproducible `uv.lock`, and a uv-managed local virtual environment. Document setup and commands using uv rather than relying on globally installed packages or Codex-specific runtimes.
-- [ ] Organize application code under `src/` as an importable package, automated tests under `tests/`, and project documentation under `docs/`. Keep the entry-point README, project configuration, and lockfile at the root. Keep seed YAML configuration separate from generated data. Update imports, command entry points, tests, rebuild scripts, and documentation links to match the structure. Move this task document into the documentation structure as part of the reorganization.
-- [ ] Add `.gitignore` rules for the virtual environment, Python bytecode, tool/test caches, build artifacts, generated data snapshots/databases, fetched evidence caches, generated results/previews, and local temporary files. Preserve existing source material and partner-supplied inputs; distinguish those from regenerable collected data. Keep source templates, seed configuration, code, tests, and dependency declarations eligible for version control.
-- [ ] Add Ruff to the development dependencies and validation pipeline for linting and formatting checks, alongside the automated test suite. Ruff is a linter/formatter, not a static type checker; do not claim these checks provide static type checking. Provide a documented validation command and run it after the structural migration.
+- [x] Initialize a Git repository at the project root. Commits and pushes are authorized under the blanket permission above.
+- [x] Set up a proper Python project using uv, with dependencies and development tools declared in `pyproject.toml`, a reproducible `uv.lock`, and a uv-managed local virtual environment. Document setup and commands using uv rather than relying on globally installed packages or Codex-specific runtimes.
+- [x] Organize application code under `src/` as an importable package, automated tests under `tests/`, and project documentation under `docs/`. Keep the entry-point README, project configuration, and lockfile at the root. Keep seed YAML configuration separate from generated data. Update imports, command entry points, tests, rebuild scripts, and documentation links to match the structure. Move this task document into the documentation structure as part of the reorganization.
+- [x] Add `.gitignore` rules for the virtual environment, Python bytecode, tool/test caches, build artifacts, generated data snapshots/databases, fetched evidence caches, generated results/previews, and local temporary files. Preserve existing source material and partner-supplied inputs; distinguish those from regenerable collected data. Keep source templates, seed configuration, code, tests, and dependency declarations eligible for version control.
+- [x] Add Ruff to the development dependencies and validation pipeline for linting and formatting checks, alongside the automated test suite. Ruff is a linter/formatter, not a static type checker; do not claim these checks provide static type checking. Provide a documented validation command and run it after the structural migration.
 
-- [ ] Add Astral's `ty` as a uv-managed development dependency and run `uv run ty check` in the documented validation pipeline alongside Ruff and automated tests. During refactoring, add meaningful function annotations and typed domain structures so type checking covers the model and pipeline effectively, rather than relying on pervasive `Any` or blanket suppressions. Configure type checking in the project and resolve reported issues.
+- [x] Add Astral's `ty` as a uv-managed development dependency and run `uv run ty check` in the documented validation pipeline alongside Ruff and automated tests. During refactoring, add meaningful function annotations and typed domain structures so type checking covers the model and pipeline effectively, rather than relying on pervasive `Any` or blanket suppressions. Configure type checking in the project and resolve reported issues.
 
 ## Remaining implementation tasks
 
