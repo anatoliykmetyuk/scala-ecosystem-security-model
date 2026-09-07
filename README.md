@@ -25,7 +25,7 @@ Optionally set `ECOSYSTEMS_CONTACT_EMAIL` to an email you authorize sending to e
 
 This single command reads **[config/seeds.yaml](config/seeds.yaml)**, creates a fresh evidence directory and SQLite snapshot, collects dependencies and score inputs, calculates and validates results, then generates **`output/preview.html`**. Open that file directly in a browser. It embeds the required data and needs no API connection or local server to view.
 
-This is a substantial Maven-wide crawl, not a quick build: every artifact variant of the selected projects is queried, followed by reverse discovery through three hops and version-specific verification. Runtime depends on index size and API response times. Progress is printed by phase and batch. HTTP failures and unresolved declarations are recorded as gaps, not silently converted to zero scores. The preview reports the gap count.
+This is a substantial Maven-wide crawl, not a quick build: published coordinates matching the configured modules and matrix are queried, followed by reverse discovery through three hops and version-specific verification. Runtime depends on index size and API response times. Progress is printed by phase and batch. HTTP failures and unresolved declarations are recorded as gaps, not silently converted to zero scores. The preview reports the gap count.
 
 Each run is retained under `output/runs/<UTC timestamp>/`:
 
@@ -55,7 +55,31 @@ uv run scala-security render --database output/runs/<run>/snapshot.sqlite
 
 ### Seeds
 
-The editable YAML records repositories, categories, source ranks/URLs, Scala eligibility evidence, artifact inventories and exclusions. The current selection takes up to ten eligible projects per Awesome Scala category in Scaladex's default order. The cohort is fixed across ordinary rebuilds; artifact coverage is refreshed for those projects.
+The editable YAML uses schema 2: repositories, main-section categories, source ranks/URLs, Scala eligibility evidence and unsuffixed module coordinates. A single shared matrix controls cross-build dimensions:
+
+```yaml
+schema: 2
+matrix:
+  jvm:
+    scala: ['2.13', '3']
+projects:
+  - repository: scala-graph/scala-graph
+    categories: [Computer Science]
+    modules:
+      - org.scala-graph:graph-core
+```
+
+This expands `graph-core` into JVM coordinates ending in `_2.13` and `_3`. On a rebuild, the collector intersects these candidates with the published Scaladex inventory before reverse lookup. Missing variants are recorded in `coordinate_checks`; an unavailable inventory never becomes an assumed publication. Generated artifact names live in SQLite, not the seed YAML. Unsuffixed artifacts and full-compiler-version cross-builds are outside this binary-version matrix. Other platforms are disabled; the schema supports explicit `scala_js` / `scala_native` entries with `versions` and `scala` lists if intentionally enabled later.
+
+The seed contains at most 100 distinct projects, with at most ten allocated to any main Awesome Scala section. Selection cycles through main sections in overview order; each section interleaves its child-category candidates by source rank, skipping repositories already selected. Child categories do not receive independent final quotas. The current file was revised offline from previously captured candidates and overview HTML; its provenance retains the source snapshot date. Ordinary rebuilds keep the selected projects and modules fixed.
+
+Inspect the expansion without any network requests:
+
+```sh
+uv run scala-security plan
+```
+
+This prints project/module counts, the matrix and the number of candidate coordinates. It does not assert that every matrix combination is published, and does not fetch data.
 
 To intentionally replace the frozen cohort with a new source snapshot:
 

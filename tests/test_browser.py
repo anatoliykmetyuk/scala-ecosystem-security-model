@@ -41,12 +41,17 @@ def test_report_interactions_and_math(tmp_path: Path) -> None:
             "INSERT INTO observations VALUES(?,?,?,?)",
             ("scala/b", kind, json.dumps(payload), "https://example.test/evidence"),
         )
+    db.execute(
+        "INSERT INTO metadata VALUES('target_matrix',?)",
+        (json.dumps({"jvm": {"scala": ["2.13", "3"]}}),),
+    )
     analyze(db)
     report = tmp_path / "preview.html"
     render(db, report)
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        page = browser.new_page()
+        context = browser.new_context(offline=True)
+        page = context.new_page()
         errors: list[str] = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(report.as_uri())
@@ -55,6 +60,7 @@ def test_report_interactions_and_math(tmp_path: Path) -> None:
         assert "0.50" in page.locator(".metrics").inner_text()
         assert page.locator("math").filter(has_text="0.3333").count() >= 1
         assert page.locator("select").count() == 0
+        assert "jvm · Scala 2.13, 3" in page.locator("#matrix").inner_text()
         assert "Maximum 3 dependency hops" in page.locator("header").inner_text()
         page.locator(".beneficiary-head .number").first.click()
         assert page.locator(".path").first.is_visible()
@@ -62,7 +68,7 @@ def test_report_interactions_and_math(tmp_path: Path) -> None:
         assert not page.locator(".path").first.is_visible()
         link = page.locator(".beneficiary-head a").first
         assert link.get_attribute("target") == "_blank"
-        page.route("https://github.com/**", lambda route: route.fulfill(body="repository"))
+        context.route("https://github.com/**", lambda route: route.fulfill(body="repository"))
         with page.expect_popup() as popup:
             link.click()
         popup.value.close()

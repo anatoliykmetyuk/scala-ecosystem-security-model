@@ -48,6 +48,8 @@ def connect(path: Path) -> sqlite3.Connection:
     CREATE TABLE IF NOT EXISTS artifacts(id TEXT PRIMARY KEY, project TEXT REFERENCES projects(id),
       latest TEXT, published TEXT, source TEXT);
     CREATE INDEX IF NOT EXISTS artifacts_project ON artifacts(project);
+    CREATE TABLE IF NOT EXISTS target_artifacts(artifact TEXT PRIMARY KEY REFERENCES artifacts(id));
+    CREATE TABLE IF NOT EXISTS coordinate_checks(project TEXT REFERENCES projects(id), artifact TEXT, published INTEGER NOT NULL, PRIMARY KEY(project,artifact));
     CREATE TABLE IF NOT EXISTS versions(id TEXT PRIMARY KEY, artifact TEXT NOT NULL REFERENCES artifacts(id),
       number TEXT NOT NULL, fetched INTEGER NOT NULL DEFAULT 0);
     CREATE TABLE IF NOT EXISTS edges(id INTEGER PRIMARY KEY, source TEXT REFERENCES versions(id),

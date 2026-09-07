@@ -8,6 +8,7 @@ import pytest
 
 from scala_security.analyze import analyze, validate
 from scala_security.collect import Collector, dependencies, exact
+from scala_security.configuration import DEFAULT_MATRIX, parse_config
 from scala_security.data import JSON, connect, repo_name
 from scala_security.http import Fetcher, query
 from scala_security.render import render
@@ -268,8 +269,15 @@ def test_offline_collection_to_preview(tmp_path):
         return httpx.Response(404, json={})
 
     db = connect(tmp_path / "snapshot.sqlite")
-    Collector(db, Fetcher(tmp_path / "evidence", httpx.MockTransport(handler))).run(
-        [{"repository": "scala/c", "categories": ["testing"], "artifacts": ["g:c_3"]}]
+    config = parse_config(
+        {
+            "schema": 2,
+            "matrix": DEFAULT_MATRIX,
+            "projects": [{"repository": "scala/c", "categories": ["testing"], "modules": ["g:c"]}],
+        }
+    )
+    Collector(db, Fetcher(tmp_path / "evidence", httpx.MockTransport(handler)), config).run(
+        config.projects
     )
     analyze(db)
     assert validate(db)["fallout"] == 1
@@ -325,7 +333,10 @@ def test_seed_selection_uses_all_variants_and_filters_java(tmp_path):
     def handler(request):
         path = request.url.path
         if path == "/awesome":
-            return httpx.Response(200, text='<a href="/awesome/testing?sort=stars">Testing</a>')
+            return httpx.Response(
+                200,
+                text='<h2>Quality</h2><h3><a href="/awesome/testing?sort=stars">Testing</a></h3>',
+            )
         if path == "/awesome/testing":
             return httpx.Response(
                 200,
@@ -353,7 +364,9 @@ def test_seed_selection_uses_all_variants_and_filters_java(tmp_path):
     select(Fetcher(tmp_path / "evidence", httpx.MockTransport(wrapped)), tmp_path / "seeds.yaml")
     config = yaml.safe_load((tmp_path / "seeds.yaml").read_text())
     assert [p["repository"] for p in config["projects"]] == ["scala/good"]
-    assert config["projects"][0]["artifacts"] == ["g:good_2.12", "g:good_3"]
+    assert config["projects"][0]["modules"] == ["g:good"]
+    assert config["projects"][0]["categories"] == ["Quality"]
+    assert config["matrix"] == DEFAULT_MATRIX
     assert config["exclusions"][0]["project"] == "java/only"
 
 

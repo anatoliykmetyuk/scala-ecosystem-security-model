@@ -25,7 +25,9 @@ def allowed(edge: Edge, depth: int) -> bool:
     return edge.scope in scopes and (depth == 0 or edge.optional is False) and edge.exact
 
 
-def paths(db: sqlite3.Connection, roots: list[str], max_hops: int = 3) -> dict[str, list[int]]:
+def paths(
+    db: sqlite3.Connection, roots: list[str], max_hops: int = 3, targets: set[str] | None = None
+) -> dict[str, list[int]]:
     queue = deque((root, []) for root in roots)
     visited = set(roots)
     found: dict[str, list[int]] = {}
@@ -34,7 +36,7 @@ def paths(db: sqlite3.Connection, roots: list[str], max_hops: int = 3) -> dict[s
         if len(path) == max_hops:
             continue
         for row in db.execute(
-            """SELECT e.*, a.project FROM edges e JOIN versions v ON v.id=e.target
+            """SELECT e.*, a.project, a.id AS artifact FROM edges e JOIN versions v ON v.id=e.target
                                  JOIN artifacts a ON a.id=v.artifact WHERE e.source=? ORDER BY e.target,e.scope,e.id""",
             (source,),
         ):
@@ -50,7 +52,11 @@ def paths(db: sqlite3.Connection, roots: list[str], max_hops: int = 3) -> dict[s
             if not allowed(edge, len(path)):
                 continue
             extended = path + [edge.id]
-            if edge.project and edge.project not in found:
+            if (
+                edge.project
+                and edge.project not in found
+                and (targets is None or row["artifact"] in targets)
+            ):
                 found[edge.project] = extended
             if edge.target not in visited:
                 visited.add(edge.target)

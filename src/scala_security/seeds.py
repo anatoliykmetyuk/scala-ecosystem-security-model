@@ -3,18 +3,17 @@
 from __future__ import annotations
 
 import json
-import re
 from datetime import datetime, timezone
 from pathlib import Path
 
 import yaml
 from bs4 import BeautifulSoup
 
+from .configuration import DEFAULT_MATRIX, excluded_repository, modules_for, parse_config
 from .data import JSON, obj, rows, string
 from .http import Fetcher, parallel
 
 INDEX = "https://index.scala-lang.org"
-SCALA_SUFFIX = re.compile(r"_(?:2\.\d+|3)(?:[._-].*)?$")
 
 
 def coordinates(items: object) -> list[str]:
@@ -34,16 +33,110 @@ def project_inventory(fetch: Fetcher, project: str) -> tuple[list[str], list[dic
     return artifacts, latest
 
 
+def main_sections(html: str) -> dict[str, list[str]]:
+    """Keep the overview's section hierarchy, not a flat quota per child category."""
+    groups: dict[str, list[str]] = {}
+    current = ""
+    for heading in BeautifulSoup(html, "html.parser").select("h2,h3"):
+        if heading.name == "h2":
+            current = heading.get_text(" ", strip=True)
+        elif current:
+            link = heading.select_one('a[href^="/awesome/"]')
+            if link:
+                slug = string(link.get("href")).split("/")[-1].split("?")[0]
+                if slug not in groups.setdefault(current, []):
+                    groups[current].append(slug)
+    if not groups:
+        raise ValueError("No main Awesome Scala sections found; refusing a flat-category fallback")
+    return groups
+
+
+def choose_projects(
+    candidates: list[dict[str, JSON]], sections: dict[str, list[str]], limit: int = 100
+) -> list[dict[str, JSON]]:
+    """Round-robin sections, then source-ranked child categories, with explicit caps."""
+    if not 1 <= limit <= 100:
+        raise ValueError("Project limit must be between 1 and 100")
+    candidates = [p for p in candidates if not excluded_repository(string(p["repository"]))]
+    queues: dict[str, list[dict[str, JSON]]] = {}
+    for section, children in sections.items():
+        child_queues = []
+        for child in children:
+            ranked = []
+            for project in candidates:
+                ranks = [
+                    int(str(s["rank"]))
+                    for s in rows(project.get("selection"))
+                    if s.get("category") == child
+                ]
+                if ranks:
+                    ranked.append((min(ranks), string(project["repository"]), project))
+            child_queues.append([p for _, _, p in sorted(ranked, key=lambda r: (r[0], r[1]))])
+        queues[section] = [
+            q[i]
+            for i in range(max(map(len, child_queues), default=0))
+            for q in child_queues
+            if i < len(q)
+        ]
+    chosen: list[dict[str, JSON]] = []
+    seen: set[str] = set()
+    quotas = dict.fromkeys(sections, 0)
+    while len(chosen) < limit:
+        progress = False
+        for section, queue in queues.items():
+            if quotas[section] >= 10:
+                continue
+            while queue and string(queue[0]["repository"]) in seen:
+                queue.pop(0)
+            if not queue:
+                continue
+            project = dict(queue.pop(0))
+            repo = string(project["repository"])
+            seen.add(repo)
+            children = {string(s.get("category")) for s in rows(project.get("selection"))}
+            project["categories"] = [
+                name for name, subs in sections.items() if children.intersection(subs)
+            ]
+            project["selected_from"] = section
+            chosen.append(project)
+            quotas[section] += 1
+            progress = True
+            if len(chosen) == limit:
+                break
+        if not progress:
+            break
+    return chosen
+
+
+def seed_document(
+    projects: list[dict[str, JSON]],
+    sections: dict[str, list[str]],
+    matrix: dict[str, JSON],
+    selected_at: str,
+) -> dict[str, JSON]:
+    return {
+        "schema": 2,
+        "selected_at": selected_at,
+        "source": INDEX + "/awesome",
+        "matrix": matrix,
+        "selection_policy": {
+            "max_projects": 100,
+            "max_per_main_section": 10,
+            "rule": "Round-robin main sections in overview order; within each section, interleave child-category lists in overview order by source rank; skip duplicate repositories; stop at 100 projects or exhaustion. Candidate pool is up to 10 eligible entries per child category.",
+            "sections": [{"name": name, "subcategories": subs} for name, subs in sections.items()],
+        },
+        "projects": projects,
+    }
+
+
 def select(fetch: Fetcher, destination: Path) -> None:
-    soup = BeautifulSoup(fetch.text(INDEX + "/awesome"), "html.parser")
-    categories = sorted(
-        {
-            string(a.get("href")).split("/")[-1].split("?")[0]
-            for a in soup.select('a[href^="/awesome/"]')
-        }
+    sections = main_sections(fetch.text(INDEX + "/awesome"))
+    categories = list(dict.fromkeys(child for children in sections.values() for child in children))
+    matrix = (
+        parse_config(yaml.safe_load(destination.read_text())).matrix
+        if destination.exists()
+        else DEFAULT_MATRIX
     )
-    if not categories:
-        raise RuntimeError("Scaladex categories unavailable; refusing an empty seed selection")
     projects: dict[str, dict[str, JSON]] = {}
     exclusions: list[dict[str, JSON]] = []
     inventory: dict[str, tuple[list[str], list[dict[str, JSON]]]] = {}
@@ -62,9 +155,11 @@ def select(fetch: Fetcher, destination: Path) -> None:
                 for a in doc.select("ol.list-result > li > a")
             ]
             refs = [r for r in refs if r not in seen]
-            if not refs:
+            page_refs = refs
+            refs = [r for r in refs if not excluded_repository(r)]
+            if not page_refs:
                 break
-            seen.update(refs)
+            seen.update(page_refs)
             missing = [r for r in refs if r not in inventory]
             for ref, result in parallel(lambda r: (r, project_inventory(fetch, r)), missing):
                 inventory[ref] = result
@@ -74,9 +169,11 @@ def select(fetch: Fetcher, destination: Path) -> None:
                 language_refs,
             ):
                 languages[ref] = data
-            for rank, ref in enumerate(refs, (page - 1) * 20 + 1):
+            ranks = {ref: rank for rank, ref in enumerate(page_refs, (page - 1) * 20 + 1)}
+            for ref in refs:
+                rank = ranks[ref]
                 artifacts, latest = inventory[ref]
-                scala = [a for a in artifacts if SCALA_SUFFIX.search(a)]
+                modules = modules_for(artifacts, matrix)
                 language = languages[ref]
                 numeric_languages = {
                     k: v for k, v in language.items() if isinstance(v, (int, float))
@@ -86,7 +183,7 @@ def select(fetch: Fetcher, destination: Path) -> None:
                     if numeric_languages
                     else "unknown"
                 )
-                if not scala or not latest or primary != "Scala":
+                if not modules or not latest or primary != "Scala":
                     exclusions.append(
                         {
                             "project": ref,
@@ -102,7 +199,7 @@ def select(fetch: Fetcher, destination: Path) -> None:
                         "categories": [],
                         "selection": [],
                         "eligibility": "Scaladex project mapping, published Scala cross-build artifacts, and Scala as largest source language",
-                        "artifacts": artifacts,
+                        "modules": modules,
                         "language_evidence": language,
                         "language_source": f"https://api.github.com/repos/{ref}/languages",
                     }
@@ -120,19 +217,15 @@ def select(fetch: Fetcher, destination: Path) -> None:
             "Seed source requests failed; refusing to replace the frozen cohort with incomplete evidence"
         )
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(
-        yaml.safe_dump(
-            {
-                "schema": 1,
-                "selected_at": datetime.now(timezone.utc).isoformat(),
-                "source": INDEX + "/awesome",
-                "rule": "Up to 10 Scala artifact-publishing projects per category in default Scaladex order; repository deduplicated",
-                "projects": list(projects.values()),
-                "exclusions": exclusions,
-            },
-            sort_keys=False,
-        )
+    document = seed_document(
+        choose_projects(list(projects.values()), sections),
+        sections,
+        matrix,
+        datetime.now(timezone.utc).isoformat(),
     )
+    document["exclusions"] = exclusions
+    parse_config(document)
+    destination.write_text(yaml.safe_dump(document, sort_keys=False))
     (destination.parent / "selection-evidence.json").write_text(
         json.dumps({"requests": sorted(fetch.used), "failures": fetch.failures}, indent=2)
     )

@@ -15,14 +15,15 @@ import yaml
 
 from .analyze import analyze, validate
 from .collect import Collector
-from .data import connect, obj, rows
+from .configuration import parse_config
+from .data import connect
 from .http import Fetcher
 from .seeds import select
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=["select", "rebuild", "render", "validate"])
+    parser.add_argument("command", choices=["select", "rebuild", "render", "validate", "plan"])
     parser.add_argument("--seeds", type=Path, default=Path("config/seeds.yaml"))
     parser.add_argument("--output", type=Path, default=Path("output"))
     parser.add_argument(
@@ -43,12 +44,30 @@ def main() -> None:
             args.seeds,
         )
         return
+    if args.command in {"rebuild", "plan"}:
+        seed_bytes = args.seeds.read_bytes()
+        config = parse_config(yaml.safe_load(seed_bytes))
+        if args.command == "plan":
+            print(
+                json.dumps(
+                    {
+                        "projects": len(config.projects),
+                        "modules": config.module_count,
+                        "matrix": config.matrix,
+                        "candidate_coordinates": len(
+                            {a for p in config.projects for a in config.coordinates(p)}
+                        ),
+                        "note": "Offline expansion only; published-coordinate availability is checked during collection.",
+                    },
+                    indent=2,
+                )
+            )
+            return
     if args.command == "rebuild":
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
         run = args.output / "runs" / stamp
         run.mkdir(parents=True)
         db = connect(run / "snapshot.sqlite")
-        seed_bytes = args.seeds.read_bytes()
         (run / "seeds.yaml").write_bytes(seed_bytes)
         db.execute(
             "INSERT INTO metadata VALUES(?,?)",
@@ -75,7 +94,7 @@ def main() -> None:
                 source_hash.update(file.read_bytes())
         db.execute("INSERT INTO metadata VALUES(?,?)", ("source_sha256", source_hash.hexdigest()))
         fetch = Fetcher(args.reuse_cache or run / "evidence")
-        Collector(db, fetch).run(rows(obj(yaml.safe_load(seed_bytes)).get("projects")))
+        Collector(db, fetch, config).run(config.projects)
         analyze(db)
     else:
         path = args.database

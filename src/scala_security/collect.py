@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from urllib.parse import quote
 from xml.etree import ElementTree as ET
 
+from .configuration import SeedConfig
 from .data import JSON, number, obj, repo_name, rows, string
 from .http import Fetcher, parallel, query, stream
 from .seeds import INDEX, coordinates
@@ -135,8 +136,11 @@ def compact_package(package: dict[str, JSON]) -> dict[str, JSON]:
 
 
 class Collector:
-    def __init__(self, db: sqlite3.Connection, fetch: Fetcher) -> None:
+    def __init__(
+        self, db: sqlite3.Connection, fetch: Fetcher, config: SeedConfig | None = None
+    ) -> None:
         self.db, self.fetch = db, fetch
+        self.config = config
         self.claims: dict[str, set[str]] = {}
         self.unresolved_owners: set[str] = set()
 
@@ -180,6 +184,8 @@ class Collector:
         return name
 
     def seed(self, item: dict[str, JSON]) -> list[str]:
+        if self.config is None:
+            raise ValueError("A validated seed matrix is required for collection")
         project = string(item["repository"])
         self.db.execute(
             "INSERT OR IGNORE INTO projects(id,seed,categories) VALUES(?,1,?)",
@@ -189,16 +195,31 @@ class Collector:
         # Refresh artifact coverage for frozen projects; the cohort itself never changes implicitly.
         url = f"{INDEX}/api/v1/projects/{project}/artifacts?stable-only=false"
         inventory = self.fetch.json(url)
-        artifacts = coordinates(inventory)
-        if not artifacts:
-            frozen = item.get("artifacts")
-            artifacts = [string(x) for x in frozen] if isinstance(frozen, list) else []
+        expected = self.config.coordinates(item)
+        if not isinstance(inventory, list):
             self.gap(
-                "inventory", project, "Live inventory unavailable; using frozen artifact inventory"
+                "inventory",
+                project,
+                "Published inventory unavailable; no coordinates assumed to exist",
+            )
+            return []
+        published = set(coordinates(inventory))
+        artifacts = sorted(set(expected) & published)
+        if not artifacts:
+            self.gap(
+                "inventory",
+                project,
+                "No published coordinates match the configured modules and matrix",
+            )
+        for name in expected:
+            self.db.execute(
+                "INSERT OR REPLACE INTO coordinate_checks VALUES(?,?,?)",
+                (project, name, int(name in published)),
             )
         for name in artifacts:
             self.claims.setdefault(name, set()).add(project)
             self.package({"name": name}, project)
+            self.db.execute("INSERT OR IGNORE INTO target_artifacts VALUES(?)", (name,))
         return artifacts
 
     def reconcile_ownership(self) -> None:
@@ -300,11 +321,23 @@ class Collector:
                     continue
                 version = next(iter(versions))
                 self.db.execute("UPDATE projects SET latest=? WHERE id=?", (version, project))
+                seed_project = self.db.execute(
+                    "SELECT seed FROM projects WHERE id=?", (project,)
+                ).fetchone()[0]
+                roots_before = len(roots)
                 for record in latest:
                     name = (
                         string(record.get("name"))
                         or f"{record.get('groupId')}:{record.get('artifactId')}"
                     )
+                    if (
+                        seed_project
+                        and not self.db.execute(
+                            "SELECT 1 FROM target_artifacts t JOIN artifacts a ON a.id=t.artifact WHERE t.artifact=? AND a.project=?",
+                            (name, project),
+                        ).fetchone()
+                    ):
+                        continue
                     self.package({"name": name}, project)
                     root = name + "@" + version
                     self.db.execute(
@@ -312,6 +345,12 @@ class Collector:
                         (root, name, version),
                     )
                     roots.append(root)
+                if seed_project and len(roots) == roots_before:
+                    self.gap(
+                        "release",
+                        project,
+                        "Latest project release has no selected matrix coordinates; no older seed release substituted",
+                    )
             self.db.commit()
             print(
                 f"Latest releases: {min(start + 120, len(projects))}/{len(projects)} projects",
@@ -443,6 +482,15 @@ class Collector:
         self.db.commit()
 
     def run(self, seeds: list[dict[str, JSON]]) -> None:
+        if self.config is None or seeds != self.config.projects:
+            raise ValueError(
+                "Collection requires the validated configuration and its seed projects"
+            )
+        self.db.execute("INSERT OR REPLACE INTO metadata VALUES('seed_schema','2')")
+        self.db.execute(
+            "INSERT OR REPLACE INTO metadata VALUES(?,?)",
+            ("target_matrix", json.dumps(self.config.matrix)),
+        )
         start = time.monotonic()
         targets: list[str] = []
         for seed in seeds:

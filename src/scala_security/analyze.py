@@ -20,6 +20,13 @@ def analyze(db: sqlite3.Connection) -> None:
     db.executescript(
         "DELETE FROM path_steps; DELETE FROM fallout; DELETE FROM ranking; DELETE FROM scores;"
     )
+    restricted = (
+        db.execute("SELECT 1 FROM metadata WHERE key='seed_schema' AND value='2'").fetchone()
+        is not None
+    )
+    targets = (
+        {r[0] for r in db.execute("SELECT artifact FROM target_artifacts")} if restricted else None
+    )
     scoring_seconds = traversal_seconds = 0.0
     seeds = {r[0] for r in db.execute("SELECT id FROM projects WHERE seed=1")}
     for project in db.execute("SELECT * FROM projects").fetchall():
@@ -60,7 +67,7 @@ def analyze(db: sqlite3.Connection) -> None:
                 (project["id"], project["latest"]),
             )
         ]
-        for target, path in paths(db, roots).items():
+        for target, path in paths(db, roots, targets=targets).items():
             if target not in seeds or target == project["id"]:
                 continue
             db.execute("INSERT OR IGNORE INTO fallout VALUES(?,?)", (target, project["id"]))
@@ -129,6 +136,11 @@ def validate(db: sqlite3.Connection) -> dict[str, int]:
         ).fetchone()
         assert start["project"] == row["dependant"] and start["number"] == start["latest"]
         assert end["project"] == row["target"]
+        if db.execute("SELECT 1 FROM metadata WHERE key='seed_schema' AND value='2'").fetchone():
+            assert db.execute(
+                "SELECT 1 FROM target_artifacts t JOIN versions v ON v.artifact=t.artifact WHERE v.id=?",
+                (path[-1]["target"],),
+            ).fetchone()
     return {
         table: db.execute(f"SELECT count(*) FROM {table}").fetchone()[0]
         for table in ("projects", "artifacts", "versions", "edges", "fallout", "gaps")
