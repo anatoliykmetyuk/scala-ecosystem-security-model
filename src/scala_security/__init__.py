@@ -1,0 +1,1 @@
+"""Scala ecosystem security assessment."""
