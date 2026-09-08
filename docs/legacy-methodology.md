@@ -1,5 +1,7 @@
 # Pilot methodology, version 0.1
 
+Historical reference only. The original `pilot/` prototype was removed after migration to the current pipeline. Commands below describe that retired implementation; use the [current README](../README.md) for supported rebuild and cache-reuse instructions.
+
 ## Question and unit of analysis
 
 Which components with weak observable maintenance capacity or security practices support the most value in a selected Scala cohort?

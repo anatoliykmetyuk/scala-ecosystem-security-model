@@ -118,7 +118,7 @@ The shell scripts resolve the repository root themselves, so they can be invoked
 - `config/`: reviewed seed configuration and selection provenance.
 - `docs/`: [methodology](docs/METHODOLOGY.md), implementation tasks and supporting notes.
 - `model/`, `data/`: original vision documents and partner-supplied inputs.
-- `output/`: ignored generated results and evidence. The earlier `pilot/` output is retained locally and ignored.
+- `output/`: ignored generated results and evidence.
 
 Website deployment is out of scope. The GitHub repository is private; CI validates the code and does not publish the report.
 

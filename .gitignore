@@ -13,6 +13,5 @@ output/
 .cache/
 .DS_Store
 .playwright-cli/
-pilot/
 *.sqlite*
 .env
