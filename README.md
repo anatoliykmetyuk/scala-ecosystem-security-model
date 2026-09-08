@@ -109,6 +109,28 @@ uv run scala-security validate --database output/runs/<run>/snapshot.sqlite
 
 The shell scripts resolve the repository root themselves, so they can be invoked by absolute path from another directory. Relative command arguments are interpreted from the repository root.
 
+## Scalaland storytelling map
+
+Generate a separate, standalone interactive atlas from the latest analyzed snapshot:
+
+```sh
+./scripts/render-map.sh
+```
+
+Open `output/ecosystem-map.html` directly in a browser. It includes score layers,
+pan/zoom, project search, hover connections with a hop filter, and multi-project
+compromise scenarios. It does not replace `preview.html` or change collection.
+
+The first run generates an Azgaar world; later runs reuse `output/map/world.json`
+and refresh the data without running the generator. Use `--database <snapshot>`
+for specific data, or `--regenerate-world --map-seed <number>` to explicitly create
+new geography. A changed project roster requires explicit regeneration.
+
+First-world generation requires Node.js 24+, npm and the existing Playwright
+Chromium setup; generator dependencies are downloaded and cached once. Refreshes
+and the delivered HTML work offline. See [MAP-PILOT.md](docs/MAP-PILOT.md) for setup,
+architecture, visual decisions, simulation semantics and performance measurements.
+
 ## Layout
 
 - `src/scala_security/`: collection, typed model boundaries, SQLite schema, analysis, rendering and CLI.

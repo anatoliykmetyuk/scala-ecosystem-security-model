@@ -23,7 +23,9 @@ from .seeds import select
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=["select", "rebuild", "render", "validate", "plan"])
+    parser.add_argument(
+        "command", choices=["select", "rebuild", "render", "render-map", "validate", "plan"]
+    )
     parser.add_argument("--seeds", type=Path, default=Path("config/seeds.yaml"))
     parser.add_argument("--output", type=Path, default=Path("output"))
     parser.add_argument(
@@ -32,7 +34,37 @@ def main() -> None:
         help="Explicitly reuse a prior evidence directory; default collects fresh",
     )
     parser.add_argument("--database", type=Path, help="Database to render or validate")
+    parser.add_argument(
+        "--world", type=Path, default=Path("output/map/world.json"), help="Saved map geography"
+    )
+    parser.add_argument(
+        "--regenerate-world", action="store_true", help="Explicitly replace saved map geography"
+    )
+    parser.add_argument(
+        "--map-seed", type=int, default=20260908, help="Random seed for new map geography"
+    )
+    parser.add_argument("--generator-cache", type=Path, default=Path(".cache/azgaar"))
     args = parser.parse_args()
+    if args.command == "render-map":
+        from .map_render import render_map
+
+        database = args.database
+        if database is None:
+            database = Path((Path("output") / "latest-database.txt").read_text().strip())
+        if not database.is_file():
+            parser.error(f"Database does not exist: {database}")
+        try:
+            render_map(
+                database,
+                args.output / "ecosystem-map.html",
+                args.world,
+                regenerate=args.regenerate_world,
+                seed=args.map_seed,
+                cache=args.generator_cache,
+            )
+        except (ValueError, RuntimeError) as error:
+            parser.error(str(error))
+        return
     if args.command == "select":
         select(
             Fetcher(

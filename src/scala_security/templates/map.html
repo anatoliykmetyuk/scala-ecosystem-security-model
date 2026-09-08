@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scalaland · The security atlas</title><style>__CSS__</style></head>
+<body>
+<header>
+  <div class="brand"><svg width="27" height="36" viewBox="0 0 27 36" aria-hidden="true"><path fill="currentColor" d="M1 0Q12 5 26 5V14Q13 14 1 9ZM1 12Q12 17 26 17V26Q13 26 1 21ZM1 24Q12 29 26 29V36Q13 36 1 33Z"/></svg><div><h1>SCALALAND</h1><span>THE SECURITY ATLAS</span></div></div>
+  <p class="header-note">An ecosystem. A shared fate.</p>
+  <button id="about-open" class="quiet">About this world <span aria-hidden="true">↗</span></button>
+</header>
+<main>
+ <section class="map-stage" aria-label="Interactive map of Scala projects">
+  <div class="map-top"><div class="eyebrow">EXPLORE THE ECOSYSTEM</div><p>Every country is a project.<br>Compromise one. See who is exposed.</p></div>
+  <svg id="atlas" role="group" aria-label="Project countries. Drag to pan, scroll to zoom. Search provides keyboard access." viewBox="0 0 2400 1550">
+   <defs>
+    <pattern id="unknown" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#36515a"/><path d="M0 8L8 0" stroke="#71878c" stroke-width="1"/></pattern>
+    <pattern id="infection" width="9" height="9" patternUnits="userSpaceOnUse"><path d="M-2 2L2 -2M0 9L9 0M7 11L11 7" stroke="#fff1de" stroke-width="2"/></pattern>
+    <symbol id="mountain" viewBox="-14 -18 28 23"><path d="M-14 5L-2 -18L14 5Z" fill="#183e47"/><path d="M-2 -18L1 5H14Z" fill="#0d303a"/><path d="M-2 -18L-7 -9L-2 -11L2 -7Z" fill="#a1b3b3"/></symbol>
+    <symbol id="forest" viewBox="-12 -16 24 24"><path d="M-8 -16L-14 -4H-10L-16 5H0L-6 -4H-2Z" fill="#153c43"/><path d="M3 -12L-3 0H1L-5 9H13L7 0H11Z" fill="#0a2e36"/><path d="M-8 4V8M4 7V11" stroke="#759092" stroke-width="1.2"/></symbol>
+    <symbol id="lighthouse" viewBox="-12 -30 24 40"><path d="M-6 7L-3 -22H3L6 7Z" fill="#c2d0ce"/><path d="M-5 -5H5V1H-5ZM-4 -15H4V-10H-4Z" fill="#f45b29"/><path d="M-7 -22L0 -28L7 -22Z" fill="#173e48"/><path d="M-10 8H10" stroke="#a5baba" stroke-width="2"/></symbol>
+    <symbol id="boat" viewBox="-20 -15 40 30"><path d="M-19 4H20L12 13H-11Z" fill="#a0b5b7"/><path d="M0 -15V4M-10 -2H13" stroke="#d6e0df" stroke-width="2"/><path d="M2 -13L15 1H2Z" fill="#f8d9c5"/><path d="M-16 6H18" stroke="#f45b29" stroke-width="3"/></symbol>
+   </defs>
+   <g id="world"><g id="sea-details"></g><g id="land"></g><g id="countries"></g><g id="water"></g><g id="scenery" pointer-events="none"></g><g id="exposure-overlay" pointer-events="none"></g><g id="connections" pointer-events="none"></g><g id="labels" pointer-events="none"></g></g>
+  </svg>
+  <div class="compass" aria-hidden="true"><span>N</span><svg viewBox="-30 -30 60 60"><circle r="23"/><path d="M0 -29L6 -6L29 0L6 6L0 29L-6 6L-29 0L-6 -6Z"/><path class="needle" d="M0 -29V0L-6 -6Z"/></svg></div>
+  <div id="tooltip" role="tooltip" hidden></div>
+  <div class="map-bottom"><div class="legend"><span id="legend-title">Exposed Value</span><div id="legend-gradient"></div><div class="legend-values"><span id="legend-min">0</span><span id="legend-mid"></span><span id="legend-max"></span></div><small>▧ Unknown evidence</small></div><div class="zoom"><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-fit" aria-label="Fit whole map">Fit</button><button id="zoom-in" aria-label="Zoom in">+</button></div></div>
+  <div class="map-credit">IMAGINED GEOGRAPHY · REAL PROJECTS</div>
+ </section>
+ <aside aria-label="Map layers and compromise simulation">
+  <div class="sidebar-inner">
+   <div class="eyebrow">01 / LOOK AT THE WORLD</div>
+   <label class="field-label" for="layer">Map layer</label>
+   <select id="layer"><option value="exposure">Exposed Value</option><option value="maintenance">Maintenance</option><option value="security">Security</option><option value="value">Project Value</option></select>
+   <p class="small" id="layer-help"></p>
+   <label class="field-label" for="search">Find a project</label>
+   <input id="search" type="search" placeholder="Search cats, zio, scala…" autocomplete="off" aria-controls="search-results">
+   <div id="search-results" hidden></div>
+   <div class="display-options"><label><input type="checkbox" id="show-scenery" checked> Scenery</label><label><input type="checkbox" id="show-links" checked> Hover connections</label></div>
+   <label class="hop-label" for="hops">Connection depth <output id="hop-value">5 hops</output></label><input id="hops" type="range" min="1" max="5" value="5">
+   <section class="simulation">
+    <div class="eyebrow">02 / CHANGE ITS FATE</div>
+    <div class="impact-heading"><h2>Shared exposure</h2><button id="reset" class="quiet">Reset</button></div>
+    <div class="impact"><span id="affected-percent">0</span><span class="percent">%</span></div>
+    <p class="impact-caption">of projects affected</p>
+    <div class="impact-track"><div id="impact-bar"></div></div>
+    <div class="stats"><div><strong id="compromised-count">0</strong><span>compromised</span></div><div><strong id="exposed-count">0</strong><span>exposed</span></div><div><strong id="value-percent">0%</strong><span>of known Value</span></div></div>
+    <p class="small" id="impact-note">Click a country to compromise it. Click again to undo.</p>
+    <div id="selected-list"></div>
+   </section>
+   <section id="project-detail" aria-live="polite"><div class="eyebrow">A PLACE TO BEGIN</div><h2>Pick a country.</h2><p class="detail-intro">Small components can have far-reaching consequences. Explore a project, then follow its exposed dependants across the world.</p><button id="try-project" class="primary">Explore a foundational project ↗</button></section>
+   <footer><span id="snapshot-label"></span><br><span id="scope-label"></span><br>Areas suggest star popularity; scenery is fictional.</footer>
+  </div>
+ </aside>
+</main>
+<dialog id="about"><button id="about-close" class="quiet close">Close ×</button><div class="eyebrow">ABOUT THIS WORLD</div><h2>A map of shared responsibility.</h2><p>This is a storytelling companion to the Scala ecosystem security report. Countries represent repositories. Larger countries generally represent more-starred projects; their areas are illustrative and stay fixed when scores are refreshed.</p><p>Security and Maintenance describe observed practices and activity, not proven safety. Unknown scores remain unknown. Exposed Value adds the provisional, star-based Value of distinct verified dependants.</p><p>The simulation assumes a selected component is compromised and highlights its verified dependant set, up to five dependency hops. It does not predict exploitability or infection probability. Geography, mountains, rivers, and proximity carry no dependency meaning.</p><p>Affected totals combine directly compromised projects and exposed dependants, counting each project once. The Value percentage uses the sum of known project Values as its denominator; unknown Values are reported separately. The connection-depth slider only filters hover lines, not the simulation.</p><p>Only the snapshot's selected seed projects and artifacts are represented. Missing evidence and collection limits can hide relationships. Dates refer to the snapshot; cached observations can be older.</p><p>Geography generated with <a href="https://github.com/Azgaar/Fantasy-Map-Generator" target="_blank" rel="noopener">Azgaar's Fantasy Map Generator</a>. Art direction inspired by the supplied Scalaland poster and Scala Center Five-Year Impact Report. Data: ecosyste.ms (CC BY-SA 4.0), Scaladex, Maven Central, and OpenSSF Scorecard.</p><details><summary>Generator attribution</summary><p style="white-space:pre-wrap">__LICENSE__</p></details></dialog>
+<script id="map-data" type="application/json">__DATA__</script><script>__JS__</script>
+</body></html>
