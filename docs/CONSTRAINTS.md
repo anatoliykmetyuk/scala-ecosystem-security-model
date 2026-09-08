@@ -28,4 +28,4 @@ The pipeline collects forward dependencies and derives dependants locally. No Ma
 
 ## Snapshot status
 
-Expansion and collection are in progress. The previously published report describes the 279-project, Scala 2.13, ten-artifact, three-hop snapshot until the expanded report is validated and published. See `docs/PILOT-RUN.md` for that historical run.
+The expanded snapshot completed on 2026-09-08: 436 projects, 3,251 distinct selected coordinates, 2,370 verified relationships. Cache-backed collection took 4 minutes 37 seconds, excluding seed selection. See [EXPANDED-RUN.md](EXPANDED-RUN.md) for measurements and coverage limitations.
