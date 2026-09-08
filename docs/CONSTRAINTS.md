@@ -28,4 +28,4 @@ The pipeline collects forward dependencies and derives dependants locally. No Ma
 
 ## Snapshot status
 
-The 529-project full-list checkpoint completed on 2026-09-08 with 5,348 coordinates and 3,266 relationships in 15 minutes 25 seconds. See [FULL-RUN.md](FULL-RUN.md). The subsequently authorized inclusion of all otherwise eligible repositories is being collected with cache reuse.
+The current snapshot covers 548 projects, 5,661 distinct coordinates and 3,648 verified relationships. All eligible repositories, including ZIO and Mill, use the same selection criteria. The final incremental collection reused the preceding full-list cache and took 4 minutes 10 seconds. See [INCLUSIVE-RUN.md](INCLUSIVE-RUN.md); [FULL-RUN.md](FULL-RUN.md) records the preceding 529-project checkpoint.

@@ -6,7 +6,7 @@ Current scope: all eligible projects across all 76 subsections, JVM Scala 2.13/3
 - [x] Collect with cache reuse and validate the 529-project checkpoint: 5,348 coordinates, 3,266 relationships, 15m25s.
 - [x] Review the 529-project checkpoint in the browser.
 - [x] Remove repository-specific exclusions after that run completed; refreshed seed adds 19 eligible projects (548 total).
-- [ ] Recalculate using existing caches and newly required data.
+- [x] Recalculate using existing caches and newly required data: 548 projects, 5,661 coordinates, 3,648 relationships; 4m10s. See [INCLUSIVE-RUN.md](INCLUSIVE-RUN.md).
 - [ ] Review and publish the final report, verify deployment.
 
 ## Previous expansion (completed)
