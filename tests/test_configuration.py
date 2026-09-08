@@ -11,12 +11,11 @@ from scala_security.analyze import analyze, validate
 from scala_security.collect import Collector
 from scala_security.configuration import (
     DEFAULT_MATRIX,
-    excluded_repository,
     expand,
     modules_for,
     parse_config,
 )
-from scala_security.data import JSON, connect, string
+from scala_security.data import JSON, connect
 from scala_security.http import Fetcher
 from scala_security.seeds import choose_projects, main_sections
 
@@ -70,9 +69,10 @@ def test_reject_expanded_seed_modules(module):
     "repo",
     ["zio/zio", "zio/zio-aws", "someone/zio-utils", "someone/my-zio-project", "com-lihaoyi/mill"],
 )
-def test_excluded_projects_cannot_reenter(repo):
-    with pytest.raises(ValueError, match="excluded"):
-        parse_config(document(repo))
+def test_formerly_excluded_projects_are_eligible(repo):
+    assert parse_config(document(repo)).projects[0]["repository"] == repo
+    candidates = [{"repository": repo, "selection": [{"category": "a", "rank": 1}]}]
+    assert choose_projects(candidates, {"Main": ["a"]})[0]["repository"] == repo
 
 
 def test_invalid_schema_and_project_limits():
@@ -153,7 +153,6 @@ def test_selection_uses_main_sections_and_keeps_all_projects():
         for i in range(14)
         for rank in range(1, 15)
     ]
-    candidates += [{"repository": "zio/zio", "selection": [{"category": "child-0", "rank": 0}]}]
     chosen = choose_projects(candidates, groups)
     assert len(chosen) == 196 and len({p["repository"] for p in chosen}) == 196
     selections = [p["selected_from"] for p in chosen]
@@ -163,7 +162,6 @@ def test_selection_uses_main_sections_and_keeps_all_projects():
     assert all(
         sum(f"child-{i}" in selected for selected in selected_lists) == 14 for i in range(14)
     )
-    assert not any(excluded_repository(string(p["repository"])) for p in chosen)
     assert chosen == choose_projects(candidates, groups)
 
 
@@ -176,9 +174,7 @@ def test_committed_seeds_and_offline_plan(monkeypatch, capsys):
     config = parse_config(raw)
     assert len(config.projects) > 0
     assert config.matrix == DEFAULT_MATRIX
-    assert not any(
-        "artifacts" in p or excluded_repository(string(p["repository"])) for p in config.projects
-    )
+    assert not any("artifacts" in p for p in config.projects)
     assert "zio" not in yaml.safe_dump(raw["selection_policy"]).lower()
     assert "com-lihaoyi/mill" not in yaml.safe_dump(raw["selection_policy"])
 

@@ -7,11 +7,11 @@ Updated 2026-09-08. Maintain this register together with configuration, implemen
 | Platform | JVM only |
 | Scala binary versions | 2.13 and 3 |
 | Seed selection | All eligible projects across all 76 Awesome Scala subsections and all listing pages, deduplicated by repository |
-| Project ceiling | No numeric quota; bounded by eligible Awesome Scala membership; current frozen count 529 |
+| Project ceiling | No numeric quota; bounded by eligible Awesome Scala membership; current frozen count 548 |
 | Artifacts per project | At most 50 published coordinates across both Scala versions combined |
 | Artifact ranking | `dependent_packages_count` descending, unknown last, coordinate-name ties |
 | Traversal universe | Closed seed universe: only selected coordinates may be roots, intermediates or targets |
-| Coordinate ceiling | 50 × frozen project count (26,450 for 529 projects); publication availability and deduplication reduce this |
+| Coordinate ceiling | 50 × frozen project count (27,400 for 548 projects); publication availability and deduplication reduce this |
 | Maximum dependency depth | Five edges: A → B → C → D → E → F is five hops |
 | Recursive dependencies per project | No separate numeric cap beyond the closed universe and hop limit |
 | Total version resolutions / HTTP requests | No separate numeric cap; different historical versions of a coordinate require separate resolution |
@@ -28,4 +28,4 @@ The pipeline collects forward dependencies and derives dependants locally. No Ma
 
 ## Snapshot status
 
-The expanded snapshot completed on 2026-09-08: 436 projects, 3,251 distinct selected coordinates, 2,370 verified relationships. Cache-backed collection took 4 minutes 37 seconds, excluding seed selection. See [EXPANDED-RUN.md](EXPANDED-RUN.md) for measurements and coverage limitations.
+The 529-project full-list checkpoint completed on 2026-09-08 with 5,348 coordinates and 3,266 relationships in 15 minutes 25 seconds. See [FULL-RUN.md](FULL-RUN.md). The subsequently authorized inclusion of all otherwise eligible repositories is being collected with cache reuse.

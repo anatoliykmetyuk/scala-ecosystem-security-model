@@ -14,7 +14,6 @@ from .configuration import (
     ARTIFACT_SELECTION,
     DEFAULT_MATRIX,
     MAX_HOPS,
-    excluded_repository,
     modules_for,
     parse_config,
 )
@@ -68,8 +67,6 @@ def choose_projects(
         ranked = []
         for project in candidates:
             repo = string(project["repository"])
-            if excluded_repository(repo):
-                continue
             ranks = [
                 int(str(s["rank"]))
                 for s in rows(project.get("selection"))
@@ -144,7 +141,6 @@ def select(fetch: Fetcher, destination: Path) -> None:
             ]
             refs = [r for r in refs if r not in seen]
             page_refs = refs
-            refs = [r for r in refs if not excluded_repository(r)]
             if not page_refs:
                 break
             seen.update(page_refs)

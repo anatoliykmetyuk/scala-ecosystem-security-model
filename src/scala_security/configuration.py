@@ -8,14 +8,6 @@ from dataclasses import dataclass
 from .data import JSON, obj, rows
 
 SUFFIX = re.compile(r"(?:_(?:sjs|native)[^_]+)?_(?:2\.1[0-3]|3)$")
-EXCLUDED_REPOSITORIES = {"com-lihaoyi/mill"}
-ZIO_REPOSITORY = re.compile(r"(?:^|[/_.-])zio(?:$|[/_.-])", re.IGNORECASE)
-
-
-def excluded_repository(repo: str) -> bool:
-    return repo.lower() in EXCLUDED_REPOSITORIES or bool(ZIO_REPOSITORY.search(repo))
-
-
 ARTIFACT_CAP = 50
 MAX_HOPS = 5
 ARTIFACT_SELECTION = "Published matrix coordinates ranked by dependent_packages_count descending; unknown counts last; coordinate-name ties; top 50."
@@ -120,8 +112,6 @@ def parse_config(raw: object) -> SeedConfig:
         repo = project.get("repository")
         if not isinstance(repo, str) or not re.fullmatch(r"[\w.-]+/[\w.-]+", repo):
             raise ValueError("Each project requires an owner/repository")
-        if excluded_repository(repo):
-            raise ValueError(f"Repository excluded by pilot policy: {repo}")
         if repo.lower() in seen:
             raise ValueError(f"Duplicate repository: {repo}")
         seen.add(repo.lower())

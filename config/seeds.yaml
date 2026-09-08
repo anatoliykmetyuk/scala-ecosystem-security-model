@@ -4,7 +4,7 @@ max_hops: 5
 max_artifacts_per_project: 50
 artifact_selection: Published matrix coordinates ranked by dependent_packages_count
   descending; unknown counts last; coordinate-name ties; top 50.
-selected_at: '2026-09-08T07:09:31.629419+00:00'
+selected_at: '2026-09-08T07:27:35.297215+00:00'
 source: https://index.scala-lang.org/awesome
 matrix:
   jvm:
@@ -122,6 +122,46 @@ selection_policy:
     - web-frontend
     - xml-html-and-dom
 projects:
+- repository: zio/zio
+  categories:
+  - asynchronous-and-reactive-programming
+  selection:
+  - category: asynchronous-and-reactive-programming
+    rank: 1
+    source: https://index.scala-lang.org/awesome/asynchronous-and-reactive-programming?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - dev.zio:core-tests
+  - dev.zio:examples
+  - dev.zio:zio
+  - dev.zio:zio-concurrent
+  - dev.zio:zio-internal-macros
+  - dev.zio:zio-macros
+  - dev.zio:zio-managed
+  - dev.zio:zio-stacktracer
+  - dev.zio:zio-streams
+  - dev.zio:zio-streams-tests
+  - dev.zio:zio-test
+  - dev.zio:zio-test-junit
+  - dev.zio:zio-test-junit-engine
+  - dev.zio:zio-test-magnolia
+  - dev.zio:zio-test-refined
+  - dev.zio:zio-test-sbt
+  - dev.zio:zio-test-scalacheck
+  - dev.zio:zio-testkit
+  language_evidence:
+    Scala: 6870668
+    CSS: 140313
+    JavaScript: 97463
+    TypeScript: 6438
+    Java: 5536
+    HTML: 1372
+    Shell: 989
+    Nix: 133
+  language_source: https://api.github.com/repos/zio/zio/languages
+  selected_from:
+  - asynchronous-and-reactive-programming
 - repository: typelevel/fs2
   categories:
   - asynchronous-and-reactive-programming
@@ -1625,6 +1665,26 @@ projects:
   language_source: https://api.github.com/repos/spotify/scio/languages
   selected_from:
   - distributed-computing
+- repository: univalence/zio-spark
+  categories:
+  - distributed-computing
+  selection:
+  - category: distributed-computing
+    rank: 6
+    source: https://index.scala-lang.org/awesome/distributed-computing?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.univalence:zio-spark
+  - io.univalence:zio-spark-test
+  language_evidence:
+    Scala: 641974
+    JavaScript: 3625
+    CSS: 927
+    Shell: 163
+  language_source: https://api.github.com/repos/univalence/zio-spark/languages
+  selected_from:
+  - distributed-computing
 - repository: makingthematrix/signals3
   categories:
   - distributed-computing
@@ -1803,6 +1863,23 @@ projects:
     Scala: 70283
     Java: 2143
   language_source: https://api.github.com/repos/blemale/scaffeine/languages
+  selected_from:
+  - caching
+- repository: zio/zio-cache
+  categories:
+  - caching
+  selection:
+  - category: caching
+    rank: 3
+    source: https://index.scala-lang.org/awesome/caching?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - dev.zio:zio-cache
+  - dev.zio:zio-cache-docs
+  language_evidence:
+    Scala: 7874
+  language_source: https://api.github.com/repos/zio/zio-cache/languages
   selected_from:
   - caching
 - repository: jcouyang/jujiu
@@ -2549,6 +2626,32 @@ projects:
     CSS: 409
     Dockerfile: 157
   language_source: https://api.github.com/repos/tofu-tf/tofu/languages
+  selected_from:
+  - functional-programming-and-category-theory
+- repository: zio/zio-prelude
+  categories:
+  - functional-programming-and-category-theory
+  selection:
+  - category: functional-programming-and-category-theory
+    rank: 8
+    source: https://index.scala-lang.org/awesome/functional-programming-and-category-theory?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - dev.zio:zio-laws-laws
+  - dev.zio:zio-prelude
+  - dev.zio:zio-prelude-docs
+  - dev.zio:zio-prelude-experimental
+  - dev.zio:zio-prelude-experimental-laws
+  - dev.zio:zio-prelude-experimental-tests
+  - dev.zio:zio-prelude-macros
+  - dev.zio:zio-prelude-magnolia
+  - dev.zio:zio-prelude-magnolia-tests
+  - dev.zio:zio-prelude-scala-parallel-collections
+  language_evidence:
+    Scala: 1276010
+    JavaScript: 3131
+  language_source: https://api.github.com/repos/zio/zio-prelude/languages
   selected_from:
   - functional-programming-and-category-theory
 - repository: higherkindness/droste
@@ -3756,6 +3859,28 @@ projects:
   language_source: https://api.github.com/repos/com-lihaoyi/mainargs/languages
   selected_from:
   - command-line-parsing
+- repository: zio/zio-cli
+  categories:
+  - command-line-parsing
+  selection:
+  - category: command-line-parsing
+    rank: 5
+    source: https://index.scala-lang.org/awesome/command-line-parsing?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - dev.zio:examples
+  - dev.zio:root
+  - dev.zio:zio-cli
+  - dev.zio:zio-cli-docs
+  - dev.zio:zio-cli-testkit
+  language_evidence:
+    Scala: 392453
+    Shell: 3842
+    JavaScript: 433
+  language_source: https://api.github.com/repos/zio/zio-cli/languages
+  selected_from:
+  - command-line-parsing
 - repository: backuity/clist
   categories:
   - command-line-parsing
@@ -4147,6 +4272,30 @@ projects:
   language_source: https://api.github.com/repos/lancewalton/treelog/languages
   selected_from:
   - logging
+- repository: zio/zio-logging
+  categories:
+  - logging
+  selection:
+  - category: logging
+    rank: 7
+    source: https://index.scala-lang.org/awesome/logging?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - dev.zio:zio-logging
+  - dev.zio:zio-logging-docs
+  - dev.zio:zio-logging-jpl
+  - dev.zio:zio-logging-jul-bridge
+  - dev.zio:zio-logging-slf4j
+  - dev.zio:zio-logging-slf4j-bridge
+  - dev.zio:zio-logging-slf4j2
+  - dev.zio:zio-logging-slf4j2-bridge
+  language_evidence:
+    Scala: 344416
+    Java: 11566
+  language_source: https://api.github.com/repos/zio/zio-logging/languages
+  selected_from:
+  - logging
 - repository: log4s/log4s
   categories:
   - logging
@@ -4429,6 +4578,49 @@ projects:
   language_evidence:
     Scala: 25625
   language_source: https://api.github.com/repos/xitrum-framework/glokka/languages
+  selected_from:
+  - performance-and-monitoring
+- repository: zio-archive/zio-metrics-legacy
+  categories:
+  - performance-and-monitoring
+  selection:
+  - category: performance-and-monitoring
+    rank: 12
+    source: https://index.scala-lang.org/awesome/performance-and-monitoring?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - dev.zio:metrics
+  - dev.zio:metrics-dropwizard
+  - dev.zio:metrics-prometheus
+  - dev.zio:metrics-statsd
+  - dev.zio:root
+  - dev.zio:zio-metrics
+  - dev.zio:zio-metrics-dropwizard
+  - dev.zio:zio-metrics-prometheus
+  - dev.zio:zio-metrics-statsd
+  language_evidence:
+    Scala: 159548
+    Shell: 23527
+    JavaScript: 8137
+    CSS: 657
+  language_source: https://api.github.com/repos/zio-archive/zio-metrics-legacy/languages
+  selected_from:
+  - performance-and-monitoring
+- repository: kaizen-solutions/zio-newrelic-events
+  categories:
+  - performance-and-monitoring
+  selection:
+  - category: performance-and-monitoring
+    rank: 15
+    source: https://index.scala-lang.org/awesome/performance-and-monitoring?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.kaizen-solutions:zio-newrelic-events
+  language_evidence:
+    Scala: 19356
+  language_source: https://api.github.com/repos/kaizen-solutions/zio-newrelic-events/languages
   selected_from:
   - performance-and-monitoring
 - repository: gatling/gatling
@@ -5080,6 +5272,55 @@ projects:
   language_source: https://api.github.com/repos/typelevel/doobie/languages
   selected_from:
   - databases
+- repository: zio/zio-quill
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 5
+    source: https://index.scala-lang.org/awesome/databases?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.getquill:quill-async
+  - io.getquill:quill-async-mysql
+  - io.getquill:quill-async-postgres
+  - io.getquill:quill-cassandra
+  - io.getquill:quill-cassandra-alpakka
+  - io.getquill:quill-cassandra-lagom
+  - io.getquill:quill-cassandra-monix
+  - io.getquill:quill-cassandra-pekko
+  - io.getquill:quill-cassandra-zio
+  - io.getquill:quill-codegen
+  - io.getquill:quill-codegen-jdbc
+  - io.getquill:quill-codegen-tests
+  - io.getquill:quill-core
+  - io.getquill:quill-core-portable
+  - io.getquill:quill-doobie
+  - io.getquill:quill-engine
+  - io.getquill:quill-finagle-mysql
+  - io.getquill:quill-jasync
+  - io.getquill:quill-jasync-mysql
+  - io.getquill:quill-jasync-postgres
+  - io.getquill:quill-jasync-zio
+  - io.getquill:quill-jasync-zio-postgres
+  - io.getquill:quill-jdbc
+  - io.getquill:quill-jdbc-monix
+  - io.getquill:quill-jdbc-zio
+  - io.getquill:quill-monix
+  - io.getquill:quill-orientdb
+  - io.getquill:quill-spark
+  - io.getquill:quill-sql
+  - io.getquill:quill-sql-portable
+  - io.getquill:quill-util
+  - io.getquill:quill-zio
+  language_evidence:
+    Scala: 2660708
+    Shell: 20047
+    CQL: 3569
+  language_source: https://api.github.com/repos/zio/zio-quill/languages
+  selected_from:
+  - databases
 - repository: typelevel/skunk
   categories:
   - databases
@@ -5598,6 +5839,27 @@ projects:
   language_source: https://api.github.com/repos/mongocamp/mongodb-driver/languages
   selected_from:
   - databases
+- repository: bilal-fazlani/zio-mongo
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 43
+    source: https://index.scala-lang.org/awesome/databases?page=3
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.bilal-fazlani.zio-mongo:circe-codec
+  - com.bilal-fazlani.zio-mongo:zio-json-codec
+  - com.bilal-fazlani.zio-mongo:zio-mongo
+  - com.bilal-fazlani:zio-mongo
+  - com.bilal-fazlani:zio-mongo-circe
+  language_evidence:
+    Scala: 68040
+    Dockerfile: 125
+  language_source: https://api.github.com/repos/bilal-fazlani/zio-mongo/languages
+  selected_from:
+  - databases
 - repository: irevive/neotypes
   categories:
   - databases
@@ -5934,6 +6196,479 @@ projects:
   language_source: https://api.github.com/repos/laserdisc-io/fs2-aws/languages
   selected_from:
   - deployment-and-cloud
+- repository: zio/zio-aws
+  categories:
+  - deployment-and-cloud
+  selection:
+  - category: deployment-and-cloud
+    rank: 9
+    source: https://index.scala-lang.org/awesome/deployment-and-cloud?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - dev.zio:zio-aws-accessanalyzer
+  - dev.zio:zio-aws-account
+  - dev.zio:zio-aws-acm
+  - dev.zio:zio-aws-acmpca
+  - dev.zio:zio-aws-aiops
+  - dev.zio:zio-aws-akka-http
+  - dev.zio:zio-aws-alexaforbusiness
+  - dev.zio:zio-aws-amp
+  - dev.zio:zio-aws-amplify
+  - dev.zio:zio-aws-amplifybackend
+  - dev.zio:zio-aws-amplifyuibuilder
+  - dev.zio:zio-aws-apigateway
+  - dev.zio:zio-aws-apigatewaymanagementapi
+  - dev.zio:zio-aws-apigatewayv2
+  - dev.zio:zio-aws-appconfig
+  - dev.zio:zio-aws-appconfigdata
+  - dev.zio:zio-aws-appfabric
+  - dev.zio:zio-aws-appflow
+  - dev.zio:zio-aws-appintegrations
+  - dev.zio:zio-aws-applicationautoscaling
+  - dev.zio:zio-aws-applicationcostprofiler
+  - dev.zio:zio-aws-applicationdiscovery
+  - dev.zio:zio-aws-applicationinsights
+  - dev.zio:zio-aws-applicationsignals
+  - dev.zio:zio-aws-appmesh
+  - dev.zio:zio-aws-apprunner
+  - dev.zio:zio-aws-appstream
+  - dev.zio:zio-aws-appsync
+  - dev.zio:zio-aws-apptest
+  - dev.zio:zio-aws-arcregionswitch
+  - dev.zio:zio-aws-arczonalshift
+  - dev.zio:zio-aws-artifact
+  - dev.zio:zio-aws-athena
+  - dev.zio:zio-aws-auditmanager
+  - dev.zio:zio-aws-autoscaling
+  - dev.zio:zio-aws-autoscalingplans
+  - dev.zio:zio-aws-b2bi
+  - dev.zio:zio-aws-backup
+  - dev.zio:zio-aws-backupgateway
+  - dev.zio:zio-aws-backupsearch
+  - dev.zio:zio-aws-backupstorage
+  - dev.zio:zio-aws-batch
+  - dev.zio:zio-aws-bcmdashboards
+  - dev.zio:zio-aws-bcmdataexports
+  - dev.zio:zio-aws-bcmpricingcalculator
+  - dev.zio:zio-aws-bcmrecommendedactions
+  - dev.zio:zio-aws-bedrock
+  - dev.zio:zio-aws-bedrockagent
+  - dev.zio:zio-aws-bedrockagentcore
+  - dev.zio:zio-aws-bedrockagentcorecontrol
+  - dev.zio:zio-aws-bedrockagentruntime
+  - dev.zio:zio-aws-bedrockdataautomation
+  - dev.zio:zio-aws-bedrockdataautomationruntime
+  - dev.zio:zio-aws-bedrockruntime
+  - dev.zio:zio-aws-billing
+  - dev.zio:zio-aws-billingconductor
+  - dev.zio:zio-aws-braket
+  - dev.zio:zio-aws-budgets
+  - dev.zio:zio-aws-chatbot
+  - dev.zio:zio-aws-chime
+  - dev.zio:zio-aws-chimesdkidentity
+  - dev.zio:zio-aws-chimesdkmediapipelines
+  - dev.zio:zio-aws-chimesdkmeetings
+  - dev.zio:zio-aws-chimesdkmessaging
+  - dev.zio:zio-aws-chimesdkvoice
+  - dev.zio:zio-aws-cleanrooms
+  - dev.zio:zio-aws-cleanroomsml
+  - dev.zio:zio-aws-cloud9
+  - dev.zio:zio-aws-cloudcontrol
+  - dev.zio:zio-aws-clouddirectory
+  - dev.zio:zio-aws-cloudformation
+  - dev.zio:zio-aws-cloudfront
+  - dev.zio:zio-aws-cloudfrontkeyvaluestore
+  - dev.zio:zio-aws-cloudhsm
+  - dev.zio:zio-aws-cloudhsmv2
+  - dev.zio:zio-aws-cloudsearch
+  - dev.zio:zio-aws-cloudsearchdomain
+  - dev.zio:zio-aws-cloudtrail
+  - dev.zio:zio-aws-cloudtraildata
+  - dev.zio:zio-aws-cloudwatch
+  - dev.zio:zio-aws-cloudwatchevents
+  - dev.zio:zio-aws-cloudwatchlogs
+  - dev.zio:zio-aws-codeartifact
+  - dev.zio:zio-aws-codebuild
+  - dev.zio:zio-aws-codecatalyst
+  - dev.zio:zio-aws-codecommit
+  - dev.zio:zio-aws-codeconnections
+  - dev.zio:zio-aws-codedeploy
+  - dev.zio:zio-aws-codeguruprofiler
+  - dev.zio:zio-aws-codegurureviewer
+  - dev.zio:zio-aws-codegurusecurity
+  - dev.zio:zio-aws-codepipeline
+  - dev.zio:zio-aws-codestar
+  - dev.zio:zio-aws-codestarconnections
+  - dev.zio:zio-aws-codestarnotifications
+  - dev.zio:zio-aws-cognitoidentity
+  - dev.zio:zio-aws-cognitoidentityprovider
+  - dev.zio:zio-aws-cognitosync
+  - dev.zio:zio-aws-comprehend
+  - dev.zio:zio-aws-comprehendmedical
+  - dev.zio:zio-aws-computeoptimizer
+  - dev.zio:zio-aws-computeoptimizerautomation
+  - dev.zio:zio-aws-config
+  - dev.zio:zio-aws-connect
+  - dev.zio:zio-aws-connectcampaigns
+  - dev.zio:zio-aws-connectcampaignsv2
+  - dev.zio:zio-aws-connectcases
+  - dev.zio:zio-aws-connectcontactlens
+  - dev.zio:zio-aws-connecthealth
+  - dev.zio:zio-aws-connectparticipant
+  - dev.zio:zio-aws-controlcatalog
+  - dev.zio:zio-aws-controltower
+  - dev.zio:zio-aws-core
+  - dev.zio:zio-aws-costandusagereport
+  - dev.zio:zio-aws-costexplorer
+  - dev.zio:zio-aws-costoptimizationhub
+  - dev.zio:zio-aws-crt-http
+  - dev.zio:zio-aws-customerprofiles
+  - dev.zio:zio-aws-databasemigration
+  - dev.zio:zio-aws-databrew
+  - dev.zio:zio-aws-dataexchange
+  - dev.zio:zio-aws-datapipeline
+  - dev.zio:zio-aws-datasync
+  - dev.zio:zio-aws-datazone
+  - dev.zio:zio-aws-dax
+  - dev.zio:zio-aws-deadline
+  - dev.zio:zio-aws-detective
+  - dev.zio:zio-aws-devicefarm
+  - dev.zio:zio-aws-devopsagent
+  - dev.zio:zio-aws-devopsguru
+  - dev.zio:zio-aws-directconnect
+  - dev.zio:zio-aws-directory
+  - dev.zio:zio-aws-directoryservicedata
+  - dev.zio:zio-aws-dlm
+  - dev.zio:zio-aws-docdb
+  - dev.zio:zio-aws-docdbelastic
+  - dev.zio:zio-aws-drs
+  - dev.zio:zio-aws-dsql
+  - dev.zio:zio-aws-dynamodb
+  - dev.zio:zio-aws-dynamodbstreams
+  - dev.zio:zio-aws-ebs
+  - dev.zio:zio-aws-ec2
+  - dev.zio:zio-aws-ec2instanceconnect
+  - dev.zio:zio-aws-ecr
+  - dev.zio:zio-aws-ecrpublic
+  - dev.zio:zio-aws-ecs
+  - dev.zio:zio-aws-efs
+  - dev.zio:zio-aws-eks
+  - dev.zio:zio-aws-eksauth
+  - dev.zio:zio-aws-elasticache
+  - dev.zio:zio-aws-elasticbeanstalk
+  - dev.zio:zio-aws-elasticinference
+  - dev.zio:zio-aws-elasticloadbalancing
+  - dev.zio:zio-aws-elasticloadbalancingv2
+  - dev.zio:zio-aws-elasticsearch
+  - dev.zio:zio-aws-elastictranscoder
+  - dev.zio:zio-aws-elementalinference
+  - dev.zio:zio-aws-emr
+  - dev.zio:zio-aws-emrcontainers
+  - dev.zio:zio-aws-emrserverless
+  - dev.zio:zio-aws-entityresolution
+  - dev.zio:zio-aws-eventbridge
+  - dev.zio:zio-aws-evidently
+  - dev.zio:zio-aws-evs
+  - dev.zio:zio-aws-finspace
+  - dev.zio:zio-aws-finspacedata
+  - dev.zio:zio-aws-firehose
+  - dev.zio:zio-aws-fis
+  - dev.zio:zio-aws-fms
+  - dev.zio:zio-aws-forecast
+  - dev.zio:zio-aws-forecastquery
+  - dev.zio:zio-aws-frauddetector
+  - dev.zio:zio-aws-freetier
+  - dev.zio:zio-aws-fsx
+  - dev.zio:zio-aws-gamelift
+  - dev.zio:zio-aws-gameliftstreams
+  - dev.zio:zio-aws-gamesparks
+  - dev.zio:zio-aws-geomaps
+  - dev.zio:zio-aws-geoplaces
+  - dev.zio:zio-aws-georoutes
+  - dev.zio:zio-aws-glacier
+  - dev.zio:zio-aws-globalaccelerator
+  - dev.zio:zio-aws-glue
+  - dev.zio:zio-aws-grafana
+  - dev.zio:zio-aws-greengrass
+  - dev.zio:zio-aws-greengrassv2
+  - dev.zio:zio-aws-groundstation
+  - dev.zio:zio-aws-guardduty
+  - dev.zio:zio-aws-health
+  - dev.zio:zio-aws-healthlake
+  - dev.zio:zio-aws-honeycode
+  - dev.zio:zio-aws-http4s
+  - dev.zio:zio-aws-iam
+  - dev.zio:zio-aws-identitystore
+  - dev.zio:zio-aws-imagebuilder
+  - dev.zio:zio-aws-inspector
+  - dev.zio:zio-aws-inspector2
+  - dev.zio:zio-aws-inspectorscan
+  - dev.zio:zio-aws-interconnect
+  - dev.zio:zio-aws-internetmonitor
+  - dev.zio:zio-aws-invoicing
+  - dev.zio:zio-aws-iot
+  - dev.zio:zio-aws-iot1clickdevices
+  - dev.zio:zio-aws-iot1clickprojects
+  - dev.zio:zio-aws-iotanalytics
+  - dev.zio:zio-aws-iotdataplane
+  - dev.zio:zio-aws-iotdeviceadvisor
+  - dev.zio:zio-aws-iotevents
+  - dev.zio:zio-aws-ioteventsdata
+  - dev.zio:zio-aws-iotfleethub
+  - dev.zio:zio-aws-iotfleetwise
+  - dev.zio:zio-aws-iotjobsdataplane
+  - dev.zio:zio-aws-iotmanagedintegrations
+  - dev.zio:zio-aws-iotroborunner
+  - dev.zio:zio-aws-iotsecuretunneling
+  - dev.zio:zio-aws-iotsitewise
+  - dev.zio:zio-aws-iotthingsgraph
+  - dev.zio:zio-aws-iottwinmaker
+  - dev.zio:zio-aws-iotwireless
+  - dev.zio:zio-aws-ivs
+  - dev.zio:zio-aws-ivschat
+  - dev.zio:zio-aws-ivsrealtime
+  - dev.zio:zio-aws-kafka
+  - dev.zio:zio-aws-kafkaconnect
+  - dev.zio:zio-aws-kendra
+  - dev.zio:zio-aws-kendraranking
+  - dev.zio:zio-aws-keyspaces
+  - dev.zio:zio-aws-keyspacesstreams
+  - dev.zio:zio-aws-kinesis
+  - dev.zio:zio-aws-kinesisanalytics
+  - dev.zio:zio-aws-kinesisanalyticsv2
+  - dev.zio:zio-aws-kinesisvideo
+  - dev.zio:zio-aws-kinesisvideoarchivedmedia
+  - dev.zio:zio-aws-kinesisvideomedia
+  - dev.zio:zio-aws-kinesisvideosignaling
+  - dev.zio:zio-aws-kinesisvideowebrtcstorage
+  - dev.zio:zio-aws-kms
+  - dev.zio:zio-aws-lakeformation
+  - dev.zio:zio-aws-lambda
+  - dev.zio:zio-aws-launchwizard
+  - dev.zio:zio-aws-lexmodelbuilding
+  - dev.zio:zio-aws-lexmodelsv2
+  - dev.zio:zio-aws-lexruntime
+  - dev.zio:zio-aws-lexruntimev2
+  - dev.zio:zio-aws-licensemanager
+  - dev.zio:zio-aws-licensemanagerlinuxsubscriptions
+  - dev.zio:zio-aws-licensemanagerusersubscriptions
+  - dev.zio:zio-aws-lightsail
+  - dev.zio:zio-aws-location
+  - dev.zio:zio-aws-lookoutequipment
+  - dev.zio:zio-aws-lookoutmetrics
+  - dev.zio:zio-aws-lookoutvision
+  - dev.zio:zio-aws-m2
+  - dev.zio:zio-aws-machinelearning
+  - dev.zio:zio-aws-macie
+  - dev.zio:zio-aws-macie2
+  - dev.zio:zio-aws-mailmanager
+  - dev.zio:zio-aws-managedblockchain
+  - dev.zio:zio-aws-managedblockchainquery
+  - dev.zio:zio-aws-marketplaceagreement
+  - dev.zio:zio-aws-marketplacecatalog
+  - dev.zio:zio-aws-marketplacecommerceanalytics
+  - dev.zio:zio-aws-marketplacedeployment
+  - dev.zio:zio-aws-marketplacediscovery
+  - dev.zio:zio-aws-marketplaceentitlement
+  - dev.zio:zio-aws-marketplacemetering
+  - dev.zio:zio-aws-marketplacereporting
+  - dev.zio:zio-aws-mediaconnect
+  - dev.zio:zio-aws-mediaconvert
+  - dev.zio:zio-aws-medialive
+  - dev.zio:zio-aws-mediapackage
+  - dev.zio:zio-aws-mediapackagev2
+  - dev.zio:zio-aws-mediapackagevod
+  - dev.zio:zio-aws-mediastore
+  - dev.zio:zio-aws-mediastoredata
+  - dev.zio:zio-aws-mediatailor
+  - dev.zio:zio-aws-medicalimaging
+  - dev.zio:zio-aws-memorydb
+  - dev.zio:zio-aws-mgn
+  - dev.zio:zio-aws-migrationhub
+  - dev.zio:zio-aws-migrationhubconfig
+  - dev.zio:zio-aws-migrationhuborchestrator
+  - dev.zio:zio-aws-migrationhubrefactorspaces
+  - dev.zio:zio-aws-migrationhubstrategy
+  - dev.zio:zio-aws-mobile
+  - dev.zio:zio-aws-mpa
+  - dev.zio:zio-aws-mq
+  - dev.zio:zio-aws-mturk
+  - dev.zio:zio-aws-mwaa
+  - dev.zio:zio-aws-mwaaserverless
+  - dev.zio:zio-aws-neptune
+  - dev.zio:zio-aws-neptunedata
+  - dev.zio:zio-aws-neptunegraph
+  - dev.zio:zio-aws-netty
+  - dev.zio:zio-aws-networkfirewall
+  - dev.zio:zio-aws-networkflowmonitor
+  - dev.zio:zio-aws-networkmanager
+  - dev.zio:zio-aws-networkmonitor
+  - dev.zio:zio-aws-nimble
+  - dev.zio:zio-aws-notifications
+  - dev.zio:zio-aws-notificationscontacts
+  - dev.zio:zio-aws-novaact
+  - dev.zio:zio-aws-oam
+  - dev.zio:zio-aws-observabilityadmin
+  - dev.zio:zio-aws-odb
+  - dev.zio:zio-aws-omics
+  - dev.zio:zio-aws-opensearch
+  - dev.zio:zio-aws-opensearchserverless
+  - dev.zio:zio-aws-opsworks
+  - dev.zio:zio-aws-opsworkscm
+  - dev.zio:zio-aws-organizations
+  - dev.zio:zio-aws-osis
+  - dev.zio:zio-aws-outposts
+  - dev.zio:zio-aws-panorama
+  - dev.zio:zio-aws-partnercentralaccount
+  - dev.zio:zio-aws-partnercentralbenefits
+  - dev.zio:zio-aws-partnercentralchannel
+  - dev.zio:zio-aws-partnercentralselling
+  - dev.zio:zio-aws-paymentcryptography
+  - dev.zio:zio-aws-paymentcryptographydata
+  - dev.zio:zio-aws-pcaconnectorad
+  - dev.zio:zio-aws-pcaconnectorscep
+  - dev.zio:zio-aws-pcs
+  - dev.zio:zio-aws-personalize
+  - dev.zio:zio-aws-personalizeevents
+  - dev.zio:zio-aws-personalizeruntime
+  - dev.zio:zio-aws-pi
+  - dev.zio:zio-aws-pinpoint
+  - dev.zio:zio-aws-pinpointemail
+  - dev.zio:zio-aws-pinpointsmsvoice
+  - dev.zio:zio-aws-pinpointsmsvoicev2
+  - dev.zio:zio-aws-pipes
+  - dev.zio:zio-aws-polly
+  - dev.zio:zio-aws-pricing
+  - dev.zio:zio-aws-privatenetworks
+  - dev.zio:zio-aws-proton
+  - dev.zio:zio-aws-qapps
+  - dev.zio:zio-aws-qbusiness
+  - dev.zio:zio-aws-qconnect
+  - dev.zio:zio-aws-qldb
+  - dev.zio:zio-aws-qldbsession
+  - dev.zio:zio-aws-quicksight
+  - dev.zio:zio-aws-ram
+  - dev.zio:zio-aws-rbin
+  - dev.zio:zio-aws-rds
+  - dev.zio:zio-aws-rdsdata
+  - dev.zio:zio-aws-redshift
+  - dev.zio:zio-aws-redshiftdata
+  - dev.zio:zio-aws-redshiftserverless
+  - dev.zio:zio-aws-rekognition
+  - dev.zio:zio-aws-repostspace
+  - dev.zio:zio-aws-resiliencehub
+  - dev.zio:zio-aws-resourceexplorer2
+  - dev.zio:zio-aws-resourcegroups
+  - dev.zio:zio-aws-resourcegroupstaggingapi
+  - dev.zio:zio-aws-robomaker
+  - dev.zio:zio-aws-rolesanywhere
+  - dev.zio:zio-aws-route53
+  - dev.zio:zio-aws-route53domains
+  - dev.zio:zio-aws-route53globalresolver
+  - dev.zio:zio-aws-route53profiles
+  - dev.zio:zio-aws-route53recoverycluster
+  - dev.zio:zio-aws-route53recoverycontrolconfig
+  - dev.zio:zio-aws-route53recoveryreadiness
+  - dev.zio:zio-aws-route53resolver
+  - dev.zio:zio-aws-rtbfabric
+  - dev.zio:zio-aws-rum
+  - dev.zio:zio-aws-s3
+  - dev.zio:zio-aws-s3control
+  - dev.zio:zio-aws-s3files
+  - dev.zio:zio-aws-s3outposts
+  - dev.zio:zio-aws-s3tables
+  - dev.zio:zio-aws-s3vectors
+  - dev.zio:zio-aws-sagemaker
+  - dev.zio:zio-aws-sagemakera2iruntime
+  - dev.zio:zio-aws-sagemakeredge
+  - dev.zio:zio-aws-sagemakerfeaturestoreruntime
+  - dev.zio:zio-aws-sagemakergeospatial
+  - dev.zio:zio-aws-sagemakermetrics
+  - dev.zio:zio-aws-sagemakerruntime
+  - dev.zio:zio-aws-sagemakerruntimehttp2
+  - dev.zio:zio-aws-savingsplans
+  - dev.zio:zio-aws-scheduler
+  - dev.zio:zio-aws-schemas
+  - dev.zio:zio-aws-secretsmanager
+  - dev.zio:zio-aws-securityagent
+  - dev.zio:zio-aws-securityhub
+  - dev.zio:zio-aws-securityir
+  - dev.zio:zio-aws-securitylake
+  - dev.zio:zio-aws-serverlessapplicationrepository
+  - dev.zio:zio-aws-servicecatalog
+  - dev.zio:zio-aws-servicecatalogappregistry
+  - dev.zio:zio-aws-servicediscovery
+  - dev.zio:zio-aws-servicequotas
+  - dev.zio:zio-aws-ses
+  - dev.zio:zio-aws-sesv2
+  - dev.zio:zio-aws-sfn
+  - dev.zio:zio-aws-shield
+  - dev.zio:zio-aws-signer
+  - dev.zio:zio-aws-signerdata
+  - dev.zio:zio-aws-signin
+  - dev.zio:zio-aws-simpledbv2
+  - dev.zio:zio-aws-simspaceweaver
+  - dev.zio:zio-aws-sms
+  - dev.zio:zio-aws-snowball
+  - dev.zio:zio-aws-snowdevicemanagement
+  - dev.zio:zio-aws-sns
+  - dev.zio:zio-aws-socialmessaging
+  - dev.zio:zio-aws-sqs
+  - dev.zio:zio-aws-ssm
+  - dev.zio:zio-aws-ssmcontacts
+  - dev.zio:zio-aws-ssmguiconnect
+  - dev.zio:zio-aws-ssmincidents
+  - dev.zio:zio-aws-ssmquicksetup
+  - dev.zio:zio-aws-ssmsap
+  - dev.zio:zio-aws-sso
+  - dev.zio:zio-aws-ssoadmin
+  - dev.zio:zio-aws-ssooidc
+  - dev.zio:zio-aws-storagegateway
+  - dev.zio:zio-aws-sts
+  - dev.zio:zio-aws-supplychain
+  - dev.zio:zio-aws-support
+  - dev.zio:zio-aws-supportapp
+  - dev.zio:zio-aws-sustainability
+  - dev.zio:zio-aws-swf
+  - dev.zio:zio-aws-synthetics
+  - dev.zio:zio-aws-taxsettings
+  - dev.zio:zio-aws-textract
+  - dev.zio:zio-aws-timestreaminfluxdb
+  - dev.zio:zio-aws-timestreamquery
+  - dev.zio:zio-aws-timestreamwrite
+  - dev.zio:zio-aws-tnb
+  - dev.zio:zio-aws-transcribe
+  - dev.zio:zio-aws-transcribestreaming
+  - dev.zio:zio-aws-transfer
+  - dev.zio:zio-aws-translate
+  - dev.zio:zio-aws-trustedadvisor
+  - dev.zio:zio-aws-uxc
+  - dev.zio:zio-aws-verifiedpermissions
+  - dev.zio:zio-aws-voiceid
+  - dev.zio:zio-aws-vpclattice
+  - dev.zio:zio-aws-waf
+  - dev.zio:zio-aws-wafregional
+  - dev.zio:zio-aws-wafv2
+  - dev.zio:zio-aws-wellarchitected
+  - dev.zio:zio-aws-wickr
+  - dev.zio:zio-aws-wisdom
+  - dev.zio:zio-aws-workdocs
+  - dev.zio:zio-aws-worklink
+  - dev.zio:zio-aws-workmail
+  - dev.zio:zio-aws-workmailmessageflow
+  - dev.zio:zio-aws-workspaces
+  - dev.zio:zio-aws-workspacesinstances
+  - dev.zio:zio-aws-workspacesthinclient
+  - dev.zio:zio-aws-workspacesweb
+  - dev.zio:zio-aws-xray
+  language_evidence:
+    Scala: 367831
+    Shell: 540
+    JavaScript: 385
+  language_source: https://api.github.com/repos/zio/zio-aws/languages
+  selected_from:
+  - deployment-and-cloud
 - repository: joan38/kubernetes-client
   categories:
   - deployment-and-cloud
@@ -5952,6 +6687,30 @@ projects:
   language_source: https://api.github.com/repos/joan38/kubernetes-client/languages
   selected_from:
   - deployment-and-cloud
+- repository: coralogix/zio-k8s
+  categories:
+  - deployment-and-cloud
+  selection:
+  - category: deployment-and-cloud
+    rank: 14
+    source: https://index.scala-lang.org/awesome/deployment-and-cloud?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.coralogix:leader-example
+  - com.coralogix:optics-example
+  - com.coralogix:zio-k8s-client
+  - com.coralogix:zio-k8s-client-monocle
+  - com.coralogix:zio-k8s-client-optics
+  - com.coralogix:zio-k8s-client-quicklens
+  - com.coralogix:zio-k8s-operator
+  language_evidence:
+    Scala: 550259
+    JavaScript: 10371
+    CSS: 637
+  language_source: https://api.github.com/repos/coralogix/zio-k8s/languages
+  selected_from:
+  - deployment-and-cloud
 - repository: hagay3/skuber
   categories:
   - deployment-and-cloud
@@ -5968,6 +6727,23 @@ projects:
     Scala: 821435
     Shell: 723
   language_source: https://api.github.com/repos/hagay3/skuber/languages
+  selected_from:
+  - deployment-and-cloud
+- repository: zio/zio-sqs
+  categories:
+  - deployment-and-cloud
+  selection:
+  - category: deployment-and-cloud
+    rank: 17
+    source: https://index.scala-lang.org/awesome/deployment-and-cloud?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - dev.zio:zio-sqs
+  - dev.zio:zio-sqs-docs
+  language_evidence:
+    Scala: 93716
+  language_source: https://api.github.com/repos/zio/zio-sqs/languages
   selected_from:
   - deployment-and-cloud
 - repository: hnaderi/scala-k8s
@@ -6346,6 +7122,225 @@ projects:
     C++: 508
     PowerShell: 408
   language_source: https://api.github.com/repos/sbt/sbt/languages
+  selected_from:
+  - build-tools
+- repository: com-lihaoyi/mill
+  categories:
+  - build-tools
+  selection:
+  - category: build-tools
+    rank: 2
+    source: https://index.scala-lang.org/awesome/build-tools?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.lihaoyi:mill-bsp
+  - com.lihaoyi:mill-bsp-worker
+  - com.lihaoyi:mill-contrib
+  - com.lihaoyi:mill-contrib-artifactory
+  - com.lihaoyi:mill-contrib-bintray
+  - com.lihaoyi:mill-contrib-bloop
+  - com.lihaoyi:mill-contrib-bsp
+  - com.lihaoyi:mill-contrib-buildinfo
+  - com.lihaoyi:mill-contrib-checkstyle
+  - com.lihaoyi:mill-contrib-codeartifact
+  - com.lihaoyi:mill-contrib-docker
+  - com.lihaoyi:mill-contrib-errorprone
+  - com.lihaoyi:mill-contrib-flyway
+  - com.lihaoyi:mill-contrib-gitlab
+  - com.lihaoyi:mill-contrib-jmh
+  - com.lihaoyi:mill-contrib-owaspdependencycheck
+  - com.lihaoyi:mill-contrib-playlib
+  - com.lihaoyi:mill-contrib-playlib-worker-2.7
+  - com.lihaoyi:mill-contrib-playlib-worker-2.8
+  - com.lihaoyi:mill-contrib-playlib-worker-2.9
+  - com.lihaoyi:mill-contrib-playlib-worker-3.0
+  - com.lihaoyi:mill-contrib-proguard
+  - com.lihaoyi:mill-contrib-sbom
+  - com.lihaoyi:mill-contrib-scalapblib
+  - com.lihaoyi:mill-contrib-scoverage
+  - com.lihaoyi:mill-contrib-scoverage-api
+  - com.lihaoyi:mill-contrib-scoverage-worker
+  - com.lihaoyi:mill-contrib-scoverage-worker2
+  - com.lihaoyi:mill-contrib-sonatypecentral
+  - com.lihaoyi:mill-contrib-testng
+  - com.lihaoyi:mill-contrib-tut
+  - com.lihaoyi:mill-contrib-twirllib
+  - com.lihaoyi:mill-contrib-versionfile
+  - com.lihaoyi:mill-core
+  - com.lihaoyi:mill-core-api
+  - com.lihaoyi:mill-core-api-daemon
+  - com.lihaoyi:mill-core-api-java11
+  - com.lihaoyi:mill-core-api-shared
+  - com.lihaoyi:mill-core-codesig
+  - com.lihaoyi:mill-core-coursierutil
+  - com.lihaoyi:mill-core-define
+  - com.lihaoyi:mill-core-eval
+  - com.lihaoyi:mill-core-exec
+  - com.lihaoyi:mill-core-internal
+  - com.lihaoyi:mill-core-internal-cli
+  - com.lihaoyi:mill-core-resolve
+  - com.lihaoyi:mill-core-util
+  - com.lihaoyi:mill-dev
+  - com.lihaoyi:mill-idea
+  - com.lihaoyi:mill-integration
+  - com.lihaoyi:mill-javascriptlib
+  - com.lihaoyi:mill-kotlinlib
+  - com.lihaoyi:mill-kotlinlib-worker
+  - com.lihaoyi:mill-kotlinlib-worker-impl
+  - com.lihaoyi:mill-libs
+  - com.lihaoyi:mill-libs-androidlib
+  - com.lihaoyi:mill-libs-androidlib-api
+  - com.lihaoyi:mill-libs-androidlib-databinding
+  - com.lihaoyi:mill-libs-androidlib-databinding-impl
+  - com.lihaoyi:mill-libs-androidlib-hilt
+  - com.lihaoyi:mill-libs-androidlib-keytool
+  - com.lihaoyi:mill-libs-daemon
+  - com.lihaoyi:mill-libs-daemon-client
+  - com.lihaoyi:mill-libs-daemon-server
+  - com.lihaoyi:mill-libs-graphviz
+  - com.lihaoyi:mill-libs-groovylib
+  - com.lihaoyi:mill-libs-groovylib-api
+  - com.lihaoyi:mill-libs-groovylib-worker
+  - com.lihaoyi:mill-libs-idea
+  - com.lihaoyi:mill-libs-init
+  - com.lihaoyi:mill-libs-init-buildgen
+  - com.lihaoyi:mill-libs-init-buildgen-api
+  - com.lihaoyi:mill-libs-init-gradle
+  - com.lihaoyi:mill-libs-init-maven
+  - com.lihaoyi:mill-libs-init-sbt
+  - com.lihaoyi:mill-libs-init-sbt-api
+  - com.lihaoyi:mill-libs-init-sbt-models
+  - com.lihaoyi:mill-libs-javalib
+  - com.lihaoyi:mill-libs-javalib-api
+  - com.lihaoyi:mill-libs-javalib-classgraph-worker
+  - com.lihaoyi:mill-libs-javalib-graalvm-reachability-worker
+  - com.lihaoyi:mill-libs-javalib-jarjarabrams-worker
+  - com.lihaoyi:mill-libs-javalib-maven-worker
+  - com.lihaoyi:mill-libs-javalib-pgp-worker
+  - com.lihaoyi:mill-libs-javalib-quarkus-worker
+  - com.lihaoyi:mill-libs-javalib-scalameta-worker
+  - com.lihaoyi:mill-libs-javalib-spotless-worker
+  - com.lihaoyi:mill-libs-javalib-spring-boot-worker
+  - com.lihaoyi:mill-libs-javalib-testrunner
+  - com.lihaoyi:mill-libs-javalib-worker
+  - com.lihaoyi:mill-libs-javascriptlib
+  - com.lihaoyi:mill-libs-jvmlib
+  - com.lihaoyi:mill-libs-jvmlib-api
+  - com.lihaoyi:mill-libs-jvmlib-classgraph-worker
+  - com.lihaoyi:mill-libs-jvmlib-jarjarabrams-worker
+  - com.lihaoyi:mill-libs-jvmlib-spotless-worker
+  - com.lihaoyi:mill-libs-jvmlib-spring-boot-worker
+  - com.lihaoyi:mill-libs-jvmlib-worker
+  - com.lihaoyi:mill-libs-kotlinlib
+  - com.lihaoyi:mill-libs-kotlinlib-api
+  - com.lihaoyi:mill-libs-kotlinlib-ksp2
+  - com.lihaoyi:mill-libs-kotlinlib-ksp2-api
+  - com.lihaoyi:mill-libs-kotlinlib-worker
+  - com.lihaoyi:mill-libs-kotlinlib-worker-1
+  - com.lihaoyi:mill-libs-kotlinlib-worker-2-4
+  - com.lihaoyi:mill-libs-kotlinlib-worker-impl
+  - com.lihaoyi:mill-libs-main
+  - com.lihaoyi:mill-libs-pythonlib
+  - com.lihaoyi:mill-libs-rpc
+  - com.lihaoyi:mill-libs-scalajslib
+  - com.lihaoyi:mill-libs-scalajslib-api
+  - com.lihaoyi:mill-libs-scalajslib-config-1
+  - com.lihaoyi:mill-libs-scalajslib-worker-1
+  - com.lihaoyi:mill-libs-scalajslib-worker-api
+  - com.lihaoyi:mill-libs-scalalib
+  - com.lihaoyi:mill-libs-scalalib-api
+  - com.lihaoyi:mill-libs-scalalib-classgraph-worker
+  - com.lihaoyi:mill-libs-scalalib-jarjarabrams-worker
+  - com.lihaoyi:mill-libs-scalalib-scalafmt-worker
+  - com.lihaoyi:mill-libs-scalalib-spotless-worker
+  - com.lihaoyi:mill-libs-scalalib-spring-boot-worker
+  - com.lihaoyi:mill-libs-scalalib-worker
+  - com.lihaoyi:mill-libs-scalanativelib
+  - com.lihaoyi:mill-libs-scalanativelib-api
+  - com.lihaoyi:mill-libs-scalanativelib-worker-0.5
+  - com.lihaoyi:mill-libs-scalanativelib-worker-api
+  - com.lihaoyi:mill-libs-script
+  - com.lihaoyi:mill-libs-script-asm-worker
+  - com.lihaoyi:mill-libs-tabcomplete
+  - com.lihaoyi:mill-libs-testrunner
+  - com.lihaoyi:mill-libs-util
+  - com.lihaoyi:mill-libs-util-java11
+  - com.lihaoyi:mill-libs-vcs
+  - com.lihaoyi:mill-main
+  - com.lihaoyi:mill-main-api
+  - com.lihaoyi:mill-main-codesig
+  - com.lihaoyi:mill-main-core
+  - com.lihaoyi:mill-main-define
+  - com.lihaoyi:mill-main-eval
+  - com.lihaoyi:mill-main-graphviz
+  - com.lihaoyi:mill-main-init
+  - com.lihaoyi:mill-main-init-buildgen
+  - com.lihaoyi:mill-main-init-gradle
+  - com.lihaoyi:mill-main-init-maven
+  - com.lihaoyi:mill-main-init-sbt
+  - com.lihaoyi:mill-main-init-sbt-models
+  - com.lihaoyi:mill-main-maven
+  - com.lihaoyi:mill-main-moduledefs
+  - com.lihaoyi:mill-main-resolve
+  - com.lihaoyi:mill-main-server
+  - com.lihaoyi:mill-main-testkit
+  - com.lihaoyi:mill-main-util
+  - com.lihaoyi:mill-pythonlib
+  - com.lihaoyi:mill-runner
+  - com.lihaoyi:mill-runner-api
+  - com.lihaoyi:mill-runner-autooverride-api
+  - com.lihaoyi:mill-runner-bsp
+  - com.lihaoyi:mill-runner-bsp-worker
+  - com.lihaoyi:mill-runner-client
+  - com.lihaoyi:mill-runner-codesig
+  - com.lihaoyi:mill-runner-compilerworker
+  - com.lihaoyi:mill-runner-compilerworker-api
+  - com.lihaoyi:mill-runner-daemon
+  - com.lihaoyi:mill-runner-eclipse
+  - com.lihaoyi:mill-runner-idea
+  - com.lihaoyi:mill-runner-launcher
+  - com.lihaoyi:mill-runner-linenumbers
+  - com.lihaoyi:mill-runner-meta
+  - com.lihaoyi:mill-runner-server
+  - com.lihaoyi:mill-runner-worker
+  - com.lihaoyi:mill-runner-worker-api
+  - com.lihaoyi:mill-scalajslib
+  - com.lihaoyi:mill-scalajslib-api
+  - com.lihaoyi:mill-scalajslib-worker-0.6
+  - com.lihaoyi:mill-scalajslib-worker-1
+  - com.lihaoyi:mill-scalajslib-worker-1.0
+  - com.lihaoyi:mill-scalajslib-worker-api
+  - com.lihaoyi:mill-scalalib
+  - com.lihaoyi:mill-scalalib-api
+  - com.lihaoyi:mill-scalalib-backgroundwrapper
+  - com.lihaoyi:mill-scalalib-classgraph-worker
+  - com.lihaoyi:mill-scalalib-maven-worker
+  - com.lihaoyi:mill-scalalib-worker
+  - com.lihaoyi:mill-scalanativelib
+  - com.lihaoyi:mill-scalanativelib-worker-0.4
+  - com.lihaoyi:mill-scalanativelib-worker-0.5
+  - com.lihaoyi:mill-scalanativelib-worker-api
+  - com.lihaoyi:mill-testkit
+  - com.lihaoyi:mill-testrunner
+  language_evidence:
+    Scala: 5954932
+    Java: 334457
+    Kotlin: 120319
+    CSS: 78566
+    TypeScript: 61117
+    Python: 44089
+    HTML: 34938
+    JavaScript: 26141
+    Shell: 21885
+    Groovy: 10911
+    Batchfile: 9909
+    Handlebars: 7056
+    PowerShell: 4950
+    C: 2084
+    C++: 445
+    CMake: 215
+  language_source: https://api.github.com/repos/com-lihaoyi/mill/languages
   selected_from:
   - build-tools
 - repository: virtuslab/scala-cli
@@ -8617,6 +9612,24 @@ projects:
   language_source: https://api.github.com/repos/com-lihaoyi/os-lib/languages
   selected_from:
   - file-systems-and-processes
+- repository: zio/zio-process
+  categories:
+  - file-systems-and-processes
+  selection:
+  - category: file-systems-and-processes
+    rank: 4
+    source: https://index.scala-lang.org/awesome/file-systems-and-processes?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - dev.zio:zio-process
+  - dev.zio:zio-process-docs
+  language_evidence:
+    Scala: 95632
+    Shell: 1377
+  language_source: https://api.github.com/repos/zio/zio-process/languages
+  selected_from:
+  - file-systems-and-processes
 - repository: spinalhdl/spinalhdl
   categories:
   - hardware-and-emulators
@@ -9096,6 +10109,30 @@ projects:
     Scala: 686061
     Java: 8836
   language_source: https://api.github.com/repos/fasterxml/jackson-module-scala/languages
+  selected_from:
+  - json
+- repository: zio/zio-json
+  categories:
+  - json
+  selection:
+  - category: json
+    rank: 8
+    source: https://index.scala-lang.org/awesome/json?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - dev.zio:zio-json
+  - dev.zio:zio-json-docs
+  - dev.zio:zio-json-golden
+  - dev.zio:zio-json-interop-enumeratum
+  - dev.zio:zio-json-interop-http4s
+  - dev.zio:zio-json-interop-refined
+  - dev.zio:zio-json-interop-scalaz7x
+  - dev.zio:zio-json-macros
+  - dev.zio:zio-json-yaml
+  language_evidence:
+    Scala: 1219395
+  language_source: https://api.github.com/repos/zio/zio-json/languages
   selected_from:
   - json
 - repository: typelevel/jawn
@@ -11797,6 +12834,45 @@ projects:
   language_source: https://api.github.com/repos/scalaj/scalaj-http/languages
   selected_from:
   - http-servers-and-clients
+- repository: zio/zio-http
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 11
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - dev.zio:sbt-zio-http-grpc
+  - dev.zio:zio-http
+  - dev.zio:zio-http-cli
+  - dev.zio:zio-http-datastar-sdk
+  - dev.zio:zio-http-docs
+  - dev.zio:zio-http-gen
+  - dev.zio:zio-http-htmx
+  - dev.zio:zio-http-logging
+  - dev.zio:zio-http-metrics
+  - dev.zio:zio-http-shaded
+  - dev.zio:zio-http-stomp
+  - dev.zio:zio-http-testkit
+  - dev.zio:zio-http-testkit-shaded
+  - io.d11:zhttp
+  - io.d11:zhttp-logging
+  - io.d11:zhttp-test
+  language_evidence:
+    Scala: 5137584
+    HTML: 376729
+    JavaScript: 65689
+    CSS: 35196
+    Shell: 17531
+    Smithy: 12816
+    Python: 3496
+    Dockerfile: 1822
+    Nix: 147
+  language_source: https://api.github.com/repos/zio/zio-http/languages
+  selected_from:
+  - http-servers-and-clients
 - repository: unfiltered/unfiltered
   categories:
   - http-servers-and-clients
@@ -12313,6 +13389,25 @@ projects:
   language_source: https://api.github.com/repos/spinoco/fs2-http/languages
   selected_from:
   - http-servers-and-clients
+- repository: ollls/zio-tls-http
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 39
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.github.ollls:zio-tls-http
+  language_evidence:
+    Scala: 204874
+    HTML: 3238
+    Dockerfile: 1137
+    Shell: 68
+  language_source: https://api.github.com/repos/ollls/zio-tls-http/languages
+  selected_from:
+  - http-servers-and-clients
 - repository: splink/pagelets
   categories:
   - http-servers-and-clients
@@ -12380,6 +13475,29 @@ projects:
     Java: 5390
     Shell: 1726
   language_source: https://api.github.com/repos/yakivy/poppet/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: yisraelu/smithy4s-zio
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 49
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=3
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.github.yisraelu:root
+  - io.github.yisraelu:smithy4s-zio-cli
+  - io.github.yisraelu:smithy4s-zio-compliance-test
+  - io.github.yisraelu:smithy4s-zio-http
+  - io.github.yisraelu:smithy4s-zio-prelude
+  - io.github.yisraelu:smithy4s-zio-schema
+  - io.github.yisraelu:smithy4s-zio-transformers
+  language_evidence:
+    Scala: 362346
+    Kotlin: 12910
+  language_source: https://api.github.com/repos/yisraelu/smithy4s-zio/languages
   selected_from:
   - http-servers-and-clients
 - repository: analogweb/analogweb-scala
