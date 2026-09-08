@@ -6,17 +6,17 @@ Updated 2026-09-08. Maintain this register together with configuration, implemen
 | --- | --- |
 | Platform | JVM only |
 | Scala binary versions | 2.13 and 3 |
-| Seed selection | First ten eligible projects per each of 76 Awesome Scala subsections, in source order; repository deduplication without backfill after deduplication |
-| Project ceiling | 760, derived from 76 × 10; actual frozen count reported by `scala-security plan` |
-| Artifacts per project | At most 20 published coordinates across both Scala versions combined |
+| Seed selection | All eligible projects across all 76 Awesome Scala subsections and all listing pages, deduplicated by repository |
+| Project ceiling | No numeric quota; bounded by eligible Awesome Scala membership; current frozen count 529 |
+| Artifacts per project | At most 50 published coordinates across both Scala versions combined |
 | Artifact ranking | `dependent_packages_count` descending, unknown last, coordinate-name ties |
 | Traversal universe | Closed seed universe: only selected coordinates may be roots, intermediates or targets |
-| Coordinate ceiling | 15,200 across at most 760 projects; availability and deduplication reduce this |
+| Coordinate ceiling | 50 × frozen project count (26,450 for 529 projects); publication availability and deduplication reduce this |
 | Maximum dependency depth | Five edges: A → B → C → D → E → F is five hops |
 | Recursive dependencies per project | No separate numeric cap beyond the closed universe and hop limit |
 | Total version resolutions / HTTP requests | No separate numeric cap; different historical versions of a coordinate require separate resolution |
 
-Expand all configured module families, then check publication availability before ranking and capping. When at most twenty published candidates exist, retain all without extra ranking-metadata requests. Record ranking inputs and decisions in SQLite; missing counts remain unknown. Inventory plots use the uncapped inventory. Package popularity is a global, historical direct-package proxy, not the final seed-only exposed Value.
+Expand all configured module families, then check publication availability before ranking and capping. When at most fifty published candidates exist, retain all without extra ranking-metadata requests. Record ranking inputs and decisions in SQLite; missing counts remain unknown. Inventory plots use the uncapped inventory. Package popularity is a global, historical direct-package proxy, not the final seed-only exposed Value.
 
 ## Version and scope rules
 

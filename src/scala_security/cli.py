@@ -15,7 +15,7 @@ import yaml
 
 from .analyze import analyze, validate
 from .collect import Collector
-from .configuration import parse_config
+from .configuration import ARTIFACT_CAP, parse_config
 from .data import connect
 from .http import Fetcher
 from .seeds import select
@@ -54,15 +54,15 @@ def main() -> None:
                         "projects": len(config.projects),
                         "modules": config.module_count,
                         "universe": "seed",
-                        "max_artifacts_per_project": 20,
+                        "max_artifacts_per_project": ARTIFACT_CAP,
                         "matrix": config.matrix,
                         "selected_coordinate_upper_bound": sum(
-                            min(20, len(config.coordinates(p))) for p in config.projects
+                            min(ARTIFACT_CAP, len(config.coordinates(p))) for p in config.projects
                         ),
                         "candidate_coordinates": len(
                             {a for p in config.projects for a in config.coordinates(p)}
                         ),
-                        "note": "Uncapped offline candidates; final top 20 selection requires publication checks and dependent-package counts during collection.",
+                        "note": "Uncapped offline candidates; final top 50 selection requires publication checks and dependent-package counts during collection.",
                     },
                     indent=2,
                 )

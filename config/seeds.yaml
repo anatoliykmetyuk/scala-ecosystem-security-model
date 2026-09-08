@@ -1,9 +1,10 @@
 schema: 2
 universe: seed
-max_artifacts_per_project: 20
+max_hops: 5
+max_artifacts_per_project: 50
 artifact_selection: Published matrix coordinates ranked by dependent_packages_count
-  descending; unknown counts last; coordinate-name ties; top 20.
-selected_at: '2026-09-08T06:32:28.807644+00:00'
+  descending; unknown counts last; coordinate-name ties; top 50.
+selected_at: '2026-09-08T07:09:31.629419+00:00'
 source: https://index.scala-lang.org/awesome
 matrix:
   jvm:
@@ -11,11 +12,10 @@ matrix:
     - '2.13'
     - '3'
 selection_policy:
-  max_projects: 760
-  max_per_subsection: 10
-  rule: First ten eligible projects per subsection in captured source order, then
-    deduplicate repositories across subsections. A shared project occupies a slot
-    in each selecting subsection; no backfill after deduplication.
+  max_projects: null
+  max_per_subsection: null
+  rule: All eligible projects across every Awesome Scala subsection in captured source
+    order, deduplicated by repository. No project or subsection quota.
   sections:
   - name: Asynchronous, Concurrent and Distributed Programming
     subcategories:
@@ -367,6 +367,46 @@ projects:
     CSS: 8973
     Java: 3619
   language_source: https://api.github.com/repos/otavia-projects/otavia/languages
+  selected_from:
+  - asynchronous-and-reactive-programming
+- repository: spring-attic/reactor-scala-extensions
+  categories:
+  - asynchronous-and-reactive-programming
+  selection:
+  - category: asynchronous-and-reactive-programming
+    rank: 15
+    source: https://index.scala-lang.org/awesome/asynchronous-and-reactive-programming?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.projectreactor:reactor-scala-extensions
+  language_evidence:
+    Scala: 349894
+    Shell: 1207
+  language_source: https://api.github.com/repos/spring-attic/reactor-scala-extensions/languages
+  selected_from:
+  - asynchronous-and-reactive-programming
+- repository: spekka/spekka
+  categories:
+  - asynchronous-and-reactive-programming
+  selection:
+  - category: asynchronous-and-reactive-programming
+    rank: 17
+    source: https://index.scala-lang.org/awesome/asynchronous-and-reactive-programming?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.github.spekka:spekka-benchmark
+  - io.github.spekka:spekka-codec
+  - io.github.spekka:spekka-context
+  - io.github.spekka:spekka-docs
+  - io.github.spekka:spekka-stateful
+  - io.github.spekka:spekka-stateful-akkapersistence
+  - io.github.spekka:spekka-stateful-sharding
+  - io.github.spekka:spekka-test
+  language_evidence:
+    Scala: 603700
+  language_source: https://api.github.com/repos/spekka/spekka/languages
   selected_from:
   - asynchronous-and-reactive-programming
 - repository: akka/akka-core
@@ -815,6 +855,249 @@ projects:
     Scala: 310114
     Nix: 199
   language_source: https://api.github.com/repos/profunktor/fs2-rabbit/languages
+  selected_from:
+  - distributed-messaging-systems-and-microservices
+- repository: parapet-io/parapet
+  categories:
+  - distributed-messaging-systems-and-microservices
+  selection:
+  - category: distributed-messaging-systems-and-microservices
+    rank: 17
+    source: https://index.scala-lang.org/awesome/distributed-messaging-systems-and-microservices?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.parapet:benchmark
+  - io.parapet:cluster
+  - io.parapet:cluster-api
+  - io.parapet:cluster-node
+  - io.parapet:common
+  - io.parapet:core
+  - io.parapet:core-api
+  - io.parapet:interop-cats
+  - io.parapet:interop-monix
+  - io.parapet:net
+  - io.parapet:protobuf
+  - io.parapet:spark
+  - io.parapet:test-utils
+  language_evidence:
+    Scala: 610824
+  language_source: https://api.github.com/repos/parapet-io/parapet/languages
+  selected_from:
+  - distributed-messaging-systems-and-microservices
+- repository: hnaderi/edomata
+  categories:
+  - distributed-messaging-systems-and-microservices
+  selection:
+  - category: distributed-messaging-systems-and-microservices
+    rank: 18
+    source: https://index.scala-lang.org/awesome/distributed-messaging-systems-and-microservices?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - dev.hnaderi:edomata-backend
+  - dev.hnaderi:edomata-core
+  - dev.hnaderi:edomata-docs
+  - dev.hnaderi:edomata-doobie
+  - dev.hnaderi:edomata-doobie-circe
+  - dev.hnaderi:edomata-doobie-jsoniter
+  - dev.hnaderi:edomata-doobie-upickle
+  - dev.hnaderi:edomata-munit
+  - dev.hnaderi:edomata-postgres
+  - dev.hnaderi:edomata-skunk
+  - dev.hnaderi:edomata-skunk-circe
+  - dev.hnaderi:edomata-skunk-jsoniter
+  - dev.hnaderi:edomata-skunk-upickle
+  - dev.hnaderi:edomata-sql-backend
+  - io.github.hnaderi:edomata-core
+  - io.github.hnaderi:edomata-docs
+  - io.github.hnaderi:edomata-skunk
+  - io.github.hnaderi:edomata-skunk-circe
+  - io.github.hnaderi:edomata-skunk-upickle
+  - io.github.hnaderi:edomata-sql-backend
+  language_evidence:
+    Scala: 350468
+    Nix: 1100
+    Shell: 10
+  language_source: https://api.github.com/repos/hnaderi/edomata/languages
+  selected_from:
+  - distributed-messaging-systems-and-microservices
+- repository: trex-paxos/trex
+  categories:
+  - distributed-messaging-systems-and-microservices
+  selection:
+  - category: distributed-messaging-systems-and-microservices
+    rank: 19
+    source: https://index.scala-lang.org/awesome/distributed-messaging-systems-and-microservices?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.trex-paxos:trex-core
+  - com.github.trex-paxos:trex-demo
+  - com.github.trex-paxos:trex-library
+  language_evidence:
+    Scala: 451668
+    Java: 836
+  language_source: https://api.github.com/repos/trex-paxos/trex/languages
+  selected_from:
+  - distributed-messaging-systems-and-microservices
+- repository: openmole/gridscale
+  categories:
+  - distributed-messaging-systems-and-microservices
+  selection:
+  - category: distributed-messaging-systems-and-microservices
+    rank: 20
+    source: https://index.scala-lang.org/awesome/distributed-messaging-systems-and-microservices?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - org.openmole.gridscale:cluster
+  - org.openmole.gridscale:condor
+  - org.openmole.gridscale:condorexample
+  - org.openmole.gridscale:dirac
+  - org.openmole.gridscale:effect
+  - org.openmole.gridscale:egi
+  - org.openmole.gridscale:egicreamexample
+  - org.openmole.gridscale:egidiracexample
+  - org.openmole.gridscale:egiwebdavexample
+  - org.openmole.gridscale:example-condor
+  - org.openmole.gridscale:example-egi-cream
+  - org.openmole.gridscale:example-egi-dirac
+  - org.openmole.gridscale:example-egi-webdav
+  - org.openmole.gridscale:example-http
+  - org.openmole.gridscale:example-local
+  - org.openmole.gridscale:example-miniclust
+  - org.openmole.gridscale:example-oar
+  - org.openmole.gridscale:example-pbs
+  - org.openmole.gridscale:example-qarnot
+  - org.openmole.gridscale:example-sge
+  - org.openmole.gridscale:example-slurm
+  - org.openmole.gridscale:example-ssh
+  - org.openmole.gridscale:gridscale
+  - org.openmole.gridscale:http
+  - org.openmole.gridscale:httpexample
+  - org.openmole.gridscale:ipfs
+  - org.openmole.gridscale:ipfsexample
+  - org.openmole.gridscale:local
+  - org.openmole.gridscale:localexample
+  - org.openmole.gridscale:miniclust
+  - org.openmole.gridscale:oar
+  - org.openmole.gridscale:oarexample
+  - org.openmole.gridscale:pbs
+  - org.openmole.gridscale:pbsexample
+  - org.openmole.gridscale:qarnot
+  - org.openmole.gridscale:sge
+  - org.openmole.gridscale:sgeexample
+  - org.openmole.gridscale:slurm
+  - org.openmole.gridscale:slurmexample
+  - org.openmole.gridscale:ssh
+  - org.openmole.gridscale:sshexample
+  - org.openmole.gridscale:webdav
+  language_evidence:
+    Scala: 157104
+    Java: 14820
+  language_source: https://api.github.com/repos/openmole/gridscale/languages
+  selected_from:
+  - distributed-messaging-systems-and-microservices
+- repository: annetteplatform/annette
+  categories:
+  - distributed-messaging-systems-and-microservices
+  selection:
+  - category: distributed-messaging-systems-and-microservices
+    rank: 21
+    source: https://index.scala-lang.org/awesome/distributed-messaging-systems-and-microservices?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - biz.lobachev.annette:annette
+  - biz.lobachev.annette:api-gateway
+  - biz.lobachev.annette:api-gateway-core
+  - biz.lobachev.annette:application
+  - biz.lobachev.annette:application-api
+  - biz.lobachev.annette:application-api-gateway
+  - biz.lobachev.annette:attributes
+  - biz.lobachev.annette:attributes-api
+  - biz.lobachev.annette:authorization
+  - biz.lobachev.annette:authorization-api
+  - biz.lobachev.annette:authorization-api-gateway
+  - biz.lobachev.annette:bpm-api-gateway
+  - biz.lobachev.annette:bpm-repository
+  - biz.lobachev.annette:bpm-repository-api
+  - biz.lobachev.annette:camunda
+  - biz.lobachev.annette:cms
+  - biz.lobachev.annette:cms-api
+  - biz.lobachev.annette:cms-api-gateway
+  - biz.lobachev.annette:core
+  - biz.lobachev.annette:demo-ignition
+  - biz.lobachev.annette:ignition-core
+  - biz.lobachev.annette:init-app
+  - biz.lobachev.annette:microservice-core
+  - biz.lobachev.annette:org-structure
+  - biz.lobachev.annette:org-structure-api
+  - biz.lobachev.annette:org-structure-api-gateway
+  - biz.lobachev.annette:persons
+  - biz.lobachev.annette:persons-api
+  - biz.lobachev.annette:persons-api-gateway
+  - biz.lobachev.annette:principal-groups
+  - biz.lobachev.annette:principal-groups-api
+  - biz.lobachev.annette:principal-groups-api-gateway
+  - biz.lobachev.annette:service-catalog
+  - biz.lobachev.annette:service-catalog-api
+  - biz.lobachev.annette:service-catalog-api-gateway
+  - biz.lobachev.annette:subscriptions
+  - biz.lobachev.annette:subscriptions-api
+  language_evidence:
+    Scala: 2893548
+    FreeMarker: 79116
+    Shell: 5804
+    Dockerfile: 390
+  language_source: https://api.github.com/repos/annetteplatform/annette/languages
+  selected_from:
+  - distributed-messaging-systems-and-microservices
+- repository: pjfanning/op-rabbit
+  categories:
+  - distributed-messaging-systems-and-microservices
+  selection:
+  - category: distributed-messaging-systems-and-microservices
+    rank: 22
+    source: https://index.scala-lang.org/awesome/distributed-messaging-systems-and-microservices?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.pjfanning:op-rabbit
+  - com.github.pjfanning:op-rabbit-airbrake
+  - com.github.pjfanning:op-rabbit-akka-stream
+  - com.github.pjfanning:op-rabbit-circe
+  - com.github.pjfanning:op-rabbit-core
+  - com.github.pjfanning:op-rabbit-json4s
+  - com.github.pjfanning:op-rabbit-pekko-stream
+  - com.github.pjfanning:op-rabbit-play-json
+  - com.github.pjfanning:op-rabbit-spray-json
+  language_evidence:
+    Scala: 255060
+    Makefile: 614
+    Shell: 163
+    Emacs Lisp: 104
+  language_source: https://api.github.com/repos/pjfanning/op-rabbit/languages
+  selected_from:
+  - distributed-messaging-systems-and-microservices
+- repository: thatscalaguy/nats4cats
+  categories:
+  - distributed-messaging-systems-and-microservices
+  selection:
+  - category: distributed-messaging-systems-and-microservices
+    rank: 23
+    source: https://index.scala-lang.org/awesome/distributed-messaging-systems-and-microservices?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - de.thatscalaguy:nats4cats
+  - de.thatscalaguy:nats4cats-circe
+  - de.thatscalaguy:nats4cats-service
+  - de.thatscalaguy:root
+  language_evidence:
+    Scala: 40775
+  language_source: https://api.github.com/repos/thatscalaguy/nats4cats/languages
   selected_from:
   - distributed-messaging-systems-and-microservices
 - repository: enragedginger/akka-quartz-scheduler
@@ -2810,6 +3093,66 @@ projects:
   language_source: https://api.github.com/repos/dvgica/managerial/languages
   selected_from:
   - miscellaneous-utils
+- repository: bishabosha/enhanced-string-interpolator
+  categories:
+  - miscellaneous-utils
+  selection:
+  - category: miscellaneous-utils
+    rank: 12
+    source: https://index.scala-lang.org/awesome/miscellaneous-utils?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.github.bishabosha:enhanced-string-interpolator
+  language_evidence:
+    Scala: 23272
+  language_source: https://api.github.com/repos/bishabosha/enhanced-string-interpolator/languages
+  selected_from:
+  - miscellaneous-utils
+- repository: bitlap/smt
+  categories:
+  - miscellaneous-utils
+  selection:
+  - category: miscellaneous-utils
+    rank: 13
+    source: https://index.scala-lang.org/awesome/miscellaneous-utils?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.github.jxnu-liguobin:scala-macro-tools
+  - org.bitlap:scala-macro-tools
+  - org.bitlap:smt-annotations
+  - org.bitlap:smt-cache
+  - org.bitlap:smt-cacheable
+  - org.bitlap:smt-cacheable-caffeine
+  - org.bitlap:smt-cacheable-core
+  - org.bitlap:smt-cacheable-redis
+  - org.bitlap:smt-common
+  - org.bitlap:smt-csv
+  - org.bitlap:smt-csv-core
+  - org.bitlap:smt-csv-derive
+  - org.bitlap:smt-tools
+  language_evidence:
+    Scala: 179963
+  language_source: https://api.github.com/repos/bitlap/smt/languages
+  selected_from:
+  - miscellaneous-utils
+- repository: xitrum-framework/sclasner
+  categories:
+  - miscellaneous-utils
+  selection:
+  - category: miscellaneous-utils
+    rank: 14
+    source: https://index.scala-lang.org/awesome/miscellaneous-utils?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - tv.cntt:sclasner
+  language_evidence:
+    Scala: 26691
+  language_source: https://api.github.com/repos/xitrum-framework/sclasner/languages
+  selected_from:
+  - miscellaneous-utils
 - repository: com-lihaoyi/fastparse
   categories:
   - parsing
@@ -3206,6 +3549,136 @@ projects:
     Scala: 46406
     Logos: 760
   language_source: https://api.github.com/repos/thoughtworksinc/each/languages
+  selected_from:
+  - scala-language-extensions
+- repository: typelevel/shapeless-3
+  categories:
+  - scala-language-extensions
+  selection:
+  - category: scala-language-extensions
+    rank: 11
+    source: https://index.scala-lang.org/awesome/scala-language-extensions?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - org.typelevel:shapeless3-deriving
+  - org.typelevel:shapeless3-test
+  - org.typelevel:shapeless3-typeable
+  language_evidence:
+    Scala: 182383
+  language_source: https://api.github.com/repos/typelevel/shapeless-3/languages
+  selected_from:
+  - scala-language-extensions
+- repository: kubuszok/hearth
+  categories:
+  - scala-language-extensions
+  selection:
+  - category: scala-language-extensions
+    rank: 13
+    source: https://index.scala-lang.org/awesome/scala-language-extensions?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.kubuszok:hearth
+  - com.kubuszok:hearth-better-printers
+  - com.kubuszok:hearth-cross-quotes
+  - com.kubuszok:hearth-micro-fp
+  - com.kubuszok:hearth-munit
+  language_evidence:
+    Scala: 4454212
+    Java: 2000
+  language_source: https://api.github.com/repos/kubuszok/hearth/languages
+  selected_from:
+  - scala-language-extensions
+- repository: thoughtworksinc/enableif.scala
+  categories:
+  - scala-language-extensions
+  selection:
+  - category: scala-language-extensions
+    rank: 15
+    source: https://index.scala-lang.org/awesome/scala-language-extensions?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.thoughtworks.enableIf:enableif
+  language_evidence:
+    Scala: 12606
+  language_source: https://api.github.com/repos/thoughtworksinc/enableif.scala/languages
+  selected_from:
+  - scala-language-extensions
+- repository: alexarchambault/data-class
+  categories:
+  - scala-language-extensions
+  selection:
+  - category: scala-language-extensions
+    rank: 16
+    source: https://index.scala-lang.org/awesome/scala-language-extensions?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.github.alexarchambault:data-class
+  language_evidence:
+    Scala: 59609
+    Batchfile: 9912
+    Shell: 6661
+  language_source: https://api.github.com/repos/alexarchambault/data-class/languages
+  selected_from:
+  - scala-language-extensions
+- repository: bishabosha/enum-extensions
+  categories:
+  - scala-language-extensions
+  selection:
+  - category: scala-language-extensions
+    rank: 19
+    source: https://index.scala-lang.org/awesome/scala-language-extensions?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.github.bishabosha:enum-extensions
+  language_evidence:
+    Scala: 11174
+  language_source: https://api.github.com/repos/bishabosha/enum-extensions/languages
+  selected_from:
+  - scala-language-extensions
+- repository: katrix/perspective
+  categories:
+  - scala-language-extensions
+  selection:
+  - category: scala-language-extensions
+    rank: 20
+    source: https://index.scala-lang.org/awesome/scala-language-extensions?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - net.katsstuff:perspective
+  - net.katsstuff:perspective-derivation
+  - net.katsstuff:perspective-macro
+  - net.katsstuff:perspectivescala2
+  - net.katsstuff:perspectivescala2-derivation
+  - net.katsstuff:perspectivescala2-macro
+  - net.katsstuff:perspectivescala2-parameterized
+  language_evidence:
+    Scala: 726089
+  language_source: https://api.github.com/repos/katrix/perspective/languages
+  selected_from:
+  - scala-language-extensions
+- repository: kubuszok/pipez
+  categories:
+  - scala-language-extensions
+  selection:
+  - category: scala-language-extensions
+    rank: 21
+    source: https://index.scala-lang.org/awesome/scala-language-extensions?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.kubuszok:pipez
+  - com.kubuszok:pipez-dsl
+  - com.kubuszok:pipez-testcases
+  - com.kubuszok:pipez-testcases-scala3
+  language_evidence:
+    Scala: 204784
+  language_source: https://api.github.com/repos/kubuszok/pipez/languages
   selected_from:
   - scala-language-extensions
 - repository: scopt/scopt
@@ -4205,6 +4678,289 @@ projects:
   language_source: https://api.github.com/repos/mockito/mockito-scala/languages
   selected_from:
   - testing
+- repository: typelevel/discipline
+  categories:
+  - testing
+  selection:
+  - category: testing
+    rank: 11
+    source: https://index.scala-lang.org/awesome/testing?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.vasilev:discipline-core
+  - org.typelevel:discipline-core
+  - org.typelevel:discipline-scalatest
+  - org.typelevel:discipline-specs2
+  language_evidence:
+    Scala: 14943
+  language_source: https://api.github.com/repos/typelevel/discipline/languages
+  selected_from:
+  - testing
+- repository: scalameter/scalameter
+  categories:
+  - testing
+  selection:
+  - category: testing
+    rank: 12
+    source: https://index.scala-lang.org/awesome/testing?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.storm-enroute:scalameter
+  - com.storm-enroute:scalameter-core
+  language_evidence:
+    Scala: 280307
+    JavaScript: 144053
+    Java: 24133
+    CSS: 13921
+    HTML: 3590
+    Shell: 877
+  language_source: https://api.github.com/repos/scalameter/scalameter/languages
+  selected_from:
+  - testing
+- repository: scalaprops/scalaprops
+  categories:
+  - testing
+  selection:
+  - category: testing
+    rank: 13
+    source: https://index.scala-lang.org/awesome/testing?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.scalaprops:scalaprops
+  - com.github.scalaprops:scalaprops-all
+  - com.github.scalaprops:scalaprops-core
+  - com.github.scalaprops:scalaprops-gen
+  - com.github.scalaprops:scalaprops-scalaz
+  language_evidence:
+    Scala: 484590
+    Java: 1022
+  language_source: https://api.github.com/repos/scalaprops/scalaprops/languages
+  selected_from:
+  - testing
+- repository: agourlay/cornichon
+  categories:
+  - testing
+  selection:
+  - category: testing
+    rank: 14
+    source: https://index.scala-lang.org/awesome/testing?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.agourlay:cornichon-core
+  - com.github.agourlay:cornichon-http-mock
+  - com.github.agourlay:cornichon-kafka
+  - com.github.agourlay:cornichon-scalatest
+  - com.github.agourlay:cornichon-test-framework
+  language_evidence:
+    Scala: 734433
+    CSS: 520
+  language_source: https://api.github.com/repos/agourlay/cornichon/languages
+  selected_from:
+  - testing
+- repository: stryker-mutator/stryker4s
+  categories:
+  - testing
+  selection:
+  - category: testing
+    rank: 15
+    source: https://index.scala-lang.org/awesome/testing?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.stryker-mutator:sbt-stryker4s-testrunner
+  - io.stryker-mutator:sbt-stryker4s_sbt2
+  - io.stryker-mutator:sbt-stryker4s_sbt2.0.0-M4
+  - io.stryker-mutator:stryker4s-api
+  - io.stryker-mutator:stryker4s-command-runner
+  - io.stryker-mutator:stryker4s-core
+  - io.stryker-mutator:stryker4s-sbt-testrunner
+  - io.stryker-mutator:stryker4s-testkit
+  - io.stryker-mutator:stryker4s-testrunner
+  - io.stryker-mutator:stryker4s-testrunner-api
+  language_evidence:
+    Scala: 624171
+    Batchfile: 9898
+    Shell: 6647
+    PowerShell: 37
+  language_source: https://api.github.com/repos/stryker-mutator/stryker4s/languages
+  selected_from:
+  - testing
+- repository: typelevel/cats-effect-testing
+  categories:
+  - testing
+  selection:
+  - category: testing
+    rank: 16
+    source: https://index.scala-lang.org/awesome/testing?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.codecommit:cats-effect-testing-minitest
+  - com.codecommit:cats-effect-testing-scalatest
+  - com.codecommit:cats-effect-testing-scalatest-scalacheck
+  - com.codecommit:cats-effect-testing-specs2
+  - com.codecommit:cats-effect-testing-utest
+  - com.codecommit:core
+  - org.typelevel:cats-effect-testing-core
+  - org.typelevel:cats-effect-testing-minitest
+  - org.typelevel:cats-effect-testing-scalatest
+  - org.typelevel:cats-effect-testing-specs2
+  - org.typelevel:cats-effect-testing-utest
+  - org.typelevel:core
+  language_evidence:
+    Scala: 54874
+  language_source: https://api.github.com/repos/typelevel/cats-effect-testing/languages
+  selected_from:
+  - testing
+- repository: japgolly/nyaya
+  categories:
+  - testing
+  selection:
+  - category: testing
+    rank: 18
+    source: https://index.scala-lang.org/awesome/testing?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.japgolly.nyaya:nyaya-gen
+  - com.github.japgolly.nyaya:nyaya-gen-circe
+  - com.github.japgolly.nyaya:nyaya-prop
+  - com.github.japgolly.nyaya:nyaya-test
+  - com.github.japgolly.nyaya:nyaya-util
+  language_evidence:
+    Scala: 200150
+  language_source: https://api.github.com/repos/japgolly/nyaya/languages
+  selected_from:
+  - testing
+- repository: monix/minitest
+  categories:
+  - testing
+  selection:
+  - category: testing
+    rank: 19
+    source: https://index.scala-lang.org/awesome/testing?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.monix:minitest
+  - io.monix:minitest-laws
+  - io.monix:minitest-laws-legacy
+  language_evidence:
+    Scala: 55763
+  language_source: https://api.github.com/repos/monix/minitest/languages
+  selected_from:
+  - testing
+- repository: japgolly/test-state
+  categories:
+  - testing
+  selection:
+  - category: testing
+    rank: 20
+    source: https://index.scala-lang.org/awesome/testing?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.japgolly.test-state:core
+  - com.github.japgolly.test-state:core-macros
+  - com.github.japgolly.test-state:dom-zipper
+  - com.github.japgolly.test-state:dom-zipper-jsoup
+  - com.github.japgolly.test-state:dom-zipper-selenium
+  - com.github.japgolly.test-state:ext-cats
+  - com.github.japgolly.test-state:ext-nyaya
+  - com.github.japgolly.test-state:ext-scalaz
+  - com.github.japgolly.test-state:ext-selenium
+  - com.github.japgolly.test-state:util
+  - com.github.japgolly.test-state:util-selenium
+  language_evidence:
+    Scala: 474274
+    Shell: 1312
+    HTML: 1185
+  language_source: https://api.github.com/repos/japgolly/test-state/languages
+  selected_from:
+  - testing
+- repository: scalaz/testz
+  categories:
+  - testing
+  selection:
+  - category: testing
+    rank: 21
+    source: https://index.scala-lang.org/awesome/testing?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - org.scalaz:testz-core
+  - org.scalaz:testz-extras
+  - org.scalaz:testz-resource
+  - org.scalaz:testz-runner
+  - org.scalaz:testz-scalatest
+  - org.scalaz:testz-scalaz
+  - org.scalaz:testz-specs2
+  - org.scalaz:testz-stdlib
+  - org.scalaz:testz-tests
+  - org.scalaz:testz-util
+  language_evidence:
+    Scala: 92243
+  language_source: https://api.github.com/repos/scalaz/testz/languages
+  selected_from:
+  - testing
+- repository: bdmendes/smockito
+  categories:
+  - testing
+  selection:
+  - category: testing
+    rank: 22
+    source: https://index.scala-lang.org/awesome/testing?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.bdmendes:smockito
+  language_evidence:
+    Scala: 100950
+  language_source: https://api.github.com/repos/bdmendes/smockito/languages
+  selected_from:
+  - testing
+- repository: sageserpent-open/americium
+  categories:
+  - testing
+  selection:
+  - category: testing
+    rank: 24
+    source: https://index.scala-lang.org/awesome/testing?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.sageserpent:americium
+  - com.sageserpent:americium-junit5
+  - com.sageserpent:americium-utilities
+  language_evidence:
+    Scala: 446441
+    Java: 164659
+    HTML: 512
+    Ruby: 474
+  language_source: https://api.github.com/repos/sageserpent-open/americium/languages
+  selected_from:
+  - testing
+- repository: martinhh/scalacheck-derived
+  categories:
+  - testing
+  selection:
+  - category: testing
+    rank: 25
+    source: https://index.scala-lang.org/awesome/testing?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.github.martinhh:scalacheck-derived
+  - io.github.martinhh:scalacheck-derived-extras
+  language_evidence:
+    Scala: 96206
+  language_source: https://api.github.com/repos/martinhh/scalacheck-derived/languages
+  selected_from:
+  - testing
 - repository: netflix/atlas
   categories:
   - databases
@@ -4490,6 +5246,384 @@ projects:
     Shell: 141
     Lua: 14
   language_source: https://api.github.com/repos/etaty/rediscala/languages
+  selected_from:
+  - databases
+- repository: squeryl/squeryl
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 13
+    source: https://index.scala-lang.org/awesome/databases?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.novamage:squeryl
+  - org.squeryl:macros
+  - org.squeryl:squeryl
+  language_evidence:
+    Scala: 623669
+    Java: 6582
+  language_source: https://api.github.com/repos/squeryl/squeryl/languages
+  selected_from:
+  - databases
+- repository: aselab/scala-activerecord
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 16
+    source: https://index.scala-lang.org/awesome/databases?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.aselab:scala-activerecord
+  - com.github.aselab:scala-activerecord-macro
+  - com.github.aselab:scala-activerecord-play2
+  - com.github.aselab:scala-activerecord-play2-specs
+  - com.github.aselab:scala-activerecord-scalatra
+  - com.github.aselab:scala-activerecord-specs
+  language_evidence:
+    Scala: 319035
+    Java: 3136
+  language_source: https://api.github.com/repos/aselab/scala-activerecord/languages
+  selected_from:
+  - databases
+- repository: playframework/anorm
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 17
+    source: https://index.scala-lang.org/awesome/databases?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - org.playframework.anorm:anorm
+  - org.playframework.anorm:anorm-akka
+  - org.playframework.anorm:anorm-enumeratum
+  - org.playframework.anorm:anorm-iteratee
+  - org.playframework.anorm:anorm-joda
+  - org.playframework.anorm:anorm-parent
+  - org.playframework.anorm:anorm-pekko
+  - org.playframework.anorm:anorm-postgres
+  - org.playframework.anorm:anorm-tokenizer
+  language_evidence:
+    Scala: 575455
+  language_source: https://api.github.com/repos/playframework/anorm/languages
+  selected_from:
+  - databases
+- repository: lastland/scala-forklift
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 18
+    source: https://index.scala-lang.org/awesome/databases?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.liyaos:scala-forklift-core
+  - com.liyaos:scala-forklift-git-tools
+  - com.liyaos:scala-forklift-plain
+  - com.liyaos:scala-forklift-slick
+  language_evidence:
+    Scala: 90512
+  language_source: https://api.github.com/repos/lastland/scala-forklift/languages
+  selected_from:
+  - databases
+- repository: neotypes/neotypes
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 19
+    source: https://index.scala-lang.org/awesome/databases?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.github.neotypes:neotypes-akka-stream
+  - io.github.neotypes:neotypes-cats-data
+  - io.github.neotypes:neotypes-cats-effect
+  - io.github.neotypes:neotypes-core
+  - io.github.neotypes:neotypes-enumeratum
+  - io.github.neotypes:neotypes-fs2-stream
+  - io.github.neotypes:neotypes-generic
+  - io.github.neotypes:neotypes-monix
+  - io.github.neotypes:neotypes-monix-stream
+  - io.github.neotypes:neotypes-pekko-stream
+  - io.github.neotypes:neotypes-refined
+  - io.github.neotypes:neotypes-zio
+  - io.github.neotypes:neotypes-zio-stream
+  language_evidence:
+    Scala: 285694
+    CSS: 16856
+    Ruby: 83
+  language_source: https://api.github.com/repos/neotypes/neotypes/languages
+  selected_from:
+  - databases
+- repository: lucidsoftware/relate
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 20
+    source: https://index.scala-lang.org/awesome/databases?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.lucidchart:relate
+  - com.lucidchart:relate-macros
+  - com.lucidchart:relate-postgres
+  language_evidence:
+    Scala: 196557
+    Shell: 497
+    Makefile: 479
+  language_source: https://api.github.com/repos/lucidsoftware/relate/languages
+  selected_from:
+  - databases
+- repository: sbt/flyway-sbt
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 22
+    source: https://index.scala-lang.org/awesome/databases?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.sbt:flyway-sbt_sbt2
+  - com.github.sbt:flyway-sbt_sbt2.0.0-M2
+  language_evidence:
+    Scala: 33180
+    Java: 172
+  language_source: https://api.github.com/repos/sbt/flyway-sbt/languages
+  selected_from:
+  - databases
+- repository: crobox/clickhouse-scala-client
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 23
+    source: https://index.scala-lang.org/awesome/databases?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.crobox.clickhouse:client
+  - com.crobox.clickhouse:dsl
+  - com.crobox.clickhouse:testkit
+  language_evidence:
+    Scala: 922900
+    Shell: 1855
+  language_source: https://api.github.com/repos/crobox/clickhouse-scala-client/languages
+  selected_from:
+  - databases
+- repository: ing-bank/scruid
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 24
+    source: https://index.scala-lang.org/awesome/databases?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.ing.wbaa.druid:scruid
+  language_evidence:
+    Scala: 329533
+    Makefile: 2814
+    Dockerfile: 2308
+    Shell: 2030
+  language_source: https://api.github.com/repos/ing-bank/scruid/languages
+  selected_from:
+  - databases
+- repository: laserdisc-io/laserdisc
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 27
+    source: https://index.scala-lang.org/awesome/databases?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.laserdisc:laserdisc-circe
+  - io.laserdisc:laserdisc-cli
+  - io.laserdisc:laserdisc-core
+  - io.laserdisc:laserdisc-fs2
+  language_evidence:
+    Scala: 683321
+  language_source: https://api.github.com/repos/laserdisc-io/laserdisc/languages
+  selected_from:
+  - databases
+- repository: wangzaixiang/scala-sql
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 29
+    source: https://index.scala-lang.org/awesome/databases?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.wangzaixiang:scala-sql
+  - com.github.wangzaixiang:wsql
+  language_evidence:
+    Scala: 104055
+  language_source: https://api.github.com/repos/wangzaixiang/scala-sql/languages
+  selected_from:
+  - databases
+- repository: finagle/finagle-postgres
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 30
+    source: https://index.scala-lang.org/awesome/databases?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.github.finagle:finagle-postgres
+  - io.github.finagle:finagle-postgres-shapeless
+  language_evidence:
+    Scala: 201069
+    Shell: 1471
+  language_source: https://api.github.com/repos/finagle/finagle-postgres/languages
+  selected_from:
+  - databases
+- repository: rolang/dumbo
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 33
+    source: https://index.scala-lang.org/awesome/databases?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - dev.rolang:dumbo
+  language_evidence:
+    Scala: 175643
+    Dockerfile: 200
+  language_source: https://api.github.com/repos/rolang/dumbo/languages
+  selected_from:
+  - databases
+- repository: polyvariant/doobie-quill
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 34
+    source: https://index.scala-lang.org/awesome/databases?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - org.polyvariant:doobie-quill
+  language_evidence:
+    Scala: 14182
+  language_source: https://api.github.com/repos/polyvariant/doobie-quill/languages
+  selected_from:
+  - databases
+- repository: mingchuno/etcd4s
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 35
+    source: https://index.scala-lang.org/awesome/databases?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.mingchuno:etcd4s
+  - com.github.mingchuno:etcd4s-akka-stream
+  - com.github.mingchuno:etcd4s-core
+  language_evidence:
+    Scala: 39146
+  language_source: https://api.github.com/repos/mingchuno/etcd4s/languages
+  selected_from:
+  - databases
+- repository: innfactory/akka-persistence-gcp-datastore
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 37
+    source: https://index.scala-lang.org/awesome/databases?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - de.innfactory:akka-persistence-gcp-datastore
+  language_evidence:
+    Scala: 59834
+    Shell: 259
+  language_source: https://api.github.com/repos/innfactory/akka-persistence-gcp-datastore/languages
+  selected_from:
+  - databases
+- repository: laserdisc-io/mysql-binlog-stream
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 38
+    source: https://index.scala-lang.org/awesome/databases?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.laserdisc:binlog-stream
+  - io.laserdisc:binlog-stream-models
+  - io.laserdisc:mysql-binlog-stream-shared
+  language_evidence:
+    Scala: 70274
+    Makefile: 298
+  language_source: https://api.github.com/repos/laserdisc-io/mysql-binlog-stream/languages
+  selected_from:
+  - databases
+- repository: mongocamp/mongodb-driver
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 40
+    source: https://index.scala-lang.org/awesome/databases?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.sfxcode.nosql:simple-mongo
+  - dev.mongocamp:mongodb-driver
+  language_evidence:
+    Scala: 493027
+    Shell: 442
+    Java: 96
+  language_source: https://api.github.com/repos/mongocamp/mongodb-driver/languages
+  selected_from:
+  - databases
+- repository: irevive/neotypes
+  categories:
+  - databases
+  selection:
+  - category: databases
+    rank: 44
+    source: https://index.scala-lang.org/awesome/databases?page=3
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.github.irevive:neotypes
+  - io.github.irevive:neotypes-akka-stream
+  - io.github.irevive:neotypes-cats-data
+  - io.github.irevive:neotypes-cats-effect
+  - io.github.irevive:neotypes-enumeratum
+  - io.github.irevive:neotypes-fs2-stream
+  - io.github.irevive:neotypes-monix
+  - io.github.irevive:neotypes-monix-stream
+  - io.github.irevive:neotypes-refined
+  - io.github.irevive:neotypes-zio
+  - io.github.irevive:neotypes-zio-stream
+  language_evidence:
+    Scala: 251586
+    Shell: 23781
+    CSS: 16856
+  language_source: https://api.github.com/repos/irevive/neotypes/languages
   selected_from:
   - databases
 - repository: philippus/elastic4s
@@ -8049,6 +9183,140 @@ projects:
   language_source: https://api.github.com/repos/jrudolph/json-lenses/languages
   selected_from:
   - json
+- repository: sirthias/borer
+  categories:
+  - json
+  selection:
+  - category: json
+    rank: 13
+    source: https://index.scala-lang.org/awesome/json?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.bullet:borer-compat-akka
+  - io.bullet:borer-compat-cats
+  - io.bullet:borer-compat-circe
+  - io.bullet:borer-compat-pekko
+  - io.bullet:borer-compat-scodec
+  - io.bullet:borer-core
+  - io.bullet:borer-derivation
+  - io.bullet:borer-deriver
+  language_evidence:
+    Scala: 978384
+    CSS: 979
+  language_source: https://api.github.com/repos/sirthias/borer/languages
+  selected_from:
+  - json
+- repository: bizzabo/play-json-extensions
+  categories:
+  - json
+  selection:
+  - category: json
+    rank: 14
+    source: https://index.scala-lang.org/awesome/json?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - ai.x:play-json-extensions
+  language_evidence:
+    Scala: 80870
+    Shell: 82
+  language_source: https://api.github.com/repos/bizzabo/play-json-extensions/languages
+  selected_from:
+  - json
+- repository: jvican/dijon
+  categories:
+  - json
+  selection:
+  - category: json
+    rank: 15
+    source: https://index.scala-lang.org/awesome/json?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.pathikrit:dijon
+  - me.vican.jorge:dijon
+  - me.vican.jorge:monix-grpc-codegen
+  - me.vican.jorge:monix-grpc-runtime
+  language_evidence:
+    Scala: 31734
+  language_source: https://api.github.com/repos/jvican/dijon/languages
+  selected_from:
+  - json
+- repository: tethys-json/tethys
+  categories:
+  - json
+  selection:
+  - category: json
+    rank: 16
+    source: https://index.scala-lang.org/awesome/json?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.tethys-json:tethys
+  - com.tethys-json:tethys-cats
+  - com.tethys-json:tethys-circe
+  - com.tethys-json:tethys-core
+  - com.tethys-json:tethys-derivation
+  - com.tethys-json:tethys-enumeratum
+  - com.tethys-json:tethys-jackson
+  - com.tethys-json:tethys-jackson211
+  - com.tethys-json:tethys-jackson212
+  - com.tethys-json:tethys-jackson213
+  - com.tethys-json:tethys-jackson214
+  - com.tethys-json:tethys-jackson215
+  - com.tethys-json:tethys-jackson216
+  - com.tethys-json:tethys-jackson217
+  - com.tethys-json:tethys-jackson218
+  - com.tethys-json:tethys-json4s
+  - com.tethys-json:tethys-refined
+  language_evidence:
+    Scala: 799918
+    Shell: 395
+  language_source: https://api.github.com/repos/tethys-json/tethys/languages
+  selected_from:
+  - json
+- repository: gzoller/scalajack
+  categories:
+  - json
+  selection:
+  - category: json
+    rank: 17
+    source: https://index.scala-lang.org/awesome/json?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - co.blocke:scalajack
+  - co.blocke:scalajack_dynamo
+  - co.blocke:scalajack_mongo
+  language_evidence:
+    Scala: 449304
+    Java: 6396
+  language_source: https://api.github.com/repos/gzoller/scalajack/languages
+  selected_from:
+  - json
+- repository: maffoo/jsonquote
+  categories:
+  - json
+  selection:
+  - category: json
+    rank: 20
+    source: https://index.scala-lang.org/awesome/json?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - net.maffoo:jsonquote-core
+  - net.maffoo:jsonquote-json4s
+  - net.maffoo:jsonquote-lift
+  - net.maffoo:jsonquote-play
+  - net.maffoo:jsonquote-spray
+  - net.maffoo:jsonquote-upickle
+  language_evidence:
+    Scala: 119499
+    Shell: 1636
+  language_source: https://api.github.com/repos/maffoo/jsonquote/languages
+  selected_from:
+  - json
 - repository: foundweekends/pamflet
   categories:
   - markdown
@@ -8719,6 +9987,69 @@ projects:
   language_evidence:
     Scala: 328854
   language_source: https://api.github.com/repos/vigoo/desert/languages
+  selected_from:
+  - serialization
+- repository: zero-deps/proto
+  categories:
+  - serialization
+  selection:
+  - category: serialization
+    rank: 13
+    source: https://index.scala-lang.org/awesome/serialization?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.github.zero-deps:proto
+  - io.github.zero-deps:proto-api
+  - io.github.zero-deps:proto-macros
+  - io.github.zero-deps:proto-ops
+  - io.github.zero-deps:proto-purs
+  - io.github.zero-deps:proto-syntax
+  - io.github.zero-deps:proto-tex
+  language_evidence:
+    Scala: 454107
+    PureScript: 65041
+    TypeScript: 34618
+    Dhall: 647
+    JavaScript: 85
+  language_source: https://api.github.com/repos/zero-deps/proto/languages
+  selected_from:
+  - serialization
+- repository: bishabosha/scala-object-notation
+  categories:
+  - serialization
+  selection:
+  - category: serialization
+    rank: 14
+    source: https://index.scala-lang.org/awesome/serialization?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.github.bishabosha:scala-object-notation
+  - io.github.bishabosha:scala-object-notation-macros
+  language_evidence:
+    Scala: 715693
+    Batchfile: 9898
+    Shell: 6647
+  language_source: https://api.github.com/repos/bishabosha/scala-object-notation/languages
+  selected_from:
+  - serialization
+- repository: halotukozak-com/mcodec
+  categories:
+  - serialization
+  selection:
+  - category: serialization
+    rank: 17
+    source: https://index.scala-lang.org/awesome/serialization?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.halotukozak:mcodec
+  language_evidence:
+    Scala: 242601
+    Python: 26289
+    Shell: 10817
+  language_source: https://api.github.com/repos/halotukozak-com/mcodec/languages
   selected_from:
   - serialization
 - repository: com-lihaoyi/fansi
@@ -10466,6 +11797,664 @@ projects:
   language_source: https://api.github.com/repos/scalaj/scalaj-http/languages
   selected_from:
   - http-servers-and-clients
+- repository: unfiltered/unfiltered
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 12
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - ws.unfiltered:unfiltered
+  - ws.unfiltered:unfiltered-agents
+  - ws.unfiltered:unfiltered-all
+  - ws.unfiltered:unfiltered-directives
+  - ws.unfiltered:unfiltered-filter
+  - ws.unfiltered:unfiltered-filter-async
+  - ws.unfiltered:unfiltered-filter-uploads
+  - ws.unfiltered:unfiltered-jetty
+  - ws.unfiltered:unfiltered-json4s
+  - ws.unfiltered:unfiltered-netty
+  - ws.unfiltered:unfiltered-netty-server
+  - ws.unfiltered:unfiltered-netty-uploads
+  - ws.unfiltered:unfiltered-netty-websockets
+  - ws.unfiltered:unfiltered-scalatest
+  - ws.unfiltered:unfiltered-specs2
+  - ws.unfiltered:unfiltered-uploads
+  - ws.unfiltered:unfiltered-util
+  language_evidence:
+    Scala: 807503
+    HTML: 52
+    CSS: 15
+    JavaScript: 14
+  language_source: https://api.github.com/repos/unfiltered/unfiltered/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: com-lihaoyi/requests-scala
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 13
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.lihaoyi:requests
+  language_evidence:
+    Scala: 59934
+    Shell: 10729
+  language_source: https://api.github.com/repos/com-lihaoyi/requests-scala/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: com-lihaoyi/cask
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 14
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.lihaoyi:cask
+  - com.lihaoyi:cask-actor
+  - com.lihaoyi:cask-examples
+  - com.lihaoyi:cask-util
+  - com.lihaoyi:cask-util-jvm
+  - io.crashbox:cask
+  - io.crashbox:cask-util
+  language_evidence:
+    Scala: 181159
+    CSS: 7143
+    Shell: 5692
+    JavaScript: 2029
+    HTML: 108
+  language_source: https://api.github.com/repos/com-lihaoyi/cask/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: skinny-framework/skinny-framework
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 15
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - org.skinny-framework:skinny-assets
+  - org.skinny-framework:skinny-common
+  - org.skinny-framework:skinny-factory-girl
+  - org.skinny-framework:skinny-framework
+  - org.skinny-framework:skinny-freemarker
+  - org.skinny-framework:skinny-http-client
+  - org.skinny-framework:skinny-json
+  - org.skinny-framework:skinny-mailer
+  - org.skinny-framework:skinny-oauth2
+  - org.skinny-framework:skinny-oauth2-controller
+  - org.skinny-framework:skinny-orm
+  - org.skinny-framework:skinny-standalone
+  - org.skinny-framework:skinny-task
+  - org.skinny-framework:skinny-test
+  - org.skinny-framework:skinny-thymeleaf
+  - org.skinny-framework:skinny-twitter-controller
+  - org.skinny-framework:skinny-validator
+  - org.skinny-framework:skinny-worker
+  language_evidence:
+    Scala: 1488619
+    JavaScript: 549638
+    Shell: 34664
+    Batchfile: 18417
+    Java: 14613
+    HTML: 8955
+    Pug: 8482
+    Scaml: 5685
+    Mustache: 1493
+    FreeMarker: 913
+    CoffeeScript: 758
+    Less: 478
+    SCSS: 75
+    Sass: 39
+    CSS: 30
+  language_source: https://api.github.com/repos/skinny-framework/skinny-framework/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: dispatch/reboot
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 16
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - de.sciss:dispatch-all
+  - de.sciss:dispatch-core
+  - de.sciss:dispatch-json4s-jackson
+  - de.sciss:dispatch-json4s-native
+  - de.sciss:dispatch-jsoup
+  - de.sciss:dispatch-tagsoup
+  - org.dispatchhttp:dispatch-all
+  - org.dispatchhttp:dispatch-core
+  - org.dispatchhttp:dispatch-json4s-jackson
+  - org.dispatchhttp:dispatch-json4s-native
+  - org.dispatchhttp:dispatch-jsoup
+  - org.dispatchhttp:dispatch-lift-json
+  - org.dispatchhttp:dispatch-tagsoup
+  language_evidence:
+    Scala: 71652
+  language_source: https://api.github.com/repos/dispatch/reboot/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: xitrum-framework/xitrum
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 17
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - tv.cntt:xitrum
+  language_evidence:
+    Scala: 496152
+    JavaScript: 21940
+    CSS: 1159
+  language_source: https://api.github.com/repos/xitrum-framework/xitrum/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: endpoints4s/endpoints4s
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 18
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - org.endpoints4s:akka-http-client
+  - org.endpoints4s:akka-http-server
+  - org.endpoints4s:algebra
+  - org.endpoints4s:algebra-circe
+  - org.endpoints4s:algebra-circe-testkit
+  - org.endpoints4s:algebra-json-schema
+  - org.endpoints4s:algebra-json-schema-testkit
+  - org.endpoints4s:algebra-playjson
+  - org.endpoints4s:algebra-testkit
+  - org.endpoints4s:http4s-client
+  - org.endpoints4s:http4s-server
+  - org.endpoints4s:json-schema-circe
+  - org.endpoints4s:json-schema-generic
+  - org.endpoints4s:json-schema-playjson
+  - org.endpoints4s:openapi
+  - org.endpoints4s:pekko-http-client
+  - org.endpoints4s:pekko-http-server
+  - org.endpoints4s:play-client
+  - org.endpoints4s:play-server
+  - org.endpoints4s:play-server-circe
+  - org.endpoints4s:scalaj-client
+  - org.endpoints4s:sttp-client
+  - org.endpoints4s:stub-server
+  - org.openmole.endpoints4s:akka-http-client
+  - org.openmole.endpoints4s:akka-http-server
+  - org.openmole.endpoints4s:algebra
+  - org.openmole.endpoints4s:algebra-circe
+  - org.openmole.endpoints4s:algebra-circe-testkit
+  - org.openmole.endpoints4s:algebra-json-schema
+  - org.openmole.endpoints4s:algebra-json-schema-testkit
+  - org.openmole.endpoints4s:algebra-playjson
+  - org.openmole.endpoints4s:algebra-testkit
+  - org.openmole.endpoints4s:http4s-client
+  - org.openmole.endpoints4s:http4s-server
+  - org.openmole.endpoints4s:json-schema-circe
+  - org.openmole.endpoints4s:json-schema-generic
+  - org.openmole.endpoints4s:json-schema-playjson
+  - org.openmole.endpoints4s:openapi
+  - org.openmole.endpoints4s:sttp-client
+  language_evidence:
+    Scala: 961548
+  language_source: https://api.github.com/repos/endpoints4s/endpoints4s/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: iheartradio/play-swagger
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 19
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.iheart:play-swagger
+  language_evidence:
+    Scala: 148722
+    Java: 11356
+    HTML: 1381
+    JavaScript: 89
+  language_source: https://api.github.com/repos/iheartradio/play-swagger/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: lihaoyi/autowire
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 20
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.lihaoyi:autowire
+  language_evidence:
+    Scala: 38262
+    Shell: 1636
+  language_source: https://api.github.com/repos/lihaoyi/autowire/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: http4s/blaze
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 21
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - org.http4s:blaze-core
+  - org.http4s:blaze-http
+  - org.http4s:http4s-blaze-client
+  - org.http4s:http4s-blaze-core
+  - org.http4s:http4s-blaze-server
+  language_evidence:
+    Scala: 1092236
+    Java: 56332
+    Nix: 1241
+    Lua: 213
+    Shell: 103
+  language_source: https://api.github.com/repos/http4s/blaze/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: higherkindness/mu-scala
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 22
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.higherkindness:legacy-avro-decimal-compat-encoders
+  - io.higherkindness:legacy-avro-decimal-compat-model
+  - io.higherkindness:legacy-avro-decimal-compat-protocol
+  - io.higherkindness:mu-common
+  - io.higherkindness:mu-config
+  - io.higherkindness:mu-rpc-channel
+  - io.higherkindness:mu-rpc-client-cache
+  - io.higherkindness:mu-rpc-client-netty
+  - io.higherkindness:mu-rpc-client-okhttp
+  - io.higherkindness:mu-rpc-dropwizard
+  - io.higherkindness:mu-rpc-fs2
+  - io.higherkindness:mu-rpc-health-check
+  - io.higherkindness:mu-rpc-health-check-unary
+  - io.higherkindness:mu-rpc-http
+  - io.higherkindness:mu-rpc-internal-core
+  - io.higherkindness:mu-rpc-internal-fs2
+  - io.higherkindness:mu-rpc-internal-monix
+  - io.higherkindness:mu-rpc-kafka
+  - io.higherkindness:mu-rpc-marshallers-jodatime
+  - io.higherkindness:mu-rpc-monix
+  - io.higherkindness:mu-rpc-netty
+  - io.higherkindness:mu-rpc-netty-ssl
+  - io.higherkindness:mu-rpc-okhttp
+  - io.higherkindness:mu-rpc-prometheus
+  - io.higherkindness:mu-rpc-server
+  - io.higherkindness:mu-rpc-service
+  - io.higherkindness:mu-rpc-testing
+  - io.higherkindness:mu-srcgen-core
+  language_evidence:
+    Scala: 485442
+    Ruby: 1985
+    Java: 1685
+    SCSS: 999
+  language_source: https://api.github.com/repos/higherkindness/mu-scala/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: akka/akka-grpc
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 23
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.lightbend.akka.grpc:akka-grpc-codegen
+  - com.lightbend.akka.grpc:akka-grpc-interop-tests
+  - com.lightbend.akka.grpc:akka-grpc-runtime
+  language_evidence:
+    Scala: 660014
+    Java: 208978
+    Groovy: 22710
+    Shell: 2646
+  language_source: https://api.github.com/repos/akka/akka-grpc/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: earldouglas/sbt-war
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 25
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.earldouglas:sbt-war_sbt2
+  language_evidence:
+    Scala: 82941
+    Java: 15679
+    Nix: 6319
+    HTML: 804
+    CSS: 65
+  language_source: https://api.github.com/repos/earldouglas/sbt-war/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: http4s/rho
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 26
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - digital.junkie:rho-core
+  - digital.junkie:rho-swagger
+  - digital.junkie:rho-swagger-ui
+  - org.http4s:rho-core
+  - org.http4s:rho-hal
+  - org.http4s:rho-swagger
+  - org.http4s:rho-swagger-ui
+  language_evidence:
+    Scala: 426783
+    Shell: 62
+  language_source: https://api.github.com/repos/http4s/rho/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: swagger-akka-http/swagger-akka-http
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 27
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.swagger-akka-http:swagger-akka-http
+  language_evidence:
+    Scala: 121455
+  language_source: https://api.github.com/repos/swagger-akka-http/swagger-akka-http/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: lomigmegard/akka-http-cors
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 28
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - ch.megard:akka-http-cors
+  language_evidence:
+    Scala: 65884
+    Java: 7006
+  language_source: https://api.github.com/repos/lomigmegard/akka-http-cors/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: pepegar/hammock
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 30
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.pepegar:hammock-akka-http
+  - com.pepegar:hammock-apache-http
+  - com.pepegar:hammock-asynchttpclient
+  - com.pepegar:hammock-circe
+  - com.pepegar:hammock-core
+  - com.pepegar:hammock-resttemplate
+  language_evidence:
+    Scala: 136411
+    Nix: 5245
+    Shell: 181
+  language_source: https://api.github.com/repos/pepegar/hammock/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: playframework/play-ws
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 33
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.xuwei-k:play-ahc-ws-standalone
+  - com.github.xuwei-k:play-ws-standalone
+  - com.github.xuwei-k:play-ws-standalone-json
+  - com.github.xuwei-k:play-ws-standalone-xml
+  - com.typesafe.play:play-ahc-ws-standalone
+  - org.playframework:play-ahc-ws-standalone
+  - org.playframework:play-ws-standalone
+  - org.playframework:play-ws-standalone-json
+  - org.playframework:play-ws-standalone-xml
+  language_evidence:
+    Scala: 263258
+    Java: 110049
+  language_source: https://api.github.com/repos/playframework/play-ws/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: lolgab/snunit
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 34
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.lolgab:mill-snunit_mill0.10
+  - com.github.lolgab:mill-snunit_mill0.11
+  - com.github.lolgab:snunit
+  - com.github.lolgab:snunit-mill-plugin
+  - com.github.lolgab:snunit-plugins-shared
+  - com.github.lolgab:snunit-tapir
+  - com.github.lolgab:snunit-tapir-zio
+  language_evidence:
+    Scala: 130174
+    Shell: 10876
+  language_source: https://api.github.com/repos/lolgab/snunit/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: spinoco/fs2-http
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 35
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.spinoco:fs2-http
+  language_evidence:
+    Scala: 131696
+    Shell: 20039
+  language_source: https://api.github.com/repos/spinoco/fs2-http/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: splink/pagelets
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 42
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=3
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - org.splink:pagelets
+  language_evidence:
+    Scala: 83150
+    JavaScript: 34
+    CSS: 32
+  language_source: https://api.github.com/repos/splink/pagelets/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: lhotari/akka-http-health
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 46
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=3
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.github.lhotari:akka-http-health
+  language_evidence:
+    Scala: 24929
+    Shell: 1295
+  language_source: https://api.github.com/repos/lhotari/akka-http-health/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: yakivy/poppet
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 47
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=3
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.yakivy:poppet-circe
+  - com.github.yakivy:poppet-coder-circe
+  - com.github.yakivy:poppet-coder-core
+  - com.github.yakivy:poppet-coder-jackson
+  - com.github.yakivy:poppet-coder-play-json
+  - com.github.yakivy:poppet-consumer
+  - com.github.yakivy:poppet-consumer-core
+  - com.github.yakivy:poppet-consumer-play-ws
+  - com.github.yakivy:poppet-consumer-spring
+  - com.github.yakivy:poppet-core
+  - com.github.yakivy:poppet-jackson
+  - com.github.yakivy:poppet-play-json
+  - com.github.yakivy:poppet-provider
+  - com.github.yakivy:poppet-provider-core
+  - com.github.yakivy:poppet-provider-play
+  - com.github.yakivy:poppet-provider-spring
+  - com.github.yakivy:poppet-upickle
+  language_evidence:
+    Scala: 140939
+    Java: 5390
+    Shell: 1726
+  language_source: https://api.github.com/repos/yakivy/poppet/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: analogweb/analogweb-scala
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 50
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=3
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - org.analogweb:analogweb-circe
+  - org.analogweb:analogweb-json4s
+  - org.analogweb:analogweb-scala
+  language_evidence:
+    Scala: 88827
+  language_source: https://api.github.com/repos/analogweb/analogweb-scala/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: aliics/mouse
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 51
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=3
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.github.aliics:mouse
+  language_evidence:
+    Scala: 123678
+  language_source: https://api.github.com/repos/aliics/mouse/languages
+  selected_from:
+  - http-servers-and-clients
+- repository: automorph-org/automorph
+  categories:
+  - http-servers-and-clients
+  selection:
+  - category: http-servers-and-clients
+    rank: 52
+    source: https://index.scala-lang.org/awesome/http-servers-and-clients?page=3
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - org.automorph:automorph-akka-http
+  - org.automorph:automorph-argonaut
+  - org.automorph:automorph-cats-effect
+  - org.automorph:automorph-circe
+  - org.automorph:automorph-core
+  - org.automorph:automorph-default
+  - org.automorph:automorph-finagle
+  - org.automorph:automorph-jackson
+  - org.automorph:automorph-jetty
+  - org.automorph:automorph-meta
+  - org.automorph:automorph-monix
+  - org.automorph:automorph-rabbitmq
+  - org.automorph:automorph-scalaz-effect
+  - org.automorph:automorph-standard
+  - org.automorph:automorph-sttp
+  - org.automorph:automorph-tapir
+  - org.automorph:automorph-undertow
+  - org.automorph:automorph-upickle
+  - org.automorph:automorph-vertx
+  - org.automorph:automorph-zio
+  language_evidence:
+    Scala: 699243
+    Java: 241391
+    Shell: 26275
+    JavaScript: 8721
+    CSS: 2204
+  language_source: https://api.github.com/repos/automorph-org/automorph/languages
+  selected_from:
+  - http-servers-and-clients
 - repository: makkarpov/scalingua
   categories:
   - internationalization
@@ -11224,6 +13213,23 @@ projects:
   language_source: https://api.github.com/repos/oleg-py/shironeko/languages
   selected_from:
   - web-frontend
+- repository: atry/html.scala
+  categories:
+  - web-frontend
+  selection:
+  - category: web-frontend
+    rank: 25
+    source: https://index.scala-lang.org/awesome/web-frontend?page=2
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.yang-bo:dynamicanyref
+  - com.yang-bo:html-interpolationparser
+  language_evidence:
+    Scala: 69564
+  language_source: https://api.github.com/repos/atry/html.scala/languages
+  selected_from:
+  - web-frontend
 - repository: com-lihaoyi/scalatags
   categories:
   - xml-html-and-dom
@@ -11412,6 +13418,119 @@ projects:
   language_source: https://api.github.com/repos/lucidsoftware/xtract/languages
   selected_from:
   - xml-html-and-dom
+- repository: fomkin/levsha
+  categories:
+  - xml-html-and-dom
+  selection:
+  - category: xml-html-and-dom
+    rank: 13
+    source: https://index.scala-lang.org/awesome/xml-html-and-dom?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.fomkin:levsha-core
+  - com.github.fomkin:levsha-events
+  language_evidence:
+    Scala: 360529
+    JavaScript: 2009
+    HTML: 1322
+    CSS: 371
+  language_source: https://api.github.com/repos/fomkin/levsha/languages
+  selected_from:
+  - xml-html-and-dom
+- repository: dylemma/xml-spac
+  categories:
+  - xml-html-and-dom
+  selection:
+  - category: xml-html-and-dom
+    rank: 14
+    source: https://index.scala-lang.org/awesome/xml-html-and-dom?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - io.dylemma:json-spac
+  - io.dylemma:json-spac-fs2-data
+  - io.dylemma:json-spac-jackson
+  - io.dylemma:spac-core
+  - io.dylemma:spac-interop-fs2
+  - io.dylemma:xml-spac
+  - io.dylemma:xml-spac-fs2-data
+  - io.dylemma:xml-spac-javax
+  language_evidence:
+    Scala: 392220
+  language_source: https://api.github.com/repos/dylemma/xml-spac/languages
+  selected_from:
+  - xml-html-and-dom
+- repository: dvreeze/yaidom
+  categories:
+  - xml-html-and-dom
+  selection:
+  - category: xml-html-and-dom
+    rank: 16
+    source: https://index.scala-lang.org/awesome/xml-html-and-dom?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - eu.cdevreeze.yaidom:yaidom
+  language_evidence:
+    Scala: 2442333
+    CSS: 10278
+    HTML: 2706
+    XSLT: 547
+  language_source: https://api.github.com/repos/dvreeze/yaidom/languages
+  selected_from:
+  - xml-html-and-dom
+- repository: ohze/scala-soap
+  categories:
+  - xml-html-and-dom
+  selection:
+  - category: xml-html-and-dom
+    rank: 17
+    source: https://index.scala-lang.org/awesome/xml-html-and-dom?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.sandinh:play-soap
+  - com.sandinh:scala-soap
+  language_evidence:
+    Scala: 35295
+  language_source: https://api.github.com/repos/ohze/scala-soap/languages
+  selected_from:
+  - xml-html-and-dom
+- repository: raquo/scala-dom-builder
+  categories:
+  - xml-html-and-dom
+  selection:
+  - category: xml-html-and-dom
+    rank: 19
+    source: https://index.scala-lang.org/awesome/xml-html-and-dom?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.raquo:dombuilder
+  language_evidence:
+    Scala: 73407
+    HTML: 928
+  language_source: https://api.github.com/repos/raquo/scala-dom-builder/languages
+  selected_from:
+  - xml-html-and-dom
+- repository: andyglow/scala-xml-diff
+  categories:
+  - xml-html-and-dom
+  selection:
+  - category: xml-html-and-dom
+    rank: 20
+    source: https://index.scala-lang.org/awesome/xml-html-and-dom?page=1
+  eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
+    Scala as largest source language
+  modules:
+  - com.github.andyglow:scala-xml-diff
+  language_evidence:
+    Scala: 41025
+    Jsonnet: 2242
+  language_source: https://api.github.com/repos/andyglow/scala-xml-diff/languages
+  selected_from:
+  - xml-html-and-dom
 exclusions:
 - project: raquo/airstream
   category: asynchronous-and-reactive-programming
@@ -11422,6 +13541,14 @@ exclusions:
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
     source language
 - project: verizon/delorean
+  category: asynchronous-and-reactive-programming
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: scalaz/scalaz-stream
+  category: asynchronous-and-reactive-programming
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: storm-enroute/reactors
   category: asynchronous-and-reactive-programming
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
     source language
@@ -11446,6 +13573,10 @@ exclusions:
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
     source language
 - project: scalaconsultants/reactive-rabbit
+  category: distributed-messaging-systems-and-microservices
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: line/armeria
   category: distributed-messaging-systems-and-microservices
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
     source language
@@ -11625,6 +13756,22 @@ exclusions:
   category: programming-language-interfaces
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
     source language
+- project: scala-records/scala-records
+  category: scala-language-extensions
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: thangiee/freasy-monad
+  category: scala-language-extensions
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: miniboxing/miniboxing-plugin
+  category: scala-language-extensions
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: iscpif/freedsl
+  category: scala-language-extensions
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
 - project: bmc/argot
   category: command-line-parsing
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
@@ -11685,7 +13832,67 @@ exclusions:
   category: performance-and-monitoring
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
     source language
+- project: sbt-doctest/sbt-doctest
+  category: testing
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: lensesio/kafka-testing
+  category: testing
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: disneystreaming/weaver-test
+  category: testing
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
 - project: neo4j/neo4j
+  category: databases
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: mongodb/casbah
+  category: databases
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: salat/salat
+  category: databases
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: livestream/scredis
+  category: databases
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: outworkers/morpheus
+  category: databases
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: monix/shade
+  category: databases
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: longevityframework/longevity
+  category: databases
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: beloglazov/couchdb-scala
+  category: databases
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: outr/scalarelational
+  category: databases
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: reactivecouchbase/reactivecouchbase-rs-core
+  category: databases
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: kostaskougios/mapperdao
+  category: databases
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: couchbase/couchbase-jvm-clients
+  category: databases
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: flyway/flyway
   category: databases
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
     source language
@@ -12301,6 +14508,30 @@ exclusions:
   category: json
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
     source language
+- project: kifi/json-annotation
+  category: json
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: fomkin/pushka
+  category: json
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: ngs-doo/dsl-json
+  category: json
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: nestorpersist/json
+  category: json
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: nrktkt/ninny-json
+  category: json
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: kag0/ninny-json
+  category: json
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
 - project: allenai/pdffigures2
   category: pdf
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
@@ -12326,6 +14557,18 @@ exclusions:
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
     source language
 - project: scala/pickling
+  category: serialization
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: json4s/muster
+  category: serialization
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: sbt/serialization
+  category: serialization
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: msgpack/msgpack-scala
   category: serialization
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
     source language
@@ -12457,6 +14700,10 @@ exclusions:
   category: authentication-and-permissions
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
     source language
+- project: pac4j/vertx-pac4j
+  category: authentication-and-permissions
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
 - project: hmrc/emailaddress
   category: emailing
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
@@ -12487,6 +14734,66 @@ exclusions:
     source language
 - project: voltir/form.rx
   category: forms-and-validation
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: verizon/remotely
+  category: http-servers-and-clients
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: pathikrit/metarest
+  category: http-servers-and-clients
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: pheymann/typedapi
+  category: http-servers-and-clients
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: swagger-api/swagger-play
+  category: http-servers-and-clients
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: hmil/roshttp
+  category: http-servers-and-clients
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: criteo/lolhttp
+  category: http-servers-and-clients
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: daviddenton/fintrospect
+  category: http-servers-and-clients
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: sjrd/scala-js-jquery
+  category: http-servers-and-clients
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: timeoutdigital/docless
+  category: http-servers-and-clients
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: jducoeur/jquery-facade
+  category: http-servers-and-clients
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: xiaodongw/swagger-finatra
+  category: http-servers-and-clients
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: buildo/wiro
+  category: http-servers-and-clients
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: udashframework/scala-js-jquery
+  category: http-servers-and-clients
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: outr/jefe
+  category: http-servers-and-clients
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: swagger-api/swagger-core
+  category: http-servers-and-clients
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
     source language
 - project: marcospereira/play-i18n-hocon
@@ -12597,6 +14904,14 @@ exclusions:
   category: web-frontend
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
     source language
+- project: atry/reacttobindinghtml.scala
+  category: web-frontend
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: iltotore/mill-tailwind
+  category: web-frontend
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
 - project: scala-js/scala-js-dom
   category: xml-html-and-dom
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
@@ -12605,4 +14920,11 @@ exclusions:
   category: xml-html-and-dom
   reason: Missing Scala publication/latest release evidence, or Scala is not the largest
     source language
-max_hops: 5
+- project: note/xml-lens
+  category: xml-html-and-dom
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language
+- project: intenthq/gander
+  category: xml-html-and-dom
+  reason: Missing Scala publication/latest release evidence, or Scala is not the largest
+    source language

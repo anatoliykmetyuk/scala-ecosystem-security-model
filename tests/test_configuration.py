@@ -77,8 +77,8 @@ def test_excluded_projects_cannot_reenter(repo):
 
 def test_invalid_schema_and_project_limits():
     d = document()
-    d["projects"] *= 761
-    with pytest.raises(ValueError, match="760"):
+    d["projects"] = []
+    with pytest.raises(ValueError, match="at least one"):
         parse_config(d)
     d = document()
     d["projects"] *= 2
@@ -139,7 +139,7 @@ def test_nonselected_target_module_does_not_count_as_fallout(tmp_path):
     assert validate(db)["fallout"] == 1
 
 
-def test_selection_uses_main_sections_and_caps_projects():
+def test_selection_uses_main_sections_and_keeps_all_projects():
     sections = main_sections(
         '<h2>Main A</h2><h3><a href="/awesome/a?sort=stars">a</a></h3><h3><a href="/awesome/b">b</a></h3><h2>Main B</h2><h3><a href="/awesome/c">c</a></h3>'
     )
@@ -155,13 +155,13 @@ def test_selection_uses_main_sections_and_caps_projects():
     ]
     candidates += [{"repository": "zio/zio", "selection": [{"category": "child-0", "rank": 0}]}]
     chosen = choose_projects(candidates, groups)
-    assert len(chosen) == 140 and len({p["repository"] for p in chosen}) == 140
+    assert len(chosen) == 196 and len({p["repository"] for p in chosen}) == 196
     selections = [p["selected_from"] for p in chosen]
     assert all(isinstance(c, list) for c in selections)
     selected_lists = [c for c in selections if isinstance(c, list)]
     assert len({str(c) for selected in selected_lists for c in selected}) == 14
     assert all(
-        sum(f"child-{i}" in selected for selected in selected_lists) == 10 for i in range(14)
+        sum(f"child-{i}" in selected for selected in selected_lists) == 14 for i in range(14)
     )
     assert not any(excluded_repository(string(p["repository"])) for p in chosen)
     assert chosen == choose_projects(candidates, groups)
@@ -174,7 +174,7 @@ def test_committed_seeds_and_offline_plan(monkeypatch, capsys):
     path = Path(__file__).resolve().parents[1] / "config/seeds.yaml"
     raw = yaml.safe_load(path.read_text())
     config = parse_config(raw)
-    assert 1 <= len(config.projects) <= 760
+    assert len(config.projects) > 0
     assert config.matrix == DEFAULT_MATRIX
     assert not any(
         "artifacts" in p or excluded_repository(string(p["repository"])) for p in config.projects
@@ -257,25 +257,24 @@ def test_subsections_deduplicate_without_backfill():
         for i in range(13)
     ]
     chosen = choose_projects(candidates, {"Main": ["a", "b"]})
-    assert len(chosen) == 10
+    assert len(chosen) == 13
     assert all(p["selected_from"] == ["a", "b"] for p in chosen)
-    assert [p["repository"] for p in chosen] == [f"scala/p{i}" for i in range(10)]
+    assert [p["repository"] for p in chosen] == [f"scala/p{i}" for i in range(13)]
 
 
-def test_reject_overfull_subsection():
+def test_accept_unlimited_subsection():
     d = document()
     d["projects"] = [
         {"repository": f"scala/p{i}", "categories": ["a"], "modules": [f"g:p{i}"]}
-        for i in range(11)
+        for i in range(800)
     ]
-    with pytest.raises(ValueError, match="ten"):
-        parse_config(d)
+    assert len(parse_config(d).projects) == 800
 
 
 @pytest.mark.parametrize("missing_metadata", [False, True])
 def test_artifact_selection_ranks_published_candidates_across_pages(tmp_path, missing_metadata):
     d = document()
-    d["projects"][0]["modules"] = [f"g:m{i:02}" for i in range(25)]
+    d["projects"][0]["modules"] = [f"g:m{i:02}" for i in range(55)]
     config = parse_config(d)
     requested = []
 
@@ -283,7 +282,7 @@ def test_artifact_selection_ranks_published_candidates_across_pages(tmp_path, mi
         requested.append(str(request.url))
         if request.url.path.endswith("/artifacts"):
             return httpx.Response(
-                200, json=[{"groupId": "g", "artifactId": f"m{i:02}_2.13"} for i in range(24)]
+                200, json=[{"groupId": "g", "artifactId": f"m{i:02}_2.13"} for i in range(54)]
             )
         assert request.url.path.endswith("/packages/lookup")
         if missing_metadata:
@@ -295,12 +294,12 @@ def test_artifact_selection_ranks_published_candidates_across_pages(tmp_path, mi
                 "dependent_packages_count": i,
                 "registry": {"name": "repo1.maven.org"},
             }
-            for i in range(23)
+            for i in range(53)
         ]
         # An excluded coordinate cannot win, even with the highest count.
         records.append(
             {
-                "name": "g:m24_2.13",
+                "name": "g:m54_2.13",
                 "dependent_packages_count": 9999,
                 "registry": {"name": "repo1.maven.org"},
             }
@@ -313,15 +312,15 @@ def test_artifact_selection_ranks_published_candidates_across_pages(tmp_path, mi
     collector = Collector(db, Fetcher(tmp_path / "evidence", httpx.MockTransport(handler)), config)
     selected = collector.seed(config.projects[0])
     assert selected == (
-        [f"g:m{i:02}_2.13" for i in range(20)]
+        [f"g:m{i:02}_2.13" for i in range(50)]
         if missing_metadata
-        else [f"g:m{i:02}_2.13" for i in range(22, 2, -1)]
+        else [f"g:m{i:02}_2.13" for i in range(52, 2, -1)]
     )
-    assert db.execute("SELECT count(*) FROM target_artifacts").fetchone()[0] == 20
-    assert db.execute("SELECT count(*) FROM artifact_selection").fetchone()[0] == 24
+    assert db.execute("SELECT count(*) FROM target_artifacts").fetchone()[0] == 50
+    assert db.execute("SELECT count(*) FROM artifact_selection").fetchone()[0] == 54
     assert (
         db.execute(
-            "SELECT dependent_packages_count FROM artifact_selection WHERE artifact='g:m23_2.13'"
+            "SELECT dependent_packages_count FROM artifact_selection WHERE artifact='g:m53_2.13'"
         ).fetchone()[0]
         is None
     )
@@ -331,7 +330,7 @@ def test_artifact_selection_ranks_published_candidates_across_pages(tmp_path, mi
 def test_reject_old_artifact_cap():
     d = document()
     d["max_artifacts_per_project"] = 10
-    with pytest.raises(ValueError, match="20 artifacts"):
+    with pytest.raises(ValueError, match="50 artifacts"):
         parse_config(d)
 
 
@@ -375,3 +374,35 @@ def test_five_hop_collection_and_sixth_hop_boundary(tmp_path):
         "INSERT INTO edges(source,target,scope,optional,exact) VALUES('g:p5_3@1','g:p6_3@1','runtime',0,1)"
     )
     assert "scala/p6" not in paths(db, ["g:p0_3@1"])
+
+
+def test_full_selection_reads_beyond_first_page(tmp_path):
+    from scala_security.seeds import select
+
+    requested = []
+
+    def handler(request):
+        requested.append(str(request.url))
+        path = request.url.path
+        if path == "/awesome":
+            return httpx.Response(200, text='<h2>Main</h2><h3><a href="/awesome/a">A</a></h3>')
+        if path == "/awesome/a":
+            page = int(request.url.params["page"])
+            repos = range(20) if page == 1 else range(20, 23) if page == 2 else []
+            return httpx.Response(
+                200,
+                text='<ol class="list-result">'
+                + "".join(f'<li><a href="/scala/p{i}">p{i}</a></li>' for i in repos)
+                + "</ol>",
+            )
+        if path.endswith("/languages"):
+            return httpx.Response(200, json={"Scala": 100})
+        return httpx.Response(200, json=[{"groupId": "g", "artifactId": "a_3", "version": "1"}])
+
+    destination = tmp_path / "seeds.yaml"
+    select(Fetcher(tmp_path / "evidence", httpx.MockTransport(handler)), destination)
+    raw = yaml.safe_load(destination.read_text())
+    assert len(parse_config(raw).projects) == 23
+    assert raw["selection_policy"]["max_projects"] is None
+    assert raw["selection_policy"]["max_per_subsection"] is None
+    assert any("/awesome/a?page=3" in url for url in requested)

@@ -1,3 +1,13 @@
+# Full Awesome Scala coverage authorized 2026-09-08
+
+Current scope: all eligible projects across all 76 subsections, JVM Scala 2.13/3, fifty ranked artifacts per project, five hops, closed seed universe.
+
+- [x] Implement full selection, fifty-artifact cap and regression tests.
+- [ ] Collect with cache reuse and validate the full report.
+- [ ] Review and publish the report, verify deployment.
+
+## Previous expansion (completed)
+
 # Expansion authorized 2026-09-08
 
 Current scope is defined in [CONSTRAINTS.md](CONSTRAINTS.md): JVM Scala 2.13/3, ten eligible projects per subsection, twenty ranked artifacts per project, five hops, closed seed universe. The completed checklist below describes the previous run.

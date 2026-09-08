@@ -29,7 +29,7 @@ Optionally set `ECOSYSTEMS_CONTACT_EMAIL` to an email you authorize sending to e
 
 This single command reads **[config/seeds.yaml](config/seeds.yaml)**, creates a fresh evidence directory and SQLite snapshot, collects dependencies and score inputs, calculates and validates results, then generates **`output/preview.html`**. Open that file directly in a browser. It embeds the required data and needs no API connection or local server to view.
 
-This pilot traverses only selected seed coordinates for at most five hops, without Maven-wide reverse discovery. The cap is 20 artifacts per project, selected by dependent-package count. Current frozen counts are reported by `uv run scala-security plan`; final selection requires metadata collection. This is not a request cap. Failures are recorded as gaps.
+This pilot traverses only selected seed coordinates for at most five hops, without Maven-wide reverse discovery. The cap is 50 artifacts per project, selected by dependent-package count. Current frozen counts are reported by `uv run scala-security plan`; final selection requires metadata collection. This is not a request cap. Failures are recorded as gaps.
 
 Each run is retained under `output/runs/<UTC timestamp>/`:
 
@@ -73,9 +73,9 @@ projects:
       - org.scala-graph:graph-core
 ```
 
-This expands `graph-core` into `graph-core_2.13` and `graph-core_3`. Expand all configured modules, check published JVM Scala 2.13/3 coordinates, then select at most 20 by `dependent_packages_count` descending. Known counts (including zero) precede unknown counts; ties use coordinate name. Projects with twenty or fewer published candidates keep all candidates without a ranking-metadata request. The YAML records `max_artifacts_per_project: 20` and the ranking rule. The SQLite `artifact_selection` table records each published candidate, its count (nullable), rank, selected flag, metadata source and reason. Raw metadata pages remain in evidence. Unknown counts generate selection gaps when ranking is needed. External coordinates cannot bridge paths.
+This expands `graph-core` into `graph-core_2.13` and `graph-core_3`. Expand all configured modules, check published JVM Scala 2.13/3 coordinates, then select at most 50 by `dependent_packages_count` descending. Known counts (including zero) precede unknown counts; ties use coordinate name. Projects with fifty or fewer published candidates keep all candidates without a ranking-metadata request. The YAML records `max_artifacts_per_project: 50` and the ranking rule. The SQLite `artifact_selection` table records each published candidate, its count (nullable), rank, selected flag, metadata source and reason. Raw metadata pages remain in evidence. Unknown counts generate selection gaps when ranking is needed. External coordinates cannot bridge paths.
 
-Select the first ten eligible projects independently from each of 76 Awesome Scala subsections, then deduplicate repositories without backfill. The project ceiling is 760. The expanded selection checks further source entries where needed to fill eligibility quotas. Ordinary rebuilds preserve the frozen seed.
+Select all eligible projects across all 76 Awesome Scala subsections, traversing every listing page and deduplicating repositories. There is no project or subsection quota. Eligibility still requires published coordinates in the configured matrix, latest-release evidence and Scala as the largest source language. Ordinary rebuilds preserve the frozen seed.
 
 Inspect the expansion without any network requests:
 
