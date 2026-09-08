@@ -309,7 +309,7 @@ def test_three_hops_cycles_and_nested_test_exclusion(tmp_path):
             "INSERT INTO edges(source,target,scope,optional,exact) VALUES(?,?,?,0,1)",
             (a + "@1", b + "@1", scope),
         )
-    found = paths(db, ["a@1"])
+    found = paths(db, ["a@1"], max_hops=3)
     assert {"b", "c", "d"} <= found.keys()
     assert "e" not in found and "test" not in found
     assert len(found["d"]) == 3

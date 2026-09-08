@@ -6,6 +6,8 @@ import sqlite3
 from collections import deque
 from dataclasses import dataclass
 
+from .configuration import MAX_HOPS
+
 
 @dataclass(frozen=True)
 class Edge:
@@ -28,7 +30,7 @@ def allowed(edge: Edge, depth: int) -> bool:
 def paths(
     db: sqlite3.Connection,
     roots: list[str],
-    max_hops: int = 3,
+    max_hops: int = MAX_HOPS,
     targets: set[str] | None = None,
     within: set[str] | None = None,
 ) -> dict[str, list[int]]:

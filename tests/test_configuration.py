@@ -32,6 +32,7 @@ def document(repo="scala/subject"):
 def test_matrix_expansion_and_module_extraction():
     assert expand(["org.scala-graph:graph-core"], DEFAULT_MATRIX) == [
         "org.scala-graph:graph-core_2.13",
+        "org.scala-graph:graph-core_3",
     ]
     assert modules_for(
         [
@@ -76,8 +77,8 @@ def test_excluded_projects_cannot_reenter(repo):
 
 def test_invalid_schema_and_project_limits():
     d = document()
-    d["projects"] *= 381
-    with pytest.raises(ValueError, match="380"):
+    d["projects"] *= 761
+    with pytest.raises(ValueError, match="760"):
         parse_config(d)
     d = document()
     d["projects"] *= 2
@@ -113,7 +114,7 @@ def test_runtime_checks_published_coordinates_and_limits_seed_roots(tmp_path):
     assert collector.roots() == ["g:subject_2.13@2"]
     assert {
         tuple(row) for row in db.execute("SELECT artifact,published FROM coordinate_checks")
-    } == {("g:subject_2.13", 1)}
+    } == {("g:subject_2.13", 1), ("g:subject_3", 0)}
     assert len(urls) == 2
 
 
@@ -154,12 +155,14 @@ def test_selection_uses_main_sections_and_caps_projects():
     ]
     candidates += [{"repository": "zio/zio", "selection": [{"category": "child-0", "rank": 0}]}]
     chosen = choose_projects(candidates, groups)
-    assert len(chosen) == 70 and len({p["repository"] for p in chosen}) == 70
+    assert len(chosen) == 140 and len({p["repository"] for p in chosen}) == 140
     selections = [p["selected_from"] for p in chosen]
     assert all(isinstance(c, list) for c in selections)
     selected_lists = [c for c in selections if isinstance(c, list)]
     assert len({str(c) for selected in selected_lists for c in selected}) == 14
-    assert all(sum(f"child-{i}" in selected for selected in selected_lists) == 5 for i in range(14))
+    assert all(
+        sum(f"child-{i}" in selected for selected in selected_lists) == 10 for i in range(14)
+    )
     assert not any(excluded_repository(string(p["repository"])) for p in chosen)
     assert chosen == choose_projects(candidates, groups)
 
@@ -171,7 +174,7 @@ def test_committed_seeds_and_offline_plan(monkeypatch, capsys):
     path = Path(__file__).resolve().parents[1] / "config/seeds.yaml"
     raw = yaml.safe_load(path.read_text())
     config = parse_config(raw)
-    assert len(config.projects) == 279
+    assert 1 <= len(config.projects) <= 760
     assert config.matrix == DEFAULT_MATRIX
     assert not any(
         "artifacts" in p or excluded_repository(string(p["repository"])) for p in config.projects
@@ -185,14 +188,16 @@ def test_committed_seeds_and_offline_plan(monkeypatch, capsys):
     monkeypatch.setattr(cli, "Fetcher", forbidden)
     monkeypatch.setattr("sys.argv", ["scala-security", "plan", "--seeds", str(path)])
     main()
-    assert '"projects": 279' in capsys.readouterr().out
+    assert f'"projects": {len(config.projects)}' in capsys.readouterr().out
 
 
 def test_offline_coordinates_remain_uncapped_for_metadata_ranking():
     d = document()
     d["projects"][0]["modules"] = [f"g:module{i:02}" for i in reversed(range(35))]
     config = parse_config(d)
-    assert config.coordinates(config.projects[0]) == [f"g:module{i:02}_2.13" for i in range(35)]
+    assert config.coordinates(config.projects[0]) == [
+        f"g:module{i:02}_{binary}" for i in range(35) for binary in ("2.13", "3")
+    ]
 
 
 def test_closed_universe_excludes_external_consumers_and_intermediates(tmp_path):
@@ -249,20 +254,21 @@ def test_subsections_deduplicate_without_backfill():
             "repository": f"scala/p{i}",
             "selection": [{"category": c, "rank": i + 1} for c in ("a", "b")],
         }
-        for i in range(8)
+        for i in range(13)
     ]
     chosen = choose_projects(candidates, {"Main": ["a", "b"]})
-    assert len(chosen) == 5
+    assert len(chosen) == 10
     assert all(p["selected_from"] == ["a", "b"] for p in chosen)
-    assert [p["repository"] for p in chosen] == [f"scala/p{i}" for i in range(5)]
+    assert [p["repository"] for p in chosen] == [f"scala/p{i}" for i in range(10)]
 
 
 def test_reject_overfull_subsection():
     d = document()
     d["projects"] = [
-        {"repository": f"scala/p{i}", "categories": ["a"], "modules": [f"g:p{i}"]} for i in range(6)
+        {"repository": f"scala/p{i}", "categories": ["a"], "modules": [f"g:p{i}"]}
+        for i in range(11)
     ]
-    with pytest.raises(ValueError, match="five"):
+    with pytest.raises(ValueError, match="ten"):
         parse_config(d)
 
 
@@ -307,11 +313,11 @@ def test_artifact_selection_ranks_published_candidates_across_pages(tmp_path, mi
     collector = Collector(db, Fetcher(tmp_path / "evidence", httpx.MockTransport(handler)), config)
     selected = collector.seed(config.projects[0])
     assert selected == (
-        [f"g:m{i:02}_2.13" for i in range(10)]
+        [f"g:m{i:02}_2.13" for i in range(20)]
         if missing_metadata
-        else [f"g:m{i:02}_2.13" for i in range(22, 12, -1)]
+        else [f"g:m{i:02}_2.13" for i in range(22, 2, -1)]
     )
-    assert db.execute("SELECT count(*) FROM target_artifacts").fetchone()[0] == 10
+    assert db.execute("SELECT count(*) FROM target_artifacts").fetchone()[0] == 20
     assert db.execute("SELECT count(*) FROM artifact_selection").fetchone()[0] == 24
     assert (
         db.execute(
@@ -324,6 +330,48 @@ def test_artifact_selection_ranks_published_candidates_across_pages(tmp_path, mi
 
 def test_reject_old_artifact_cap():
     d = document()
-    d["max_artifacts_per_project"] = 20
-    with pytest.raises(ValueError, match="10 artifacts"):
+    d["max_artifacts_per_project"] = 10
+    with pytest.raises(ValueError, match="20 artifacts"):
         parse_config(d)
+
+
+def test_five_hop_collection_and_sixth_hop_boundary(tmp_path):
+    from scala_security.graph import paths
+
+    db = connect(tmp_path / "db.sqlite")
+    for i in range(7):
+        db.execute("INSERT INTO projects(id,seed) VALUES(?,1)", (f"scala/p{i}",))
+        db.execute("INSERT INTO artifacts(id,project) VALUES(?,?)", (f"g:p{i}_3", f"scala/p{i}"))
+        db.execute("INSERT INTO versions VALUES(?,?,?,0)", (f"g:p{i}_3@1", f"g:p{i}_3", "1"))
+    fetched = []
+
+    def handler(request):
+        if request.url.path.endswith(".pom"):
+            return httpx.Response(200, text="<project/>")
+        i = int(request.url.path.split("g:p")[1].split("_")[0])
+        fetched.append(i)
+        return httpx.Response(
+            200,
+            json={
+                "dependencies": [
+                    {
+                        "package_name": f"g:p{i + 1}_3",
+                        "requirements": "1",
+                        "kind": "runtime",
+                        "optional": False,
+                    }
+                ]
+            },
+        )
+
+    Collector(db, Fetcher(tmp_path / "evidence", httpx.MockTransport(handler))).forward(
+        ["g:p0_3@1"], {f"g:p{i}_3" for i in range(7)}
+    )
+    assert fetched == [0, 1, 2, 3, 4]
+    found = paths(db, ["g:p0_3@1"])
+    assert len(found["scala/p5"]) == 5
+    assert "scala/p6" not in found
+    db.execute(
+        "INSERT INTO edges(source,target,scope,optional,exact) VALUES('g:p5_3@1','g:p6_3@1','runtime',0,1)"
+    )
+    assert "scala/p6" not in paths(db, ["g:p0_3@1"])

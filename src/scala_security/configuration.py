@@ -16,10 +16,11 @@ def excluded_repository(repo: str) -> bool:
     return repo.lower() in EXCLUDED_REPOSITORIES or bool(ZIO_REPOSITORY.search(repo))
 
 
-ARTIFACT_CAP = 10
-ARTIFACT_SELECTION = "Published matrix coordinates ranked by dependent_packages_count descending; unknown counts last; coordinate-name ties; top 10."
+ARTIFACT_CAP = 20
+MAX_HOPS = 5
+ARTIFACT_SELECTION = "Published matrix coordinates ranked by dependent_packages_count descending; unknown counts last; coordinate-name ties; top 20."
 
-DEFAULT_MATRIX: dict[str, JSON] = {"jvm": {"scala": ["2.13"]}}
+DEFAULT_MATRIX: dict[str, JSON] = {"jvm": {"scala": ["2.13", "3"]}}
 
 
 @dataclass(frozen=True)
@@ -101,14 +102,16 @@ def parse_config(raw: object) -> SeedConfig:
     if data.get("universe", "seed") != "seed":
         raise ValueError("Only the closed seed universe is supported")
     if data.get("max_artifacts_per_project", ARTIFACT_CAP) != ARTIFACT_CAP:
-        raise ValueError("The pilot requires at most 10 artifacts per project")
+        raise ValueError("The pilot requires at most 20 artifacts per project")
+    if data.get("max_hops", MAX_HOPS) != MAX_HOPS:
+        raise ValueError("The pilot requires a five-hop limit")
     matrix = obj(data.get("matrix"))
     if not matrix:
         raise ValueError("A nonempty seed-wide matrix is required")
     expand(["validation:module"], matrix)
     projects = rows(data.get("projects"))
-    if not projects or len(projects) > 380:
-        raise ValueError("Seeds must contain between 1 and 380 projects")
+    if not projects or len(projects) > 760:
+        raise ValueError("Seeds must contain between 1 and 760 projects")
     raw_projects = data.get("projects")
     if not isinstance(raw_projects, list) or len(projects) != len(raw_projects):
         raise ValueError("Every project must be a mapping")
@@ -140,8 +143,8 @@ def parse_config(raw: object) -> SeedConfig:
             if not isinstance(section, str):
                 raise ValueError("Subsections must be strings")
             allocations[section] = allocations.get(section, 0) + 1
-            if allocations[section] > 5:
-                raise ValueError(f"More than five projects selected from subsection: {section}")
+            if allocations[section] > 10:
+                raise ValueError(f"More than ten projects selected from subsection: {section}")
         modules = module_names(project)
         if len(set(modules)) != len(modules):
             raise ValueError(f"Duplicate modules for {repo}")

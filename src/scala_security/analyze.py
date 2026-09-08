@@ -7,6 +7,7 @@ import sqlite3
 import time
 from datetime import datetime
 
+from .configuration import MAX_HOPS
 from .data import obj
 from .graph import paths
 from .scoring import health, value
@@ -124,7 +125,7 @@ def validate(db: sqlite3.Connection) -> dict[str, int]:
            WHERE s.target=? AND s.dependant=? ORDER BY s.position""",
             (row["target"], row["dependant"]),
         ).fetchall()
-        assert 1 <= len(path) <= 3
+        assert 1 <= len(path) <= MAX_HOPS
         for i, edge in enumerate(path):
             assert edge["exact"] and (i == 0 or edge["optional"] == 0)
             assert edge["scope"] in (

@@ -1,3 +1,10 @@
+# Expansion authorized 2026-09-08
+
+Current scope is defined in [CONSTRAINTS.md](CONSTRAINTS.md): JVM Scala 2.13/3, ten eligible projects per subsection, twenty ranked artifacts per project, five hops, closed seed universe. The completed checklist below describes the previous run.
+
+- [x] Implement expanded limits and five-hop boundary tests.
+- [ ] Refresh eligible subsection selection, collect using reusable evidence, validate, inspect and publish the expanded report.
+
 # Implementation status and remaining work
 
 Last reviewed: 2026-09-07.

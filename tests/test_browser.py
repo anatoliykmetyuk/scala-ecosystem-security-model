@@ -80,7 +80,7 @@ def test_report_interactions_and_math(tmp_path: Path) -> None:
         assert "not prescribed by CHAOSS" in (panels.first.text_content() or "")
         assert page.locator("select").count() == 0
         assert "jvm · Scala 2.13, 3" in page.locator("#matrix").inner_text()
-        assert "Maximum 3 dependency hops" in page.locator("header").inner_text()
+        assert "Maximum 5 dependency hops" in page.locator("header").inner_text()
         page.locator(".beneficiary-head .number").first.click()
         assert page.locator(".path").first.is_visible()
         page.get_by_role("button", name="Hide path").first.click()

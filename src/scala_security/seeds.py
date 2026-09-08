@@ -13,6 +13,7 @@ from .configuration import (
     ARTIFACT_CAP,
     ARTIFACT_SELECTION,
     DEFAULT_MATRIX,
+    MAX_HOPS,
     excluded_repository,
     modules_for,
     parse_config,
@@ -61,7 +62,7 @@ def main_sections(html: str) -> dict[str, list[str]]:
 def choose_projects(
     candidates: list[dict[str, JSON]], sections: dict[str, list[str]]
 ) -> list[dict[str, JSON]]:
-    """Take the first five eligible repositories independently in each subsection."""
+    """Take the first ten eligible repositories independently in each subsection."""
     chosen: dict[str, dict[str, JSON]] = {}
     for child in dict.fromkeys(c for children in sections.values() for c in children):
         ranked = []
@@ -88,7 +89,7 @@ def choose_projects(
             assert isinstance(categories, list) and isinstance(selected, list)
             categories.append(child)
             selected.append(child)
-            if len(seen) == 5:
+            if len(seen) == 10:
                 break
     return list(chosen.values())
 
@@ -102,15 +103,16 @@ def seed_document(
     return {
         "schema": 2,
         "universe": "seed",
+        "max_hops": MAX_HOPS,
         "max_artifacts_per_project": ARTIFACT_CAP,
         "artifact_selection": ARTIFACT_SELECTION,
         "selected_at": selected_at,
         "source": INDEX + "/awesome",
         "matrix": matrix,
         "selection_policy": {
-            "max_projects": 5 * len({c for children in sections.values() for c in children}),
-            "max_per_subsection": 5,
-            "rule": "First five eligible projects per subsection in captured source order, then deduplicate repositories across subsections. A shared project occupies a slot in each selecting subsection; no backfill after deduplication.",
+            "max_projects": 10 * len({c for children in sections.values() for c in children}),
+            "max_per_subsection": 10,
+            "rule": "First ten eligible projects per subsection in captured source order, then deduplicate repositories across subsections. A shared project occupies a slot in each selecting subsection; no backfill after deduplication.",
             "sections": [{"name": name, "subcategories": subs} for name, subs in sections.items()],
         },
         "projects": projects,
@@ -132,7 +134,7 @@ def select(fetch: Fetcher, destination: Path) -> None:
     for category in categories:
         count, page = 0, 1
         seen: set[str] = set()
-        while count < 5:
+        while count < 10:
             url = f"{INDEX}/awesome/{category}?page={page}"
             text = fetch.text(url)
             if not text:
@@ -196,7 +198,7 @@ def select(fetch: Fetcher, destination: Path) -> None:
                 assert isinstance(cats, list) and isinstance(selections, list)
                 cats.append(category)
                 selections.append({"category": category, "rank": rank, "source": url})
-                if count == 5:
+                if count == 10:
                     break
             page += 1
         print(f"Seeds: {category}: {count} eligible; {len(projects)} unique projects", flush=True)

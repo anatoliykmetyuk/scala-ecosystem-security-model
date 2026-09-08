@@ -1,41 +1,31 @@
 # Current pilot constraints
 
-Last updated: 2026-09-07. This is the current constraints register. It supersedes broader scope described in historical task entries. Update this file in the same change as any adjustment to selection, collection or traversal limits, and keep the seed configuration, methodology, preview labels and relevant tests consistent.
+Updated 2026-09-08. Maintain this register together with configuration, implementation, preview labels and tests. Earlier run documents describe historical snapshots.
 
-## Dimensions and caps
+| Dimension or limit | Current setting |
+| --- | --- |
+| Platform | JVM only |
+| Scala binary versions | 2.13 and 3 |
+| Seed selection | First ten eligible projects per each of 76 Awesome Scala subsections, in source order; repository deduplication without backfill after deduplication |
+| Project ceiling | 760, derived from 76 × 10; actual frozen count reported by `scala-security plan` |
+| Artifacts per project | At most 20 published coordinates across both Scala versions combined |
+| Artifact ranking | `dependent_packages_count` descending, unknown last, coordinate-name ties |
+| Traversal universe | Closed seed universe: only selected coordinates may be roots, intermediates or targets |
+| Coordinate ceiling | 15,200 across at most 760 projects; availability and deduplication reduce this |
+| Maximum dependency depth | Five edges: A → B → C → D → E → F is five hops |
+| Recursive dependencies per project | No separate numeric cap beyond the closed universe and hop limit |
+| Total version resolutions / HTTP requests | No separate numeric cap; different historical versions of a coordinate require separate resolution |
 
-| Dimension or limit | Current setting | Meaning and enforcement |
-| --- | --- | --- |
-| Platform | JVM only | `matrix.jvm` in `config/seeds.yaml`. Scala.js and Scala Native are excluded from the current matrix. |
-| Scala binary version | 2.13 only | `matrix.jvm.scala` in the seed YAML. This is a cross-build dimension, distinct from a library's release version. |
-| Artifacts per project | At most 10 selected coordinates | Expand all configured modules, check published JVM Scala 2.13 coordinates, then select at most 10 by `dependent_packages_count` descending. Known counts (including zero) precede unknown counts; ties use coordinate name. Projects with ten or fewer published candidates keep all candidates without a ranking-metadata request. Enforced during collection; offline expansion remains uncapped. |
-| Seed projects | At most 380 | Five slots per each of the 76 captured subsections, replacing the earlier 100-project cap. Validation enforces the 380 ceiling. Current frozen seed: 279 repositories. |
-| Projects per subsection | At most 5 | First five eligible projects in source order per subsection, then repository deduplication. Shared projects occupy a slot in every selecting subsection; no backfill after deduplication. No separate main-section quota. |
-| Traversal universe | Closed seed universe | Only selected seed coordinates may be roots, intermediate nodes or targets. Only seed repositories contribute exposed Value. No Maven-wide reverse discovery is invoked. |
-| Universe size | At most 3,800 selected coordinates across at most 380 projects | Current 279-project seed has 2,596 distinct uncapped candidates (2,606 project–artifact entries) and an upper bound of 1,297 selected entries. Final selection depends on publication and ranking metadata. |
-| Recursive dependencies per project | No separate numeric cap | Traversal stays within the selected universe and hop limit. At repository level, a seed can reach at most 278 other repositories with the current 279-project seed. That is a derived ceiling, not a limit on dependency declarations or artifact versions. |
-| Total recursive dependency resolutions | No separate numeric cap | Specific historical versions of the same coordinate can require separate resolution. Coordinate and project caps do not bound requests to 1,297 or 3,800. Duplicate version nodes are fetched once per collection traversal; cached responses can be reused explicitly. |
-| Transitive resolution depth | At most 3 dependency edges | Enforced by collection and analysis. A → B is one hop; A → B → C → D is three. Paths beyond three hops do not qualify. |
+Expand all configured module families, then check publication availability before ranking and capping. When at most twenty published candidates exist, retain all without extra ranking-metadata requests. Record ranking inputs and decisions in SQLite; missing counts remain unknown. Inventory plots use the uncapped inventory. Package popularity is a global, historical direct-package proxy, not the final seed-only exposed Value.
 
-The module list in the YAML may contain more than 10 families for a project. All matrix-matching published candidates are eligible for metadata ranking; only the selected top ten enter dependency traversal. Artifact-count plots use the uncapped inventory. Raw inventories and evidence responses may mention additional artifacts; those do not enlarge the traversal universe. Collection batch size is an operational setting, not a dependency cap.
+## Version and scope rules
 
-Ranking uses global direct dependent-package counts as a selection proxy, not the final seed-only exposed Value. It can include historical releases, cross-builds and internal modules. Selection counts, ranks, decisions and sources are saved in SQLite, with raw metadata pages in evidence.
+Start each project from its latest project release overall. If it has no selected coordinates, record a gap instead of substituting an older release. Intermediate dependencies use their actual declared versions, never an upgrade to latest. A target can match any version of its selected coordinates.
 
-## Version and dependency semantics
+Direct compile/runtime/test/build/development/provided dependencies are eligible. Later hops follow compile/runtime dependencies with confirmed nonoptional declarations. Unresolved declarations do not establish verified paths. External coordinates cannot bridge paths. Count each dependant repository once per target, with no self-exposure.
 
-Each seed starts from its latest project release. If that release has no selected Scala 2.13 coordinates, record a gap rather than substitute an older release. Intermediate dependencies retain their actual declared versions; they are never upgraded to latest during traversal. A target can match any version of its selected coordinates.
+The pipeline collects forward dependencies and derives dependants locally. No Maven-wide reverse discovery is invoked. Cache reuse is explicit; cached failures and original retrieval timestamps remain visible. Project and artifact limits do not guarantee a runtime.
 
-Direct compile, runtime, test, build, development and provided dependencies are eligible. Beyond the first hop, follow compile/runtime dependencies with confirmed nonoptional declarations. Thus supporting runtime libraries of a direct test framework can qualify, provided every coordinate remains inside the selected universe. Unresolved version or scope information does not establish a verified path.
+## Snapshot status
 
-Exposed Value is seed-only and repository-deduplicated. It does not estimate all Maven consumers. Omitting projects, coordinates or paths can reduce measured exposure.
-
-## Maintaining the register
-
-When changing a constraint:
-
-1. Update this register and the applicable configuration or implementation together.
-2. Update README/methodology explanations, generated preview labels and relevant regression tests.
-3. Run `uv run scala-security plan` to refresh the offline counts reported here. Candidate counts are not observed publication counts or request estimates.
-4. Record whether a real snapshot has been rebuilt under the changed constraints. Existing reports retain their original scope until rebuilt.
-
-Current snapshot status: collection and report verification completed on 2026-09-07. The final snapshot selected 1,297 coordinates. See [PILOT-RUN.md](PILOT-RUN.md) for cache provenance, measured timings and known coverage gaps.
+Expansion and collection are in progress. The previously published report describes the 279-project, Scala 2.13, ten-artifact, three-hop snapshot until the expanded report is validated and published. See `docs/PILOT-RUN.md` for that historical run.

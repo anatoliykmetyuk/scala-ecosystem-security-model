@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from urllib.parse import quote
 from xml.etree import ElementTree as ET
 
-from .configuration import ARTIFACT_CAP, ARTIFACT_SELECTION, SeedConfig
+from .configuration import ARTIFACT_CAP, ARTIFACT_SELECTION, MAX_HOPS, SeedConfig
 from .data import JSON, number, obj, repo_name, rows, string
 from .http import Fetcher, parallel, query, stream
 from .seeds import INDEX, coordinates
@@ -426,7 +426,7 @@ class Collector:
     def forward(self, roots: list[str], relevant: set[str]) -> None:
         frontier = set(roots)
         visited: set[str] = set()
-        for depth in range(3):
+        for depth in range(MAX_HOPS):
             pending = sorted(frontier - visited)
             visited.update(pending)
             frontier = set()
@@ -471,7 +471,7 @@ class Collector:
                             {"test", "provided", "build", "development"} if depth == 0 else set()
                         )
                         if (
-                            depth < 2
+                            depth < MAX_HOPS - 1
                             and name in relevant
                             and is_exact
                             and (depth == 0 or optional is False)
@@ -550,6 +550,7 @@ class Collector:
             "INSERT OR REPLACE INTO metadata VALUES(?,?)",
             ("artifact_selection", ARTIFACT_SELECTION),
         )
+        self.db.execute("INSERT OR REPLACE INTO metadata VALUES(?,?)", ("max_hops", str(MAX_HOPS)))
         start = time.monotonic()
         targets: list[str] = []
         for seed in seeds:
