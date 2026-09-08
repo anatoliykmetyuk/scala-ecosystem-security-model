@@ -4,7 +4,7 @@ Current scope is defined in [CONSTRAINTS.md](CONSTRAINTS.md): JVM Scala 2.13/3, 
 
 - [x] Implement expanded limits and five-hop boundary tests.
 - [x] Refresh eligible subsection selection, collect using reusable evidence and validate the expanded report: 436 projects, 3,251 distinct selected coordinates, 2,370 relationships. See [EXPANDED-RUN.md](EXPANDED-RUN.md).
-- [ ] Inspect and publish the expanded report.
+- [x] Inspect and publish the expanded report. Deployment and validation workflows passed for `327b9b3`; the live HTTPS response matches the reviewed HTML byte-for-byte.
 
 # Implementation status and remaining work
 

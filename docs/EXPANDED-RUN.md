@@ -81,3 +81,5 @@ rejects the sixth. Browser verification covers the actual generated report,
 collapsed formulas, search, dependency paths and responsive light/dark rendering.
 Generated audits and screenshots are under `output/expanded-verification/` and
 `output/expansion-estimate/`.
+
+Publication verified: GitHub Actions deployment and validation passed for commit `327b9b3`. The live HTTPS HTML SHA-256 matches `site/index.html`: `936f3cbdb7595ded45aa8a8a483c69878b168b63b5aab1a1c1afab9608ba997e`.
