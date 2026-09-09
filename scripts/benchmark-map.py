@@ -64,6 +64,8 @@ def main() -> None:
           const d=JSON.parse(document.querySelector('#map-data').textContent);
           return d.projects.map((p,i)=>({i,v:p.exposure})).sort((a,b)=>b.v-a.v).slice(0,2).map(x=>x.i);
         }""")
+        if page.locator("#compromise-mode").count():
+            page.locator("#compromise-mode").click()
         for i in chosen:
             page.locator(f"#country-{i}").dispatch_event("click")
         results = []

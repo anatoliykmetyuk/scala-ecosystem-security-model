@@ -56,7 +56,6 @@ def main() -> None:
             == f"{100 * affected_value / total_value:.1f}%"
         )
         page.get_by_role("button", name="Fit whole map").click()
-        page.locator("aside").evaluate("el => el.scrollTop = 280")
         page.screenshot(path=str(args.output / "simulation.png"))
         # Check both detail levels on the actual geometry, including close-zoom artwork.
         for _ in range(3):

@@ -316,3 +316,78 @@ def test_map_detail_buttons_and_all_hop_connections(tmp_path: Path) -> None:
                 box = page.locator(selector).bounding_box()
                 assert box and box["x"] >= 0 and box["x"] + box["width"] <= width
         browser.close()
+
+
+def test_inspection_compromise_mode_and_conditional_overlays(tmp_path: Path) -> None:
+    database, world = map_fixture(tmp_path)
+    output = tmp_path / "map.html"
+    render_map(database, output, world)
+    model = read_snapshot(database)
+    ids = {project["id"]: i for i, project in enumerate(model["projects"])}
+    with sync_playwright() as p:
+        browser = getattr(p, os.environ.get("MAP_TEST_BROWSER", "chromium")).launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        page.goto(output.as_uri())
+        panel, summary = page.locator("#project-panel"), page.locator("#shared-exposure")
+        mode = page.get_by_role("button", name="Compromise mode", exact=True)
+        expect(panel).to_be_hidden()
+        expect(summary).to_be_hidden()
+        expect(mode).to_have_attribute("aria-pressed", "false")
+        assert page.locator("#atlas").bounding_box() == {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 1000,
+        }
+        page.locator(f"#country-{ids['scala/c']}").dispatch_event("click")
+        expect(panel).to_be_visible()
+        expect(page.get_by_role("combobox")).to_have_value("scala/c")
+        assert page.locator("#compromised-count").inner_text() == "0"
+        expect(summary).to_be_hidden()
+        page.locator(f"#country-{ids['scala/b']}").dispatch_event("click")
+        expect(page.locator("#project-detail .owner")).to_have_text("scala/b")
+        page.mouse.click(900, 40)  # Open map space, outside both overlays.
+        expect(panel).to_be_hidden()
+        expect(page.get_by_role("combobox")).to_have_value("")
+        page.locator(f"#country-{ids['scala/c']}").dispatch_event("click")
+        page.get_by_role("button", name="Compromise this project", exact=True).click()
+        expect(summary).to_be_visible()
+        expect(panel).to_be_visible()
+        assert page.locator("#compromised-count").inner_text() == "1"
+        assert page.locator("#exposed-count").inner_text() == "1"
+        mode.click()
+        expect(panel).to_be_hidden()
+        expect(page.get_by_role("combobox")).to_have_value("")
+        assert page.locator(".country.focused").count() == 0
+        page.locator(f"#country-{ids['scala/b']}").dispatch_event("click")
+        expect(panel).to_be_hidden()
+        assert page.locator("#compromised-count").inner_text() == "2"
+        assert page.locator("#affected-percent").inner_text() == "100.0"
+        # Clicking again in compromise mode undoes that compromise, without selecting.
+        page.locator(f"#country-{ids['scala/b']}").dispatch_event("click")
+        assert page.locator("#compromised-count").inner_text() == "1"
+        mode.click()
+        page.locator(f"#country-{ids['scala/b']}").dispatch_event("click")
+        expect(panel).to_be_visible()
+        assert page.locator("#compromised-count").inner_text() == "1"
+        page.get_by_role("button", name="Reset", exact=True).click()
+        expect(summary).to_be_hidden()
+        expect(panel).to_be_visible()
+        page.get_by_role("button", name="Close project details", exact=True).click()
+        expect(panel).to_be_hidden()
+        mode.click()
+        search = page.get_by_role("combobox")
+        search.fill("scala/c")
+        search.press("Enter")
+        expect(panel).to_be_visible()
+        expect(search).to_have_value("scala/c")
+        expect(mode).to_have_attribute("aria-pressed", "false")
+        page.get_by_role("button", name="Compromise this project", exact=True).click()
+        for width in (320, 390, 900, 1440):
+            page.set_viewport_size({"width": width, "height": 844})
+            assert page.locator("#atlas").bounding_box()["width"] == width
+            for overlay in (panel, summary):
+                box = overlay.bounding_box()
+                assert box and box["x"] >= 0 and box["x"] + box["width"] <= width
+                assert box["y"] >= 0 and box["y"] + box["height"] <= 844
+        browser.close()

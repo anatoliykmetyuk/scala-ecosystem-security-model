@@ -26,7 +26,7 @@
   let affected = new Set(), selected = null, hovered = null, layer = "exposure";
   let zoom=1, tx=0, ty=0, drag=null, suppressClick=false;
   let pendingFrame=0, labelsDirty=true, markerZoom=1, moving=false, settleTimer=0;
-  let showLinks=false, showScenery=true;
+  let showLinks=false, showScenery=true, compromiseMode=false;
   let pointer=null, linksKey="", fineGeometry=false, inputMatrix=null, viewportScale=1;
   const detailPaths={land:[],lakes:[],rivers:[]};
   const labelPriority=()=>[...labels].sort((a,b)=>(b.i===selected)-(a.i===selected)||a.rank-b.rank);
@@ -59,7 +59,7 @@
     el.addEventListener("pointerenter",e=>{if(drag||moving)return;hovered=i;showTooltip(i,e);drawConnections(i);});
     el.addEventListener("pointermove",e=>{if(!drag&&!moving)positionTooltip(e);});
     el.addEventListener("pointerleave",()=>{if(moving)return;hovered=null;$("tooltip").hidden=true;drawConnections(null);});
-    el.addEventListener("click",()=>{if(suppressClick)return;selected=i;toggleCompromise(i);});
+    el.addEventListener("click",()=>{if(suppressClick)return;if(compromiseMode)toggleCompromise(i);else inspect(i);});
     els.push(el);
   });
   world.rivers.forEach((d,i)=>detailPaths.rivers.push(svg("path",{d:world.overview.rivers[i],class:"river"},$("water"))));
@@ -107,8 +107,10 @@
     $("compromised-count").textContent=compromised.size;$("exposed-count").textContent=exposed.length;
     $("value-percent").textContent=totalValue?`${pct(known,totalValue)}%`:"Unknown";
     $("impact-bar").style.width=`${pct(affected.size,projects.length)}%`;
-    $("impact-note").textContent=compromised.size?`${affected.size} of ${projects.length} projects affected, counted once. Includes verified dependants up to 5 hops.${unknownValueCount?` ${unknown} affected / ${unknownValueCount} total projects have unknown Value.`:""}`:"Click a country to compromise it. Click again to undo.";
+    $("impact-note").textContent=compromised.size?`${affected.size} of ${projects.length} projects affected, counted once. Includes verified dependants up to 5 hops.${unknownValueCount?` ${unknown} affected / ${unknownValueCount} total projects have unknown Value.`:""}`:"Select a project to inspect it, or enable Compromise mode.";
     $("reset").disabled=!compromised.size;
+    $("shared-exposure").hidden=!compromised.size;
+    document.querySelector(".map-stage").classList.toggle("has-impact",compromised.size>0);
     $("exposure-overlay").replaceChildren();
     projects.forEach((_,i)=>{
       els[i].classList.toggle("compromised",compromised.has(i));
@@ -123,18 +125,37 @@
     renderDetail();labelsDirty=true;scheduleTransform();
   }
   function toggleCompromise(i){if(compromised.has(i))compromised.delete(i);else compromised.add(i);impact();}
-  function inspect(i,fly=false){selected=i;impact();if(fly){zoom=3.5;tx=width/2-country[i].x*zoom;ty=height/2-country[i].y*zoom;labelsDirty=true;scheduleTransform();}}
+  function updateSelection(){
+    els.forEach((el,i)=>el.classList.toggle("focused",i===selected));
+    $("project-panel").hidden=selected==null;
+    document.querySelector(".map-stage").classList.toggle("has-selection",selected!=null);
+    $("search").value=selected==null?"":projects[selected].id;
+    closeSearch();renderDetail();labelsDirty=true;scheduleTransform();
+  }
+  function deselect(){selected=null;updateSelection();}
+  function setCompromiseMode(enabled){
+    compromiseMode=enabled;$("compromise-mode").setAttribute("aria-pressed",String(enabled));
+    $("atlas").classList.toggle("compromise-mode",enabled);
+    $("tooltip").hidden=true;
+    if(enabled)deselect();
+  }
+  function inspect(i,fly=false){
+    setCompromiseMode(false);selected=i;updateSelection();
+    if(fly){zoom=3.5;tx=width/2-country[i].x*zoom;ty=height/2-country[i].y*zoom;labelsDirty=true;scheduleTransform();}
+  }
   function renderDetail(){
+    const box=$("project-detail");box.replaceChildren();
     if(selected==null)return;
-    const i=selected,p=projects[i],box=$("project-detail");box.replaceChildren();
+    const i=selected,p=projects[i];
+    const close=text(box,"button","×","close-project");close.setAttribute("aria-label","Close project details");close.onclick=deselect;
     text(box,"div","COUNTRY / PROJECT","eyebrow");
     text(box,"h2",p.id.split("/").at(-1));text(box,"div",p.id,"owner");
-    text(box,"span",compromised.has(i)?"▧ COMPROMISED":affected.has(i)?"◇ EXPOSED":"NOT SELECTED","status");
+    text(box,"span",compromised.has(i)?"▧ COMPROMISED":affected.has(i)?"◇ EXPOSED":"NOT COMPROMISED","status");
     const metrics=text(box,"div","","project-metrics");
     for(const [name,v] of [["Exposed Value",p.exposure],["Verified dependants",data.fallout[i].length],["Maintenance",p.maintenance],["Security",p.security],["Project Value",p.value],["Stars",p.stars]]){
       const m=text(metrics,"div","");text(m,"span",name);text(m,"strong",fmt(v));
     }
-    const action=text(box,"button",compromised.has(i)?"Undo compromise":"Compromise this project","primary");action.onclick=()=>toggleCompromise(i);
+    const action=text(box,"button",compromised.has(i)?"Undo compromise":"Compromise this project","primary");action.prepend($("compromise-mode").querySelector("svg").cloneNode(true));action.onclick=()=>toggleCompromise(i);
     const link=text(box,"a","View repository ↗","repo-link");link.href=`https://github.com/${p.id}`;link.target="_blank";link.rel="noopener";
     if(p.unvalued)text(box,"p",`${p.unvalued} dependants have unknown Value and do not contribute to Exposed Value.`,"small");
     text(box,"p",p.categories.join(" · "),"small");
@@ -142,7 +163,7 @@
   function showTooltip(i,e){
     const tip=$("tooltip");tip.replaceChildren();text(tip,"strong",projects[i].id);
     text(tip,"span",`${names[layer]}: ${fmt(projects[i][layer])} · ${data.fallout[i].length} dependants`);
-    text(tip,"span",compromised.has(i)?"Click to undo compromise":"Click to compromise");tip.hidden=false;positionTooltip(e);
+    text(tip,"span",compromiseMode?(compromised.has(i)?"Click to undo compromise":"Click to compromise"):"Click to view project");tip.hidden=false;positionTooltip(e);
   }
   function positionTooltip(e){const rect=$("atlas").getBoundingClientRect(),tip=$("tooltip");tip.style.left=Math.max(8,Math.min(e.clientX-rect.left+16,rect.width-tip.offsetWidth-10))+"px";tip.style.top=Math.max(8,Math.min(e.clientY-rect.top+16,rect.height-tip.offsetHeight-10))+"px";}
   function drawConnections(i){
@@ -224,6 +245,8 @@
     text(tip,"strong",names[key]);text(tip,"span",descriptions[key]);
     button.onclick=()=>{layer=key;recolor();};
   });
+  $("compromise-mode").onclick=()=>setCompromiseMode(!compromiseMode);
+  $("atlas").addEventListener("click",e=>{if(!suppressClick&&!e.target.closest(".country"))deselect();});
   $("reset").onclick=()=>{compromised.clear();impact();};
   $("show-scenery").onclick=()=>{
     showScenery=!showScenery;$("scenery").style.display=showScenery?"":"none";
@@ -239,7 +262,7 @@
   }
   function chooseResult(position){
     const match=searchMatches[position];if(!match)return;
-    inspect(match.i,true);$("search").value="";searchMatches=[];closeSearch();$("search").focus();
+    inspect(match.i,true);searchMatches=[];$("search").focus();closeSearch();
   }
   function activateResult(position){
     activeResult=position;
@@ -265,7 +288,10 @@
     if(!searchMatches.length)text(results,"p","No matching projects.","small");
   }
   $("search").oninput=searchProjects;
-  $("search").onfocus=searchProjects;
+  $("search").onfocus=()=>{
+    if(selected!=null&&$("search").value===projects[selected].id)$("search").select();
+    else searchProjects();
+  };
   $("search").onkeydown=e=>{
     if(e.key==="Escape"){e.preventDefault();closeSearch();}
     else if(e.key==="ArrowDown"||e.key==="ArrowUp"){
@@ -276,7 +302,6 @@
     else if(e.key==="Tab")closeSearch();
   };
   document.addEventListener("pointerdown",e=>{if(!e.target.closest(".map-search"))closeSearch();});
-  $("try-project").onclick=()=>inspect(projects.reduce((best,p,i)=>p.exposure>projects[best].exposure?i:best,0),true);
   $("about-open").onclick=()=>$("about").showModal();$("about-close").onclick=()=>$("about").close();
   $("snapshot-label").textContent=`${projects.length} projects · Snapshot ${data.snapshot.slice(0,8).replace(/^(\d{4})(\d{2})(\d{2})$/,"$1-$2-$3")}`;
   $("scope-label").textContent=`Seed-only exposure · Up to 5 hops · ${data.gaps.toLocaleString()} evidence gaps`;

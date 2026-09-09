@@ -101,7 +101,11 @@ refresh, changing stars does not move or resize countries. Some countries are sm
 and require zoom or search. Labels progressively appear as space permits; search
 provides access to every project, including countries whose full names do not fit.
 
-The page has no header; the desktop map and sidebar fill the viewport. The question-mark
+The page has no header or fixed sidebar; the map fills the entire viewport.
+Selecting a country opens a left details overlay beneath the search field and updates
+the field to that project’s repository name. Clicking empty map space or the card’s
+close button clears selection without changing compromises. Shared exposure appears
+as a translucent top-right overlay only while at least one project is compromised. The question-mark
 button above and to the right of the compass opens “About this world.”
 
 Project search sits at the map’s top left and stays visible at every zoom. Up/Down
@@ -111,8 +115,9 @@ Escape dismisses the list. Clicking a result also navigates without compromising
 Four icon buttons at the map’s bottom right, immediately left of the zoom controls,
 select the score layer. Each has a name and explanation on hover or keyboard focus;
 the active button is highlighted and exposes its pressed state to assistive tools.
-Matching scenery and hover-connection toggle buttons sit immediately to their left.
-Scenery defaults on, connections off; both support tooltips and keyboard activation.
+Matching scenery, hover-connection, and compromise-mode buttons sit immediately to
+their left. Scenery defaults on; connections and compromise mode default off. All
+support tooltips and keyboard activation.
 
 Default color is Exposed Value. Its color intensity uses square-root scaling to
 keep moderate exposure visible; the legend marks actual values at the ends and
@@ -125,8 +130,11 @@ status distinguishable from the current score layer.
 
 ## Simulation semantics
 
-- Click a country to compromise it; click it again or its chip to undo. Search
-  inspects and centers a country without compromising it; a separate button acts.
+- Normal country clicks select details without compromising the project. The details
+  card provides a compromise/undo button. Enabling Compromise mode clears selection;
+  country clicks then toggle compromises without opening details. Disabling the mode
+  preserves the scenario. Search always selects and centers a project, returning to
+  inspection mode. Undo chips and Reset also remain available in the exposure overlay.
 - The simulation uses the saved, verified `fallout` sets. It never transitively
   closes repository-level links, which would lose historical version semantics.
 - Multiple selections use set union. A directly compromised project that is also
