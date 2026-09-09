@@ -304,6 +304,15 @@
   document.addEventListener("pointerdown",e=>{if(!e.target.closest(".map-search"))closeSearch();});
   $("about-open").onclick=()=>$("about").showModal();$("about-close").onclick=()=>$("about").close();
   $("snapshot-label").textContent=`${projects.length} projects · Snapshot ${data.snapshot.slice(0,8).replace(/^(\d{4})(\d{2})(\d{2})$/,"$1-$2-$3")}`;
+  const collectedAt=new Date(data.collected);
+  $("collection-timestamp").textContent=Number.isNaN(collectedAt.getTime())
+    ? "Snapshot timestamp unavailable"
+    : `Snapshot collected ${collectedAt.toISOString().slice(0,19).replace("T"," ")} UTC`;
+  const browserBrands=navigator.userAgentData?.brands;
+  const isChrome=browserBrands
+    ? browserBrands.some(({brand})=>brand==="Google Chrome")
+    : /Chrome\/|CriOS\//.test(navigator.userAgent)&&!/Edg(?:e|A|iOS)?\/|OPR\/|OPiOS\/|SamsungBrowser\//.test(navigator.userAgent);
+  $("browser-recommendation").hidden=isChrome;
   $("scope-label").textContent=`Seed-only exposure · Up to 5 hops · ${data.gaps.toLocaleString()} evidence gaps`;
   window.addEventListener("scroll",()=>{inputMatrix=null;},{capture:true,passive:true});
   window.addEventListener("resize",()=>{inputMatrix=null;});
