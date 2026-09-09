@@ -36,8 +36,9 @@
   const totalValue = projects.reduce((s,p)=>s+(p.value??0),0);
   const unknownValueCount = projects.filter(p=>p.value==null).length;
   const maxExposure=Math.max(...projects.map(p=>p.exposure),1);
+  const exposureLogMax=Math.log1p(maxExposure);
   const descriptions={
-    exposure:"The combined Value of verified dependants. Brighter countries support more of the ecosystem.",
+    exposure:"The combined Value of verified dependants. Brighter countries support more of the ecosystem. Colors use a logarithmic scale to reveal smaller exposures.",
     maintenance:"Observed maintenance activity and contributor resilience. Warmer colors indicate lower scores.",
     security:"Observed security practices. Warmer colors indicate lower scores; missing evidence is hatched.",
     value:"Each project's provisional Value, calculated from stars with logarithmic saturation."
@@ -87,14 +88,14 @@
   function recolor(){
     projects.forEach((p,i)=>{
       const v=p[layer];
-      const t=layer==="exposure"?Math.sqrt(v/maxExposure):layer==="maintenance"||layer==="security"?1-v:v;
+      const t=layer==="exposure"?Math.log1p(v)/exposureLogMax:layer==="maintenance"||layer==="security"?1-v:v;
       els[i].style.fill=layer==="exposure"&&p.coverage?.status==="unavailable"?"url(#coverage-hatch)":v==null?"url(#unknown)":color(t);
     });
     document.querySelectorAll("[data-layer]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.layer===layer)));$("legend-title").textContent=names[layer];
     $("coverage-legend").textContent=layer==="exposure"?"▧ Gray: dependency coverage unavailable":"⚠ Dependency coverage warnings in project details";
     const reverse=layer==="maintenance"||layer==="security";
     $("legend-gradient").style.background=`linear-gradient(to right,${(reverse?[...palette].reverse():palette).join(",")})`;
-    $("legend-min").textContent="0";$("legend-mid").textContent=fmt(layer==="exposure"?maxExposure/4:.5);
+    $("legend-min").textContent="0";$("legend-mid").textContent=fmt(layer==="exposure"?Math.expm1(exposureLogMax/2):.5);
     $("legend-max").textContent=fmt(layer==="exposure"?maxExposure:1);
     if(selected!=null)renderDetail();
   }
