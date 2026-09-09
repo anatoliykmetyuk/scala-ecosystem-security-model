@@ -22,6 +22,8 @@ main{display:block;height:100dvh;min-height:0}.map-stage{height:100dvh;min-heigh
 
 #project-detail .primary svg{width:16px;height:16px;vertical-align:middle;margin-right:7px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 
-.coverage-warning{margin:14px 0;padding:10px;border:1px solid #858c90;background:#52606633;font-size:11px;line-height:1.5}.coverage-warning p{margin:6px 0}.coverage-warning.partial{border-color:#65777b}.coverage-warning.complete{border:0;padding:0;background:none;color:var(--muted)}.coverage-warning summary{cursor:pointer}.legend small{display:block}.legend small[hidden]{display:none}
+.coverage-warning{margin:14px 0;font-size:11px;line-height:1.5;color:var(--muted)}.coverage-warning p{margin:6px 0}.coverage-warning summary{cursor:pointer}.legend small{display:block}.legend small[hidden]{display:none}
 
 .map-credit a{pointer-events:auto;color:inherit;text-underline-offset:3px}
+
+.dependency-details{margin:14px 0}.dependency-details>summary{cursor:pointer;color:var(--muted)}

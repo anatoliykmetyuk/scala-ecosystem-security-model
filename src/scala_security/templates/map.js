@@ -160,7 +160,9 @@
     }
     const coverage=p.coverage;
     if(coverage){
-      const warning=text(box,"div","",`coverage-warning ${coverage.status}`);
+      const dependencyDetails=text(box,"details","","dependency-details");
+      text(dependencyDetails,"summary","Dependency details");
+      const warning=text(dependencyDetails,"div","","coverage-warning");
       text(warning,"strong",coverage.status==="unavailable"?"Dependency coverage unavailable: no release artifacts could be analysed.":coverage.status==="partial"?"Partial dependency coverage":"Selected release artifacts analysed");
       text(warning,"p",`${coverage.usable} usable / ${coverage.roots} release artifacts · ${coverage.selected} selected coordinates · ${coverage.complete} fully resolved within the supported scope.`);
       if(coverage.reasons.length){const details=text(warning,"details","");text(details,"summary","Evidence details");for(const reason of coverage.reasons)text(details,"p",reason);}

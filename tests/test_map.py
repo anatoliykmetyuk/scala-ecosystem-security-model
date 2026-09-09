@@ -418,6 +418,9 @@ def test_dependency_coverage_layers_and_incoming_exposure(tmp_path: Path) -> Non
         country = page.locator('[data-project="scala/c"]')
         assert "coverage-hatch" in country.evaluate("e=>e.style.fill")
         country.dispatch_event("click")
+        expect(page.locator(".coverage-warning")).to_be_hidden()
+        page.locator(".dependency-details > summary").click()
+        expect(page.locator(".coverage-warning")).to_be_visible()
         expect(page.locator(".coverage-warning")).to_contain_text("Dependency coverage unavailable")
         expect(page.locator(".coverage-warning")).to_contain_text("incoming dependants")
         page.locator('[data-layer="maintenance"]').click()
@@ -427,6 +430,8 @@ def test_dependency_coverage_layers_and_incoming_exposure(tmp_path: Path) -> Non
         page.get_by_role("button", name="Compromise this project", exact=True).click()
         assert "compromised" in country.get_attribute("class")
         assert page.locator("#exposed-count").inner_text() == "1"
+        expect(page.locator(".coverage-warning")).to_be_hidden()
+        page.locator(".dependency-details > summary").click()
         expect(page.locator(".coverage-warning")).to_be_visible()
         page.locator('[data-layer="exposure"]').click()
         assert "coverage-hatch" not in country.evaluate("e=>getComputedStyle(e).fill")
