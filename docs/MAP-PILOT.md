@@ -101,6 +101,10 @@ refresh, changing stars does not move or resize countries. Some countries are sm
 and require zoom or search. Labels progressively appear as space permits; search
 provides access to every project, including countries whose full names do not fit.
 
+Four icon buttons at the map’s bottom right, immediately left of the zoom controls,
+select the score layer. Each has a name and explanation on hover or keyboard focus;
+the active button is highlighted and exposes its pressed state to assistive tools.
+
 Default color is Exposed Value. Its color intensity uses square-root scaling to
 keep moderate exposure visible; the legend marks actual values at the ends and
 midpoint. Project Value uses its existing 0–1 score. Maintenance and Security use

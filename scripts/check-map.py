@@ -80,7 +80,7 @@ def main() -> None:
         layer_times = []
         for name in ("security", "maintenance", "value", "exposure"):
             start = time.perf_counter()
-            page.get_by_label("Map layer", exact=True).select_option(name)
+            page.locator(f'[data-layer="{name}"]').click()
             layer_times.append(time.perf_counter() - start)
             assert page.locator("#affected-percent").inner_text() == expected_percent
         # Use the interior anchor exported by Azgaar, not the bounding-box center

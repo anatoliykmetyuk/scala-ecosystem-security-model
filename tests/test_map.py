@@ -94,7 +94,7 @@ def test_map_simulation_offline_unknowns_and_keyboard_search(tmp_path: Path) -> 
         page.goto(output.as_uri())
         assert page.locator("html").get_attribute("data-map-ready") == "true"
         assert page.locator(".country").count() == 3
-        assert page.locator("#layer").input_value() == "exposure"
+        assert page.locator('[data-layer="exposure"]').get_attribute("aria-pressed") == "true"
         for name in ("scala/c", "scala/b"):
             page.get_by_label("Find a project").fill(name)
             page.get_by_label("Find a project").press("Enter")
@@ -110,9 +110,16 @@ def test_map_simulation_offline_unknowns_and_keyboard_search(tmp_path: Path) -> 
         assert page.locator("#value-percent").inner_text() == "100.0%"
         assert "1 affected / 1 total" in page.locator("#impact-note").inner_text()
         for layer in ("security", "maintenance", "value", "exposure"):
-            page.get_by_label("Map layer", exact=True).select_option(layer)
+            button = page.locator(f'[data-layer="{layer}"]')
+            button.hover()
+            expect(button.get_by_role("tooltip")).to_be_visible()
+            button.click()
+            expect(button).to_have_attribute("aria-pressed", "true")
+            assert page.locator('[data-layer][aria-pressed="true"]').count() == 1
             assert page.locator("#affected-percent").inner_text() == "100.0"
-        page.get_by_label("Map layer", exact=True).select_option("security")
+        page.locator('[data-layer="security"]').focus()
+        page.keyboard.press("Enter")
+        expect(page.locator('[data-layer="security"]')).to_have_attribute("aria-pressed", "true")
         assert page.locator('.country[style*="unknown"]').count() == 3
         page.get_by_role("button", name="Reset", exact=True).click()
         assert page.locator("#affected-percent").inner_text() == "0.0"
@@ -126,7 +133,7 @@ def test_map_simulation_offline_unknowns_and_keyboard_search(tmp_path: Path) -> 
         assert page.locator("#about").is_visible()
         page.keyboard.press("Escape")
         assert not page.locator("#about").is_visible()
-        for width in (390, 900, 1440):
+        for width in (320, 390, 900, 1440):
             page.set_viewport_size({"width": width, "height": 900})
             assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
         assert not errors

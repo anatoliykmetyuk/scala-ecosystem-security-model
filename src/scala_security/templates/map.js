@@ -89,7 +89,7 @@
       const t=layer==="exposure"?Math.sqrt(v/maxExposure):layer==="maintenance"||layer==="security"?1-v:v;
       els[i].style.fill=v==null?"url(#unknown)":color(t);
     });
-    $("layer-help").textContent=descriptions[layer];$("legend-title").textContent=names[layer];
+    document.querySelectorAll("[data-layer]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.layer===layer)));$("legend-title").textContent=names[layer];
     const reverse=layer==="maintenance"||layer==="security";
     $("legend-gradient").style.background=`linear-gradient(to right,${(reverse?[...palette].reverse():palette).join(",")})`;
     $("legend-min").textContent="0";$("legend-mid").textContent=fmt(layer==="exposure"?maxExposure/4:.5);
@@ -220,7 +220,11 @@
   window.addEventListener("pointerup",finish);window.addEventListener("pointercancel",()=>{pointer=null;finish();});
   $("zoom-in").onclick=()=>zoomAt(1.5);$("zoom-out").onclick=()=>zoomAt(1/1.5);
   $("zoom-fit").onclick=()=>{zoom=1;tx=ty=0;labelsDirty=true;scheduleTransform();};
-  $("layer").onchange=e=>{layer=e.target.value;recolor();};
+  document.querySelectorAll("[data-layer]").forEach(button=>{
+    const key=button.dataset.layer, tip=button.querySelector(".layer-tooltip");
+    text(tip,"strong",names[key]);text(tip,"span",descriptions[key]);
+    button.onclick=()=>{layer=key;recolor();};
+  });
   $("reset").onclick=()=>{compromised.clear();impact();};
   $("show-scenery").onchange=e=>{$("scenery").style.display=e.target.checked?"":"none";};
   $("show-links").onchange=()=>drawConnections(hovered);
