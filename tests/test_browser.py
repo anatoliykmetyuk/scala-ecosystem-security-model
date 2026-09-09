@@ -43,7 +43,16 @@ def test_report_interactions_and_math(tmp_path: Path) -> None:
         )
     db.execute(
         "INSERT INTO metadata VALUES('target_matrix',?)",
-        (json.dumps({"jvm": {"scala": ["2.13", "3"]}}),),
+        (
+            json.dumps(
+                {
+                    "jvm": {"scala": ["2.13", "3"]},
+                    "sbt": {
+                        "variants": [{"scala": "2.12", "sbt": "1.0"}, {"scala": "3", "sbt": "2"}]
+                    },
+                }
+            ),
+        ),
     )
     analyze(db)
     report = tmp_path / "preview.html"
@@ -80,7 +89,17 @@ def test_report_interactions_and_math(tmp_path: Path) -> None:
         assert "not prescribed by CHAOSS" in (panels.first.text_content() or "")
         assert page.locator("select").count() == 0
         assert "jvm · Scala 2.13, 3" in page.locator("#matrix").inner_text()
-        assert "Maximum 5 dependency hops" in page.locator("header").inner_text()
+        assert "sbt · Scala 2.12 / sbt 1.0, Scala 3 / sbt 2" in page.locator("#matrix").inner_text()
+        assert not page.locator("#about").is_visible()
+        page.locator("#about-open").click()
+        assert page.locator("#about").is_visible()
+        page.keyboard.press("Escape")
+        assert not page.locator("#about").is_visible()
+        assert page.locator("#about-open").evaluate("el => el === document.activeElement")
+        page.locator("#about-open").click()
+        page.locator("#about-close").click()
+        assert not page.locator("#about").is_visible()
+        assert "Maximum 5 dependency hops" in page.locator("#about").inner_text()
         page.locator(".beneficiary-head .number").first.click()
         assert page.locator(".path").first.is_visible()
         page.get_by_role("button", name="Hide path").first.click()
@@ -95,7 +114,7 @@ def test_report_interactions_and_math(tmp_path: Path) -> None:
         page.locator("#search").fill("scala/c")
         assert page.locator(".rank-button").count() == 1
         page.locator(".rank-button").click()
-        assert "scala/c" in page.locator("h2").inner_text()
+        assert "scala/c" in page.locator("#detail h2").inner_text()
         for theme in ("light", "dark"):
             page.emulate_media(color_scheme=theme)
             for width in (360, 1024):

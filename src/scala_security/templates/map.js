@@ -165,7 +165,7 @@
       text(warning,"p",coverage.status==="complete"?"Zero verified paths means none were established within the analysed scope.":"Missing outgoing evidence limits what this project is known to depend on. Verified incoming dependants and simulation results are preserved.");
     }
     const action=text(box,"button",compromised.has(i)?"Undo compromise":"Compromise this project","primary");action.prepend($("compromise-mode").querySelector("svg").cloneNode(true));action.onclick=()=>toggleCompromise(i);
-    const link=text(box,"a","View repository ↗","repo-link");link.href=`https://github.com/${p.id}`;link.target="_blank";link.rel="noopener";
+    const link=text(box,"a","View repository","repo-link");link.href=`https://github.com/${p.id}`;link.target="_blank";link.rel="noopener";
     if(p.unvalued)text(box,"p",`${p.unvalued} dependants have unknown Value and do not contribute to Exposed Value.`,"small");
     text(box,"p",p.categories.join(" · "),"small");
   }

@@ -24,7 +24,8 @@ from .seeds import select
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "command", choices=["select", "rebuild", "render", "render-map", "validate", "plan"]
+        "command",
+        choices=["select", "rebuild", "render", "render-map", "render-site", "validate", "plan"],
     )
     parser.add_argument("--seeds", type=Path, default=Path("config/seeds.yaml"))
     parser.add_argument("--output", type=Path, default=Path("output"))
@@ -45,6 +46,26 @@ def main() -> None:
     )
     parser.add_argument("--generator-cache", type=Path, default=Path(".cache/azgaar"))
     args = parser.parse_args()
+    if args.command == "render-site":
+        from .site_render import render_site
+
+        database = args.database
+        if database is None:
+            database = Path((args.output / "latest-database.txt").read_text().strip())
+        if not database.is_file():
+            parser.error(f"Database does not exist: {database}")
+        try:
+            render_site(
+                database,
+                args.output,
+                args.world,
+                regenerate=args.regenerate_world,
+                seed=args.map_seed,
+                cache=args.generator_cache,
+            )
+        except (ValueError, RuntimeError) as error:
+            parser.error(str(error))
+        return
     if args.command == "render-map":
         from .map_render import render_map
 

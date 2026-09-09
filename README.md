@@ -121,6 +121,35 @@ uv run scala-security validate --database output/runs/<run>/snapshot.sqlite
 
 The shell scripts resolve the repository root themselves, so they can be invoked by absolute path from another directory. Relative command arguments are interpreted from the repository root.
 
+## Generate the complete website
+
+```sh
+./scripts/render-site.sh
+```
+
+This renders `output/index.html` (the Scala Land entry page), `output/preview.html`
+(the rankings), and `output/ecosystem-map.html` (the atlas) from the latest analyzed
+snapshot. Open `output/index.html` to enter the website. All three files work offline
+and use relative links, so keep them together.
+
+To choose an existing snapshot and destination:
+
+```sh
+./scripts/render-site.sh --database /path/to/snapshot.sqlite --output output/website --world output/map/world.json
+```
+
+The database is opened read-only; report metadata changes are confined to an
+in-memory copy. Existing map geography and generator caches are reused. A new
+project roster requires `--regenerate-world`, as with the map-only command.
+Collection and analysis are separate: run the existing rebuild first when fresh
+analysis is wanted, then render the website.
+
+In the frontend worktree, `.venv/bin/python scripts/render-frontend.py` generates
+all three pages using the shared snapshot and caches with worktree-local output.
+This operation does not publish the website.
+
+The bundled white Scala mark comes from the [Scala website](https://www.scala-lang.org/resources/img/frontpage/scala-logo-solo-white.svg).
+
 ## Scalaland storytelling map
 
 Generate a separate, standalone interactive atlas from the latest analyzed snapshot:
