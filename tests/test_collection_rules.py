@@ -46,6 +46,7 @@ def test_management_warnings_and_classifier_siblings():
     assert [(d["kind"], d["optional"]) for d in result.dependencies] == [
         ("compile", False),
         ("test", False),
+        ("build", False),
     ]
     missing = resolve_pom("g:child", "1", lambda u: child if u.endswith("child-1.pom") else "")
     assert missing.dependencies[0]["kind"] == "unknown"

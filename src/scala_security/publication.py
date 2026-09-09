@@ -36,6 +36,13 @@ class Publication:
     dependencies: list[dict[str, JSON]] = field(default_factory=list)
     properties: dict[str, str] = field(default_factory=dict)
     management: dict[tuple[str, str, str], dict[str, JSON]] = field(default_factory=dict)
+    # Keep declarations separate from resolved output: inherited defaults must
+    # be applied in the consuming child's effective management context.
+    declarations: list[dict[str, JSON]] = field(default_factory=list)
+    management_declarations: list[dict[str, JSON]] = field(default_factory=list)
+    plugins: list[dict[str, JSON]] = field(default_factory=list)
+    plugin_management: list[dict[str, JSON]] = field(default_factory=list)
+    extensions: list[dict[str, JSON]] = field(default_factory=list)
     issues: list[str] = field(default_factory=list)
     evidence: list[str] = field(default_factory=list)
 
@@ -87,8 +94,11 @@ def resolve_pom(
         parent_version = subst(parent.findtext("version") or "")
         inherited = resolve_pom(parent_name, parent_version, fetch, trail + (key,), props)
         props = inherited.properties | props
-        result.management.update(inherited.management)
-        result.issues.extend(inherited.issues)
+        result.issues.extend(
+            issue
+            for issue in inherited.issues
+            if not issue.startswith("Unresolved direct declaration:")
+        )
         result.evidence.extend(inherited.evidence)
     group = subst(root.findtext("groupId") or root.findtext("parent/groupId") or "")
     artifact = subst(root.findtext("artifactId") or "")
@@ -117,80 +127,150 @@ def resolve_pom(
 
     def identity(dep: dict[str, JSON]) -> tuple[str, str, str]:
         return (
-            string(dep["package_name"]),
-            string(dep.get("type")) or "jar",
-            string(dep.get("classifier")),
+            subst(string(dep["package_name"])),
+            subst(string(dep.get("type")) or "jar"),
+            subst(string(dep.get("classifier"))),
         )
 
-    def declaration(dep: ET.Element, defaults: bool = True) -> dict[str, JSON]:
-        name = subst((dep.findtext("groupId") or "") + ":" + (dep.findtext("artifactId") or ""))
-        kind = subst(dep.findtext("type") or "jar")
-        classifier = subst(dep.findtext("classifier") or "")
-        managed = result.management.get((name, kind, classifier), {}) if defaults else {}
-        version_text = subst(dep.findtext("version") or string(managed.get("requirements")))
-        scope = subst(
-            dep.findtext("scope")
-            or string(managed.get("kind"))
-            or ("unknown" if management_incomplete else "compile")
+    def declaration(dep: ET.Element, default_group: str = "") -> dict[str, JSON]:
+        # Do not manufacture absent fields before parent/child inheritance merges.
+        parsed: dict[str, JSON] = {
+            "package_name": (dep.findtext("groupId") or default_group)
+            + ":"
+            + (dep.findtext("artifactId") or ""),
+            "type": dep.findtext("type") or "jar",
+            "classifier": dep.findtext("classifier") or "",
+        }
+        for tag, name in (
+            ("version", "requirements"),
+            ("scope", "kind"),
+            ("optional", "optional"),
+            ("inherited", "inherited"),
+        ):
+            value = dep.findtext(tag)
+            if value is not None:
+                parsed[name] = value
+        return parsed
+
+    def merge(
+        parent_declarations: list[dict[str, JSON]],
+        local: list[dict[str, JSON]],
+        merge_fields: bool = False,
+    ) -> dict[tuple[str, str, str], dict[str, JSON]]:
+        merged = {identity(dep): dict(dep) for dep in parent_declarations}
+        for dep in local:
+            key = identity(dep)
+            # Maven replaces matching dependency/management/extension entries.
+            # Plugins instead inherit unspecified fields.
+            merged[key] = merged.get(key, {}) | dep if merge_fields else dict(dep)
+        return merged
+
+    def resolved(dep: dict[str, JSON], managed: dict[str, JSON] | None = None) -> dict[str, JSON]:
+        effective = (managed or {}) | dep
+        name, kind, classifier = identity(effective)
+        optional = effective.get(
+            "optional", effective.get("_optional_default", None if management_incomplete else False)
         )
-        optional = dep.findtext("optional")
+        if isinstance(optional, str):
+            text = subst(optional)
+            optional = text == "true" if text in ("true", "false") else None
         return {
             "package_name": name,
             "type": kind,
             "classifier": classifier,
-            "requirements": version_text,
-            "kind": scope,
-            "optional": (
-                subst(optional) == "true" if subst(optional) in ("true", "false") else None
-            )
-            if optional is not None
-            else managed.get("optional", None if management_incomplete else False),
+            "requirements": subst(string(effective.get("requirements"))),
+            "kind": subst(
+                string(effective.get("kind"))
+                or string(effective.get("_kind_default"))
+                or ("unknown" if management_incomplete else "compile")
+            ),
+            "optional": optional,
         }
 
     local_management = [
-        declaration(dep, False)
-        for dep in root.findall("./dependencyManagement/dependencies/dependency")
+        declaration(dep) for dep in root.findall("./dependencyManagement/dependencies/dependency")
     ]
-    imported_management: dict[tuple[str, str, str], dict[str, JSON]] = {}
     for dep in local_management:
-        if dep["kind"] == "import":
+        # Preserve the existing missing-BOM fallback policy (GitHub issue #2).
+        # These defaults only apply after explicit inherited/local fields merge.
+        dep["_kind_default"] = "unknown" if management_incomplete else "compile"
+        dep["_optional_default"] = None if management_incomplete else False
+    management = merge(inherited.management_declarations, local_management)
+    imported_management: dict[tuple[str, str, str], dict[str, JSON]] = {}
+    for key, dep in list(management.items()):
+        if subst(string(dep.get("kind"))) == "import":
             imported = resolve_pom(
-                string(dep["package_name"]), string(dep["requirements"]), fetch, trail + (key,)
+                subst(string(dep["package_name"])),
+                subst(string(dep.get("requirements"))),
+                fetch,
+                trail + (coordinate + "@" + version,),
             )
             for name, managed in imported.management.items():
-                imported_management.setdefault(name, managed)
+                # A BOM is resolved in its own property context, not the child's.
+                imported_management.setdefault(name, dict(managed))
             management_incomplete = (
                 management_incomplete or not imported.verified or imported.management_incomplete
             )
             result.issues.extend(imported.issues)
             result.evidence.extend(imported.evidence)
-    result.management.update(imported_management)
-    for dep in local_management:
-        if dep["kind"] != "import":
-            result.management[identity(dep)] = dep
-    direct = {
-        identity(dep): dict(dep) for dep in inherited.dependencies if dep.get("kind") != "build"
-    }
-    for dep in root.findall("./dependencies/dependency"):
-        parsed = declaration(dep)
-        direct[identity(parsed)] = parsed
+            del management[key]
+    for key, dep in imported_management.items():
+        management.setdefault(key, dep)
+    result.management_declarations = list(management.values())
+    result.management = {key: resolved(dep) for key, dep in management.items()}
+    result.declarations = list(
+        merge(
+            inherited.declarations,
+            [declaration(dep) for dep in root.findall("./dependencies/dependency")],
+        ).values()
+    )
     result.management_incomplete = management_incomplete
-    result.dependencies = list(direct.values())
-    for location, default_group in (
-        ("./build/plugins/plugin", "org.apache.maven.plugins"),
-        ("./build/extensions/extension", ""),
-    ):
-        for dep in root.findall(location):
-            result.dependencies.append(
-                {
-                    "package_name": subst(dep.findtext("groupId") or default_group)
-                    + ":"
-                    + subst(dep.findtext("artifactId") or ""),
-                    "requirements": subst(dep.findtext("version") or ""),
-                    "kind": "build",
-                    "optional": False,
-                }
-            )
+    result.dependencies = [
+        resolved(dep, result.management.get(identity(dep))) for dep in result.declarations
+    ]
+
+    def inheritable(declarations: list[dict[str, JSON]]) -> list[dict[str, JSON]]:
+        return [dep for dep in declarations if subst(string(dep.get("inherited"))) != "false"]
+
+    result.plugin_management = list(
+        merge(
+            inheritable(inherited.plugin_management),
+            [
+                declaration(dep, "org.apache.maven.plugins")
+                for dep in root.findall("./build/pluginManagement/plugins/plugin")
+            ],
+            merge_fields=True,
+        ).values()
+    )
+    result.plugins = list(
+        merge(
+            inheritable(inherited.plugins),
+            [
+                declaration(dep, "org.apache.maven.plugins")
+                for dep in root.findall("./build/plugins/plugin")
+            ],
+            merge_fields=True,
+        ).values()
+    )
+    result.extensions = list(
+        merge(
+            inherited.extensions,
+            [declaration(dep) for dep in root.findall("./build/extensions/extension")],
+        ).values()
+    )
+    plugin_management = {identity(dep): dep for dep in result.plugin_management}
+    for dep, defaults in [(p, plugin_management.get(identity(p), {})) for p in result.plugins] + [
+        (e, {}) for e in result.extensions
+    ]:
+        effective = defaults | dep
+        result.dependencies.append(
+            {
+                "package_name": subst(string(effective["package_name"])),
+                "requirements": subst(string(effective.get("requirements"))),
+                "kind": "build",
+                "optional": False,
+            }
+        )
     for dep in result.dependencies:
         if (
             not exact_version(string(dep["requirements"]))
