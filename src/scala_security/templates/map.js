@@ -26,6 +26,7 @@
   let affected = new Set(), selected = null, hovered = null, layer = "exposure";
   let zoom=1, tx=0, ty=0, drag=null, suppressClick=false;
   let pendingFrame=0, labelsDirty=true, markerZoom=1, moving=false, settleTimer=0;
+  let showLinks=false, showScenery=true;
   let pointer=null, linksKey="", fineGeometry=false, inputMatrix=null, viewportScale=1;
   const detailPaths={land:[],lakes:[],rivers:[]};
   const labelPriority=()=>[...labels].sort((a,b)=>(b.i===selected)-(a.i===selected)||a.rank-b.rank);
@@ -145,13 +146,12 @@
   }
   function positionTooltip(e){const rect=$("atlas").getBoundingClientRect(),tip=$("tooltip");tip.style.left=Math.max(8,Math.min(e.clientX-rect.left+16,rect.width-tip.offsetWidth-10))+"px";tip.style.top=Math.max(8,Math.min(e.clientY-rect.top+16,rect.height-tip.offsetHeight-10))+"px";}
   function drawConnections(i){
-    const group=$("connections"), key=`${i}/${$("hops").value}/${$("show-links").checked}`;
+    const group=$("connections"), key=`${i}/${showLinks}`;
     if(key===linksKey)return;
-    linksKey=key;group.replaceChildren();if(i==null||!$("show-links").checked)return;
+    linksKey=key;group.replaceChildren();if(i==null||!showLinks)return;
     markerZoom=zoom;
-    const a=country[i],depth=Number($("hops").value);
-    for(const [j,hops] of data.fallout[i]){
-      if(hops>depth)continue;
+    const a=country[i];
+    for(const [j] of data.fallout[i]){
       const b=country[j],dx=b.x-a.x,dy=b.y-a.y;
       svg("path",{d:`M${a.x} ${a.y}Q${(a.x+b.x)/2-dy*.12} ${(a.y+b.y)/2+dx*.12} ${b.x} ${b.y}`,class:"connection"},group);
       svg("circle",{cx:b.x,cy:b.y,r:2.3/zoom,fill:"var(--exposure)"},group);
@@ -225,9 +225,13 @@
     button.onclick=()=>{layer=key;recolor();};
   });
   $("reset").onclick=()=>{compromised.clear();impact();};
-  $("show-scenery").onchange=e=>{$("scenery").style.display=e.target.checked?"":"none";};
-  $("show-links").onchange=()=>drawConnections(hovered);
-  $("hops").oninput=e=>{$("hop-value").textContent=`${e.target.value} hop${e.target.value==1?"":"s"}`;drawConnections(hovered);};
+  $("show-scenery").onclick=()=>{
+    showScenery=!showScenery;$("scenery").style.display=showScenery?"":"none";
+    $("show-scenery").setAttribute("aria-pressed",String(showScenery));
+  };
+  $("show-links").onclick=()=>{
+    showLinks=!showLinks;$("show-links").setAttribute("aria-pressed",String(showLinks));drawConnections(hovered);
+  };
   let searchMatches=[], activeResult=-1;
   function closeSearch(){
     $("search-results").hidden=true;$("search").setAttribute("aria-expanded","false");

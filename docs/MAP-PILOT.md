@@ -108,6 +108,8 @@ Escape dismisses the list. Clicking a result also navigates without compromising
 Four icon buttons at the map’s bottom right, immediately left of the zoom controls,
 select the score layer. Each has a name and explanation on hover or keyboard focus;
 the active button is highlighted and exposes its pressed state to assistive tools.
+Matching scenery and hover-connection toggle buttons sit immediately to their left.
+Scenery defaults on, connections off; both support tooltips and keyboard activation.
 
 Default color is Exposed Value. Its color intensity uses square-root scaling to
 keep moderate exposure visible; the legend marks actual values at the ends and
@@ -130,10 +132,10 @@ status distinguishable from the current score layer.
   divided by all scored seed projects in the map.
 - Affected Value percentage sums known Values of affected projects and divides by
   known Value across the mapped cohort. Unknown Values are counted separately.
-- Simulation uses all retained paths, up to five hops. The connection-depth slider
-  filters hover lines only. Lines run from the hovered project to its verified
-  dependants within the selected depth, rather than pretending to be a complete
-  drawing of all intermediate artifact edges.
+- Simulation and hover connections use all retained paths, currently up to five
+  hops. Hover connections default off and have no viewer-configurable depth. When
+  enabled, lines connect the hovered project to every verified dependant, rather than
+  drawing all intermediate artifact edges.
 - Reset clears every compromise. It does not alter scores or the saved snapshot.
 
 This is a scenario about potential downstream exposure, not a prediction of actual

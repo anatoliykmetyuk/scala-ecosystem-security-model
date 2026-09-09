@@ -268,3 +268,51 @@ def test_search_arrow_selection_and_map_placement(tmp_path: Path) -> None:
             box = page.locator("#search-results").bounding_box()
             assert box and box["x"] >= 0 and box["x"] + box["width"] <= width
         browser.close()
+
+
+def test_map_detail_buttons_and_all_hop_connections(tmp_path: Path) -> None:
+    database, world = map_fixture(tmp_path)
+    output = tmp_path / "map.html"
+    render_map(database, output, world)
+    model = read_snapshot(database)
+    target = next(i for i, project in enumerate(model["projects"]) if project["id"] == "scala/c")
+    with sync_playwright() as p:
+        browser = getattr(p, os.environ.get("MAP_TEST_BROWSER", "chromium")).launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        page.goto(output.as_uri())
+        scenery = page.get_by_role("button", name="Scenery", exact=True)
+        links = page.get_by_role("button", name="Hover connections", exact=True)
+        expect(scenery).to_have_attribute("aria-pressed", "true")
+        expect(links).to_have_attribute("aria-pressed", "false")
+        assert page.locator("#hops, input[type=checkbox]").count() == 0
+        assert page.locator(".map-controls #show-scenery, .map-controls #show-links").count() == 2
+        page.locator(f"#country-{target}").dispatch_event(
+            "pointerenter", {"clientX": 500, "clientY": 400}
+        )
+        assert page.locator("#connections path").count() == 0
+        scenery.click()
+        assert page.locator("#scenery").evaluate("el=>el.style.display") == "none"
+        scenery.focus()
+        page.keyboard.press("Space")
+        expect(scenery).to_have_attribute("aria-pressed", "true")
+        assert page.locator("#scenery").evaluate("el=>el.style.display") == ""
+        links.focus()
+        page.keyboard.press("Enter")
+        expect(links).to_have_attribute("aria-pressed", "true")
+        page.locator(f"#country-{target}").dispatch_event(
+            "pointerenter", {"clientX": 500, "clientY": 400}
+        )
+        assert page.locator("#connections path").count() == len(model["fallout"][target])
+        links.click()
+        assert page.locator("#connections path").count() == 0
+        for width in (320, 390, 1440):
+            page.set_viewport_size({"width": width, "height": 900})
+            for selector in (
+                "#show-scenery",
+                "#show-links",
+                '[data-layer="exposure"]',
+                "#zoom-fit",
+            ):
+                box = page.locator(selector).bounding_box()
+                assert box and box["x"] >= 0 and box["x"] + box["width"] <= width
+        browser.close()

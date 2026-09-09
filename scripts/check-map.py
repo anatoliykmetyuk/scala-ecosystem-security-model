@@ -94,15 +94,16 @@ def main() -> None:
             anchor,
         )
         page.mouse.move(point["x"], point["y"])
+        assert page.locator("#connections path").count() == 0
+        assert page.locator("#show-links").get_attribute("aria-pressed") == "false"
+        page.get_by_role("button", name="Hover connections", exact=True).click()
+        page.mouse.move(point["x"], point["y"])
         page.wait_for_function("document.querySelectorAll('#connections path').length > 0")
         count5 = page.locator("#connections path").count()
         assert count5 == len(model["fallout"][selected])
-        page.locator("#hops").fill("1")
-        page.mouse.move(point["x"] + 1, point["y"])
-        count1 = page.locator("#connections path").count()
-        assert count1 == sum(h <= 1 for _, h in model["fallout"][selected])
+        assert page.locator("#hops").count() == 0
         assert page.locator("#affected-percent").inner_text() == expected_percent
-        page.get_by_label("Hover connections", exact=True).uncheck()
+        page.get_by_role("button", name="Hover connections", exact=True).click()
         assert page.locator("#connections path").count() == 0
         # Dragging over a country must not accidentally compromise it.
         page.mouse.move(point["x"], point["y"])
@@ -135,8 +136,7 @@ def main() -> None:
             "javascript_errors": errors,
             "tested_selection": [projects[i]["id"] for i in chosen],
             "affected_projects": len(affected),
-            "hover_connections_5_hops": count5,
-            "hover_connections_1_hop": count1,
+            "hover_connections_all_hops": count5,
             "note": "Single local browser smoke run; action timings include Playwright overhead and are not FPS measurements.",
         }
         (args.output / "verification.json").write_text(json.dumps(metrics, indent=2))
