@@ -212,3 +212,59 @@ def test_camera_batches_events_and_reuses_pan_labels(tmp_path: Path) -> None:
         assert page.locator("#connections").evaluate("el=>el.style.visibility") == ""
         assert page.locator("#compromised-count").inner_text() == "0"
         browser.close()
+
+
+def test_search_arrow_selection_and_map_placement(tmp_path: Path) -> None:
+    database, world = map_fixture(tmp_path)
+    output = tmp_path / "map.html"
+    render_map(database, output, world)
+    with sync_playwright() as p:
+        browser = getattr(p, os.environ.get("MAP_TEST_BROWSER", "chromium")).launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        page.goto(output.as_uri())
+        search = page.get_by_role("combobox", name="Find a project")
+        assert page.locator(".map-stage #search").count() == 1
+        assert page.locator("aside #search, .map-top").count() == 0
+        search.fill("/")
+        for key, name in (
+            ("ArrowDown", "java/a"),
+            ("ArrowDown", "scala/b"),
+            ("ArrowDown", "scala/c"),
+            ("ArrowUp", "scala/b"),
+        ):
+            search.press(key)
+            expect(page.get_by_role("option", name=name, exact=True)).to_have_attribute(
+                "aria-selected", "true"
+            )
+            expect(search).to_be_focused()
+            assert page.locator('[role="option"][aria-selected="true"]').count() == 1
+        search.press("Enter")
+        expect(page.locator("#project-detail .owner")).to_have_text("scala/b")
+        expect(search).to_have_attribute("aria-expanded", "false")
+        assert page.locator("#compromised-count").inner_text() == "0"
+        expect(search).to_be_visible()  # Search remains available after flying to a country.
+        search.fill("/")
+        search.press("ArrowUp")
+        expect(page.get_by_role("option", name="scala/c", exact=True)).to_have_attribute(
+            "aria-selected", "true"
+        )
+        search.press("Escape")
+        expect(search).to_have_attribute("aria-expanded", "false")
+        assert search.get_attribute("aria-activedescendant") is None
+        search.press("ArrowDown")
+        expect(page.get_by_role("option", name="java/a", exact=True)).to_have_attribute(
+            "aria-selected", "true"
+        )
+        search.fill("no-such-project")
+        search.press("ArrowDown")
+        search.press("Enter")
+        expect(page.locator("#project-detail .owner")).to_have_text("scala/b")
+        search.fill("/")
+        page.get_by_role("option", name="scala/c", exact=True).click()
+        expect(page.locator("#project-detail .owner")).to_have_text("scala/c")
+        for width in (320, 390, 1440):
+            page.set_viewport_size({"width": width, "height": 900})
+            search.fill("/")
+            box = page.locator("#search-results").bounding_box()
+            assert box and box["x"] >= 0 and box["x"] + box["width"] <= width
+        browser.close()

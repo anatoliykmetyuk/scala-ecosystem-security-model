@@ -101,6 +101,10 @@ refresh, changing stars does not move or resize countries. Some countries are sm
 and require zoom or search. Labels progressively appear as space permits; search
 provides access to every project, including countries whose full names do not fit.
 
+Project search sits at the map’s top left and stays visible at every zoom. Up/Down
+arrows highlight matching projects, Enter navigates to the highlighted result, and
+Escape dismisses the list. Clicking a result also navigates without compromising it.
+
 Four icon buttons at the map’s bottom right, immediately left of the zoom controls,
 select the score layer. Each has a name and explanation on hover or keyboard focus;
 the active button is highlighted and exposes its pressed state to assistive tools.

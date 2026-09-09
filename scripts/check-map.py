@@ -40,7 +40,7 @@ def main() -> None:
         for i in chosen:
             page.get_by_label("Find a project").fill(projects[i]["id"])
             page.locator("#search-results").get_by_role(
-                "button", name=projects[i]["id"], exact=True
+                "option", name=projects[i]["id"], exact=True
             ).click()
             start = time.perf_counter()
             page.get_by_role("button", name="Compromise this project", exact=True).click()

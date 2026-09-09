@@ -178,7 +178,6 @@
     tx=Math.max(width*(1-zoom)-width*.2,Math.min(width*.2,tx));
     ty=Math.max(height*(1-zoom)-height*.2,Math.min(height*.2,ty));
     $("world").setAttribute("transform",`translate(${tx} ${ty}) scale(${zoom})`);
-    document.querySelector(".map-top").hidden=zoom>1.3;
     const fine=zoom>(fineGeometry?2.2:2.5);
     if(fine!==fineGeometry){
       fineGeometry=fine;
@@ -229,14 +228,50 @@
   $("show-scenery").onchange=e=>{$("scenery").style.display=e.target.checked?"":"none";};
   $("show-links").onchange=()=>drawConnections(hovered);
   $("hops").oninput=e=>{$("hop-value").textContent=`${e.target.value} hop${e.target.value==1?"":"s"}`;drawConnections(hovered);};
-  $("search").oninput=e=>{
-    const query=e.target.value.trim().toLowerCase(),results=$("search-results");results.replaceChildren();results.hidden=!query;
+  let searchMatches=[], activeResult=-1;
+  function closeSearch(){
+    $("search-results").hidden=true;$("search").setAttribute("aria-expanded","false");
+    $("search").removeAttribute("aria-activedescendant");activeResult=-1;
+  }
+  function chooseResult(position){
+    const match=searchMatches[position];if(!match)return;
+    inspect(match.i,true);$("search").value="";searchMatches=[];closeSearch();$("search").focus();
+  }
+  function activateResult(position){
+    activeResult=position;
+    const options=$("search-results").querySelectorAll('[role="option"]');
+    options.forEach((option,i)=>option.setAttribute("aria-selected",String(i===position)));
+    if(options[position]){
+      $("search").setAttribute("aria-activedescendant",options[position].id);
+      options[position].scrollIntoView({block:"nearest"});
+    }
+  }
+  function searchProjects(){
+    const query=$("search").value.trim().toLowerCase(),results=$("search-results");
+    results.replaceChildren();closeSearch();searchMatches=[];
     if(!query)return;
-    const matches=projects.map((p,i)=>({p,i})).filter(({p})=>p.id.includes(query));
-    for(const {p,i} of matches.slice(0,12)){const b=text(results,"button",p.id);b.onclick=()=>{inspect(i,true);results.hidden=true;$("search").value="";};}
-    if(!matches.length)text(results,"p","No matching projects.","small");
+    searchMatches=projects.map((p,i)=>({p,i})).filter(({p})=>p.id.toLowerCase().includes(query)).slice(0,12);
+    results.hidden=false;$("search").setAttribute("aria-expanded","true");
+    searchMatches.forEach(({p},position)=>{
+      const option=text(results,"button",p.id);
+      option.id=`search-option-${position}`;option.type="button";option.tabIndex=-1;
+      option.setAttribute("role","option");option.setAttribute("aria-selected","false");
+      option.onclick=()=>chooseResult(position);
+    });
+    if(!searchMatches.length)text(results,"p","No matching projects.","small");
+  }
+  $("search").oninput=searchProjects;
+  $("search").onfocus=searchProjects;
+  $("search").onkeydown=e=>{
+    if(e.key==="Escape"){e.preventDefault();closeSearch();}
+    else if(e.key==="ArrowDown"||e.key==="ArrowUp"){
+      e.preventDefault();if($("search-results").hidden)searchProjects();
+      if(searchMatches.length)activateResult(activeResult<0?(e.key==="ArrowDown"?0:searchMatches.length-1):
+        Math.max(0,Math.min(searchMatches.length-1,activeResult+(e.key==="ArrowDown"?1:-1))));
+    }else if(e.key==="Enter"&&!$("search-results").hidden){e.preventDefault();chooseResult(activeResult<0?0:activeResult);}
+    else if(e.key==="Tab")closeSearch();
   };
-  $("search").onkeydown=e=>{if(e.key==="Escape"){$("search-results").hidden=true;}if(e.key==="ArrowDown"){$("search-results").querySelector("button")?.focus();e.preventDefault();}if(e.key==="Enter")$("search-results").querySelector("button")?.click();};
+  document.addEventListener("pointerdown",e=>{if(!e.target.closest(".map-search"))closeSearch();});
   $("try-project").onclick=()=>inspect(projects.reduce((best,p,i)=>p.exposure>projects[best].exposure?i:best,0),true);
   $("about-open").onclick=()=>$("about").showModal();$("about-close").onclick=()=>$("about").close();
   $("snapshot-label").textContent=`${projects.length} projects · Snapshot ${data.snapshot.slice(0,8).replace(/^(\d{4})(\d{2})(\d{2})$/,"$1-$2-$3")}`;

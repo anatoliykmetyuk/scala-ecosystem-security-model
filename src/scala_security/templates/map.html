@@ -10,7 +10,11 @@
 </header>
 <main>
  <section class="map-stage" aria-label="Interactive map of Scala projects">
-  <div class="map-top"><div class="eyebrow">EXPLORE THE ECOSYSTEM</div><p>Every country is a project.<br>Compromise one. See who is exposed.</p></div>
+  <div class="map-search">
+   <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg>
+   <input id="search" type="search" role="combobox" aria-label="Find a project" placeholder="Search projects…" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="search-results">
+   <div id="search-results" role="listbox" aria-label="Matching projects" hidden></div>
+  </div>
   <svg id="atlas" role="group" aria-label="Project countries. Drag to pan, scroll to zoom. Search provides keyboard access." viewBox="0 0 2400 1550">
    <defs>
     <pattern id="unknown" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#36515a"/><path d="M0 8L8 0" stroke="#71878c" stroke-width="1"/></pattern>
@@ -31,9 +35,6 @@
  <aside aria-label="Map layers and compromise simulation">
   <div class="sidebar-inner">
    <div class="eyebrow">01 / LOOK AT THE WORLD</div>
-   <label class="field-label" for="search">Find a project</label>
-   <input id="search" type="search" placeholder="Search cats, zio, scala…" autocomplete="off" aria-controls="search-results">
-   <div id="search-results" hidden></div>
    <div class="display-options"><label><input type="checkbox" id="show-scenery" checked> Scenery</label><label><input type="checkbox" id="show-links" checked> Hover connections</label></div>
    <label class="hop-label" for="hops">Connection depth <output id="hop-value">5 hops</output></label><input id="hops" type="range" min="1" max="5" value="5">
    <section class="simulation">
