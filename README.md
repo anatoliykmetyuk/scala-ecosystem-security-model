@@ -183,27 +183,29 @@ architecture, visual decisions, simulation semantics and performance measurement
 - `model/`, `data/`: original vision documents and partner-supplied inputs.
 - `output/`: ignored generated results and evidence.
 
-Website deployment is out of scope. The GitHub repository is private; CI validates the code and does not publish the report.
-
-## Publish the reviewed report
+## Publish the reviewed website
 
 The public site is https://anatoliikmt.me/scala-ecosystem-security-model/.
 It inherits the account website's custom domain; the account website remains unchanged.
 
-After generating and reviewing `output/preview.html`, run:
+Generate all three pages with `./scripts/render-site.sh` and review the website
+starting at `output/index.html`. Then run:
 
 ```sh
 ./scripts/publish.sh
 ```
 
 The script must run on `main` with no pre-existing staged changes. It copies the
-reviewed report to `site/index.html`, commits the publication files and pushes
+reviewed `index.html`, `preview.html`, and `ecosystem-map.html` into `site/`,
+preserving their names and relative navigation links, commits the publication files and pushes
 `main`. GitHub Actions then deploys only `site/` to GitHub Pages. No collection,
 Python runtime, database or evidence cache is deployed. An optional first argument
-selects a different reviewed HTML file. Track deployment with
+selects a different directory containing all three reviewed HTML files. The script
+checks that every page exists and is nonempty before copying any files. Track deployment with
 `gh run list --workflow publish.yml`.
 
-Source changes alone do not republish the report. Regenerate, review and invoke
-the publishing script when the report should change. The workflow also supports
-manual dispatch to redeploy the already committed report. To roll back, restore
-the desired earlier `site/index.html`, commit it and push `main`.
+Source changes alone do not republish the website. Regenerate, review and invoke
+the publishing script when the website should change. The workflow also supports
+manual dispatch to redeploy the already committed website. To roll back, restore
+the three HTML pages in `site/` from the desired earlier publication, commit them
+and push `main`.

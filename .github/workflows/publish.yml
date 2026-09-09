@@ -1,4 +1,4 @@
-name: Publish report
+name: Publish website
 on:
   push:
     branches: [main]
@@ -26,6 +26,6 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
-      - name: Deploy report
+      - name: Deploy website
         id: deployment
         uses: actions/deploy-pages@v4
