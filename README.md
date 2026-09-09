@@ -51,6 +51,14 @@ To reconstruct using responses already downloaded, including after an interrupte
 
 This replays available responses, including cached failures, and fetches missing URLs. It creates a new database; it is not a fresh observation of cached URLs. Recorded request timestamps remain their actual retrieval times. Omit `--reuse-cache` to collect fresh data. Prior runs and caches are never automatically deleted.
 
+To explain relationship removals between two generated snapshots without modifying them:
+
+```sh
+uv run python scripts/compare-relationships.py output/runs/<old>/snapshot.sqlite output/runs/<new>/snapshot.sqlite --output output/relationship-diff.json
+```
+
+The report records selection-cap/matrix exclusions, version-ownership changes and declaration-evidence differences along each removed witness path. Reasons can overlap; a changed witness does not imply every real-world alternative has been disproven. Rebuilds have no additive guarantee.
+
 To regenerate only the preview from an existing database, without network access:
 
 ```sh
@@ -66,6 +74,10 @@ schema: 2
 matrix:
   jvm:
     scala: ['2.13', '3']
+  sbt:
+    variants:
+      - {scala: '2.12', sbt: '1.0'}
+      - {scala: '3', sbt: '2'}
 projects:
   - repository: scala-graph/scala-graph
     categories: [Computer Science]
@@ -73,7 +85,7 @@ projects:
       - org.scala-graph:graph-core
 ```
 
-This expands `graph-core` into `graph-core_2.13` and `graph-core_3`. Expand all configured modules, check published JVM Scala 2.13/3 coordinates, then select at most 50 by `dependent_packages_count` descending. Known counts (including zero) precede unknown counts; ties use coordinate name. Projects with fifty or fewer published candidates keep all candidates without a ranking-metadata request. The YAML records `max_artifacts_per_project: 50` and the ranking rule. The SQLite `artifact_selection` table records each published candidate, its count (nullable), rank, selected flag, metadata source and reason. Raw metadata pages remain in evidence. Unknown counts generate selection gaps when ranking is needed. External coordinates cannot bridge paths.
+This considers `graph-core_2.13`, `graph-core_3`, the enabled sbt suffix forms and the exact unsuffixed module, subject to inventory discovery, publication verification and matrix evidence; historical targets need not publish at the latest project release. Selection retains at most 50 coordinates by dependant count, balancing only cutoff ties across matrix cells with a fixed seed. See [the authoritative artifact-resolution specification](docs/METHODOLOGY.md#artifact-resolution-and-selection-authoritative) for publication verification, unsuffixed filtering, sbt metadata, ranking evidence, coverage and traversal rules. No JAR downloads are required.
 
 Select all eligible projects across all 76 Awesome Scala subsections, traversing every listing page and deduplicating repositories. There is no project or subsection quota. Eligibility still requires published coordinates in the configured matrix, latest-release evidence and Scala as the largest source language. Ordinary rebuilds preserve the frozen seed.
 

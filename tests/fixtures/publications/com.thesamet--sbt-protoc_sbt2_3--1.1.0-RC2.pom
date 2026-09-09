@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.thesamet</groupId>
+    <artifactId>sbt-protoc_sbt2_3</artifactId>
+    <packaging>jar</packaging>
+    <description>SBT plugin for generating code from Protocol Buffer using protoc</description>
+    <url>https://github.com/thesamet/sbt-protoc</url>
+    <version>1.1.0-RC2</version>
+    <licenses>
+        <license>
+            <name>Apache-2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <name>sbt-protoc</name>
+    <organization>
+        <name>com.thesamet</name>
+        <url>https://github.com/thesamet/sbt-protoc</url>
+    </organization>
+    <scm>
+        <url>https://github.com/thesamet/sbt-protoc</url>
+        <connection>scm:git:https://github.com/thesamet/sbt-protoc.git</connection>
+        <developerConnection>scm:git:git@github.com:thesamet/sbt-protoc.git</developerConnection>
+    </scm>
+    <developers>
+        <developer>
+            <id>thesamet</id>
+            <name>Nadav Samet</name>
+            <url>https://www.thesamet.com</url>
+            <email>thesamet@gmail.com</email>
+        </developer>
+    </developers>
+    <dependencies>
+        <dependency>
+            <groupId>org.scala-sbt</groupId>
+            <artifactId>sbt</artifactId>
+            <version>2.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala3-library_3</artifactId>
+            <version>3.8.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.sbt</groupId>
+            <artifactId>sbt2-compat_sbt2_3</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.hamnaberg</groupId>
+            <artifactId>dataclass-annotation_3</artifactId>
+            <version>0.3.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.thesamet.scalapb</groupId>
+            <artifactId>protoc-bridge_3</artifactId>
+            <version>0.9.10</version>
+        </dependency>
+    </dependencies>
+</project>

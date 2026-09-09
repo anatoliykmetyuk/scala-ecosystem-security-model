@@ -3,7 +3,8 @@ universe: seed
 max_hops: 5
 max_artifacts_per_project: 50
 artifact_selection: Published matrix coordinates ranked by dependent_packages_count
-  descending; unknown counts last; coordinate-name ties; top 50.
+  descending; unknown counts last; cutoff ties balanced across matrix cells with
+  SHA-256 seed scalaland-artifact-selection-v1; top 50.
 selected_at: '2026-09-08T07:27:35.297215+00:00'
 source: https://index.scala-lang.org/awesome
 matrix:
@@ -11,6 +12,12 @@ matrix:
     scala:
     - '2.13'
     - '3'
+  sbt:
+    variants:
+    - scala: '2.12'
+      sbt: '1.0'
+    - scala: '3'
+      sbt: '2'
 selection_policy:
   max_projects: null
   max_per_subsection: null
@@ -1908,10 +1915,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.eed3si9n:sbt-buildinfo_sbt2
-  - com.eed3si9n:sbt-buildinfo_sbt2.0.0-M2
-  - com.eed3si9n:sbt-buildinfo_sbt2.0.0-M3
-  - com.eed3si9n:sbt-buildinfo_sbt2.0.0-M4
+  - com.eed3si9n:sbt-buildinfo
   language_evidence:
     Scala: 117309
   language_source: https://api.github.com/repos/sbt/sbt-buildinfo/languages
@@ -1955,7 +1959,7 @@ projects:
   - com.disneystreaming.smithy4s:smithy4s-protobuf
   - com.disneystreaming.smithy4s:smithy4s-protocol
   - com.disneystreaming.smithy4s:smithy4s-protocolTests
-  - com.disneystreaming.smithy4s:smithy4s-sbt-codegen_sbt2
+  - com.disneystreaming.smithy4s:smithy4s-sbt-codegen
   - com.disneystreaming.smithy4s:smithy4s-tests
   - com.disneystreaming.smithy4s:smithy4s-tests-ce2
   - com.disneystreaming.smithy4s:smithy4s-xml
@@ -1982,7 +1986,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.thesamet:sbt-protoc_sbt2
+  - com.thesamet:sbt-protoc
   language_evidence:
     Scala: 53740
     Nix: 280
@@ -1999,7 +2003,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.github.sbt:sbt-boilerplate_sbt2
+  - com.github.sbt:sbt-boilerplate
   language_evidence:
     Scala: 15139
   language_source: https://api.github.com/repos/sbt/sbt-boilerplate/languages
@@ -2151,7 +2155,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - org.scala-js:sbt-scalajs_sbt2
+  - org.scala-js:sbt-scalajs
   - org.scala-js:scalajs-cli
   - org.scala-js:scalajs-env-nodejs
   - org.scala-js:scalajs-ir
@@ -2189,7 +2193,7 @@ projects:
     Scala as largest source language
   modules:
   - org.scala-native:nir
-  - org.scala-native:sbt-scala-native_sbt2
+  - org.scala-native:sbt-scala-native
   - org.scala-native:test-runner
   - org.scala-native:tools
   - org.scala-native:util
@@ -2217,7 +2221,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - org.typelevel:sbt-tpolecat_sbt2
+  - org.typelevel:sbt-tpolecat
   language_evidence:
     Scala: 43138
   language_source: https://api.github.com/repos/typelevel/sbt-tpolecat/languages
@@ -3001,7 +3005,7 @@ projects:
   - org.wvlet.airframe:airspec-core
   - org.wvlet.airframe:airspec-light
   - org.wvlet.airframe:airspec-log
-  - org.wvlet.airframe:sbt-airframe_sbt2
+  - org.wvlet.airframe:sbt-airframe
   language_evidence:
     Scala: 4031390
     Shell: 50588
@@ -4460,7 +4464,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - pl.project13.scala:sbt-jmh_sbt2
+  - pl.project13.scala:sbt-jmh
   language_evidence:
     Scala: 210658
   language_source: https://api.github.com/repos/sbt/sbt-jmh/languages
@@ -4839,7 +4843,7 @@ projects:
   - org.scalameta:munit
   - org.scalameta:munit-diff
   - org.scalameta:munit-docs
-  - org.scalameta:sbt-munit_sbt2
+  - org.scalameta:sbt-munit
   language_evidence:
     Scala: 295466
     Java: 59125
@@ -4964,8 +4968,7 @@ projects:
     Scala as largest source language
   modules:
   - io.stryker-mutator:sbt-stryker4s-testrunner
-  - io.stryker-mutator:sbt-stryker4s_sbt2
-  - io.stryker-mutator:sbt-stryker4s_sbt2.0.0-M4
+  - io.stryker-mutator:sbt-stryker4s
   - io.stryker-mutator:stryker4s-api
   - io.stryker-mutator:stryker4s-command-runner
   - io.stryker-mutator:stryker4s-core
@@ -5633,8 +5636,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.github.sbt:flyway-sbt_sbt2
-  - com.github.sbt:flyway-sbt_sbt2.0.0-M2
+  - com.github.sbt:flyway-sbt
   language_evidence:
     Scala: 33180
     Java: 172
@@ -6901,10 +6903,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.github.sbt:sbt-git_sbt2
-  - com.github.sbt:sbt-git_sbt2.0.0-M2
-  - com.github.sbt:sbt-git_sbt2.0.0-M3
-  - com.github.sbt:sbt-git_sbt2.0.0-M4
+  - com.github.sbt:sbt-git
   language_evidence:
     Scala: 42588
   language_source: https://api.github.com/repos/sbt/sbt-git/languages
@@ -7064,9 +7063,8 @@ projects:
   - ch.epfl.scala:util-relation
   - ch.epfl.scala:util-scripted
   - ch.epfl.scala:util-tracking
-  - com.github.sbt:flyway-sbt_sbt2.0.0-M2
-  - com.github.sbt:sbt-license-report_sbt2
-  - com.github.sbt:sbt-license-report_sbt2.0.0-M2
+  - com.github.sbt:flyway-sbt
+  - com.github.sbt:sbt-license-report
   - org.scala-sbt:actions
   - org.scala-sbt:build-file
   - org.scala-sbt:collections
@@ -7082,17 +7080,8 @@ projects:
   - org.scala-sbt:main-settings
   - org.scala-sbt:protocol
   - org.scala-sbt:run
-  - org.scala-sbt:sbt-dependency-tree_sbt2.0.0-M1
-  - org.scala-sbt:sbt-dependency-tree_sbt2.0.0-M2
-  - org.scala-sbt:sbt-dependency-tree_sbt2.0.0-M3
-  - org.scala-sbt:sbt-dependency-tree_sbt2.0.0-M4
-  - org.scala-sbt:sbt-dependency-tree_sbt2.0.0-M5
-  - org.scala-sbt:sbt-remote-cache_sbt2
-  - org.scala-sbt:sbt-remote-cache_sbt2.0.0-M1
-  - org.scala-sbt:sbt-remote-cache_sbt2.0.0-M2
-  - org.scala-sbt:sbt-remote-cache_sbt2.0.0-M3
-  - org.scala-sbt:sbt-remote-cache_sbt2.0.0-M4
-  - org.scala-sbt:sbt-remote-cache_sbt2.0.0-M5
+  - org.scala-sbt:sbt-dependency-tree
+  - org.scala-sbt:sbt-remote-cache
   - org.scala-sbt:scripted-plugin
   - org.scala-sbt:scripted-sbt
   - org.scala-sbt:scripted-sbt-redux
@@ -7579,8 +7568,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - org.scoverage:sbt-scoverage_sbt2
-  - org.scoverage:sbt-scoverage_sbt2.0.0-M3
+  - org.scoverage:sbt-scoverage
   language_evidence:
     Scala: 54984
   language_source: https://api.github.com/repos/scoverage/sbt-scoverage/languages
@@ -7598,7 +7586,7 @@ projects:
   modules:
   - com.typesafe:mima-cli
   - com.typesafe:mima-core
-  - com.typesafe:sbt-mima-plugin_sbt2
+  - com.typesafe:sbt-mima-plugin
   language_evidence:
     Scala: 378543
     Java: 1907
@@ -7726,9 +7714,7 @@ projects:
   - org.scalameta:mtags-java
   - org.scalameta:mtags-protobuf
   - org.scalameta:mtags-shared
-  - org.scalameta:sbt-metals_sbt2
-  - org.scalameta:sbt-metals_sbt2.0.0-M3
-  - org.scalameta:sbt-metals_sbt2.0.0-M4
+  - org.scalameta:sbt-metals
   language_evidence:
     Scala: 7075099
     Java: 65720
@@ -7829,7 +7815,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - org.jetbrains.scala:sbt-ide-settings_sbt2
+  - org.jetbrains.scala:sbt-ide-settings
   language_evidence:
     Scala: 4609
   language_source: https://api.github.com/repos/jetbrains/sbt-ide-settings/languages
@@ -7876,9 +7862,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - org.scalameta:sbt-scalafmt_sbt2
-  - org.scalameta:sbt-scalafmt_sbt2.0.0-M3
-  - org.scalameta:sbt-scalafmt_sbt2.0.0-M4
+  - org.scalameta:sbt-scalafmt
   language_evidence:
     Scala: 48977
     Java: 976
@@ -7895,9 +7879,8 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.github.sbt:sbt-java-formatter-add-opens_sbt2
-  - com.github.sbt:sbt-java-formatter_sbt2
-  - com.github.sbt:sbt-java-formatter_sbt2.0.0-M4
+  - com.github.sbt:sbt-java-formatter-add-opens
+  - com.github.sbt:sbt-java-formatter
   language_evidence:
     Scala: 36522
     Java: 6826
@@ -7975,7 +7958,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.timushev.sbt:sbt-updates_sbt2
+  - com.timushev.sbt:sbt-updates
   language_evidence:
     Scala: 68161
   language_source: https://api.github.com/repos/rtimush/sbt-updates/languages
@@ -8010,11 +7993,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - org.wartremover:sbt-wartremover_sbt2
-  - org.wartremover:sbt-wartremover_sbt2.0.0-M2
-  - org.wartremover:sbt-wartremover_sbt2.0.0-M3
-  - org.wartremover:sbt-wartremover_sbt2.0.0-M4
-  - org.wartremover:sbt-wartremover_sbt2.0.0-M5
+  - org.wartremover:sbt-wartremover
   - org.wartremover:wartremover
   - org.wartremover:wartremover-inspector
   - org.wartremover:wartremover-inspector-common
@@ -8095,7 +8074,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.github.sbt:sbt-jshint_sbt2
+  - com.github.sbt:sbt-jshint
   language_evidence:
     Scala: 6540
     JavaScript: 2808
@@ -8136,8 +8115,8 @@ projects:
   - org.foundweekends.giter8:giter8-cli-git
   - org.foundweekends.giter8:giter8-launcher
   - org.foundweekends.giter8:giter8-lib
-  - org.foundweekends.giter8:sbt-giter8-scaffold_sbt2
-  - org.foundweekends.giter8:sbt-giter8_sbt2
+  - org.foundweekends.giter8:sbt-giter8-scaffold
+  - org.foundweekends.giter8:sbt-giter8
   language_evidence:
     Scala: 145816
   language_source: https://api.github.com/repos/foundweekends/giter8/languages
@@ -8153,7 +8132,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.github.sbt:sbt-header_sbt2
+  - com.github.sbt:sbt-header
   language_evidence:
     Scala: 97612
   language_source: https://api.github.com/repos/sbt/sbt-header/languages
@@ -8202,10 +8181,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.eed3si9n:sbt-assembly_sbt2
-  - com.eed3si9n:sbt-assembly_sbt2.0.0-M2
-  - com.eed3si9n:sbt-assembly_sbt2.0.0-M3
-  - com.eed3si9n:sbt-assembly_sbt2.0.0-M4
+  - com.eed3si9n:sbt-assembly
   language_evidence:
     Scala: 202505
     Shell: 321
@@ -8223,9 +8199,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.github.sbt:sbt-native-packager_sbt2
-  - com.github.sbt:sbt-native-packager_sbt2.0.0-M3
-  - com.github.sbt:sbt-native-packager_sbt2.0.0-M4
+  - com.github.sbt:sbt-native-packager
   language_evidence:
     Scala: 559210
     Shell: 23770
@@ -8251,7 +8225,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.github.sbt:sbt-release_sbt2
+  - com.github.sbt:sbt-release
   language_evidence:
     Scala: 73281
   language_source: https://api.github.com/repos/sbt/sbt-release/languages
@@ -8267,7 +8241,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - org.xerial.sbt:sbt-pack_sbt2
+  - org.xerial.sbt:sbt-pack
   language_evidence:
     Scala: 65002
     Shell: 23957
@@ -8284,8 +8258,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.github.sbt:sbt-ci-release_sbt2
-  - com.github.sbt:sbt-ci-release_sbt2.0.0-M2
+  - com.github.sbt:sbt-ci-release
   language_evidence:
     Scala: 16107
   language_source: https://api.github.com/repos/sbt/sbt-ci-release/languages
@@ -8301,8 +8274,8 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.michaelpollmeier:sbt-sonatype_sbt2.0.0-M3
-  - org.xerial.sbt:sbt-sonatype_sbt2.0.0-M2
+  - com.michaelpollmeier:sbt-sonatype
+  - org.xerial.sbt:sbt-sonatype
   language_evidence:
     Scala: 69355
     Shell: 23915
@@ -8319,7 +8292,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - org.scalameta:sbt-native-image_sbt2
+  - org.scalameta:sbt-native-image
   language_evidence:
     Scala: 35808
     Batchfile: 2313
@@ -8337,10 +8310,7 @@ projects:
     Scala as largest source language
   modules:
   - com.github.sbt:pgp-library
-  - com.github.sbt:sbt-pgp_sbt2
-  - com.github.sbt:sbt-pgp_sbt2.0.0-M2
-  - com.github.sbt:sbt-pgp_sbt2.0.0-M3
-  - com.github.sbt:sbt-pgp_sbt2.0.0-M4
+  - com.github.sbt:sbt-pgp
   language_evidence:
     Scala: 114071
     HTML: 906
@@ -8407,7 +8377,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - ch.epfl.scala:sbt-debug-adapter_sbt2
+  - ch.epfl.scala:sbt-debug-adapter
   - ch.epfl.scala:scala-debug-adapter
   - ch.epfl.scala:scala-debug-decoder
   - ch.epfl.scala:scala-debug-step-filter
@@ -8573,7 +8543,7 @@ projects:
   - org.scalameta:mdoc-js-worker
   - org.scalameta:mdoc-parser
   - org.scalameta:mdoc-runtime
-  - org.scalameta:sbt-mdoc_sbt2
+  - org.scalameta:sbt-mdoc
   language_evidence:
     Scala: 558115
     JavaScript: 47250
@@ -8595,8 +8565,8 @@ projects:
     Scala as largest source language
   modules:
   - com.lightbend.paradox:paradox
-  - com.lightbend.paradox:sbt-paradox-theme_sbt2
-  - com.lightbend.paradox:sbt-paradox_sbt2
+  - com.lightbend.paradox:sbt-paradox-theme
+  - com.lightbend.paradox:sbt-paradox
   - com.lightbend.paradox:testkit
   language_evidence:
     Scala: 389900
@@ -8620,7 +8590,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.github.sbt:sbt-unidoc_sbt2
+  - com.github.sbt:sbt-unidoc
   language_evidence:
     Scala: 17278
   language_source: https://api.github.com/repos/sbt/sbt-unidoc/languages
@@ -8681,7 +8651,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.thoughtworks.sbt-api-mappings:sbt-api-mappings_sbt2
+  - com.thoughtworks.sbt-api-mappings:sbt-api-mappings
   language_evidence:
     Scala: 24141
   language_source: https://api.github.com/repos/thoughtworksinc/sbt-api-mappings/languages
@@ -11567,7 +11537,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.github.sbt:sbt-web_sbt2
+  - com.github.sbt:sbt-web
   language_evidence:
     Scala: 103350
     JavaScript: 8
@@ -11584,7 +11554,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.vmunier:sbt-web-scalajs_sbt2
+  - com.vmunier:sbt-web-scalajs
   language_evidence:
     Scala: 22881
     HTML: 1426
@@ -11602,7 +11572,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.github.sbt:sbt-digest_sbt2
+  - com.github.sbt:sbt-digest
   language_evidence:
     Scala: 21738
     Java: 6045
@@ -11621,7 +11591,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.github.sbt:sbt-gzip_sbt2
+  - com.github.sbt:sbt-gzip
   language_evidence:
     Scala: 5401
   language_source: https://api.github.com/repos/sbt/sbt-gzip/languages
@@ -12166,7 +12136,7 @@ projects:
   - org.playframework:play-cluster-sharding
   - org.playframework:play-configuration
   - org.playframework:play-docs
-  - org.playframework:play-docs-sbt-plugin_sbt2
+  - org.playframework:play-docs-sbt-plugin
   - org.playframework:play-ehcache
   - org.playframework:play-filters-helpers
   - org.playframework:play-guice
@@ -12191,9 +12161,9 @@ projects:
   - org.playframework:play-streams
   - org.playframework:play-test
   - org.playframework:play-ws
-  - org.playframework:sbt-plugin_sbt2
+  - org.playframework:sbt-plugin
   - org.playframework:sbt-routes-compiler
-  - org.playframework:sbt-scripted-tools_sbt2
+  - org.playframework:sbt-scripted-tools
   language_evidence:
     Scala: 4518434
     Java: 2668998
@@ -12567,7 +12537,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.softwaremill.sttp.tapir:sbt-openapi-codegen_sbt2
+  - com.softwaremill.sttp.tapir:sbt-openapi-codegen
   - com.softwaremill.sttp.tapir:sttp-mock-server
   - com.softwaremill.sttp.tapir:tapir-akka-grpc-server
   - com.softwaremill.sttp.tapir:tapir-akka-http-server
@@ -12783,7 +12753,7 @@ projects:
   - com.github.ghostdogpr:caliban-cats
   - com.github.ghostdogpr:caliban-client
   - com.github.ghostdogpr:caliban-codegen
-  - com.github.ghostdogpr:caliban-codegen-sbt_sbt2
+  - com.github.ghostdogpr:caliban-codegen-sbt
   - com.github.ghostdogpr:caliban-federation
   - com.github.ghostdogpr:caliban-finch
   - com.github.ghostdogpr:caliban-http4s
@@ -13235,7 +13205,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - com.earldouglas:sbt-war_sbt2
+  - com.earldouglas:sbt-war
   language_evidence:
     Scala: 82941
     Java: 15679
@@ -13780,8 +13750,7 @@ projects:
   - com.typesafe.play:twirl-api
   - com.typesafe.play:twirl-compiler
   - com.typesafe.play:twirl-parser
-  - org.playframework.twirl:sbt-twirl_sbt2
-  - org.playframework.twirl:sbt-twirl_sbt2.0.0-M2
+  - org.playframework.twirl:sbt-twirl
   - org.playframework.twirl:twirl-api
   - org.playframework.twirl:twirl-compiler
   - org.playframework.twirl:twirl-maven-plugin
@@ -14397,8 +14366,7 @@ projects:
   eligibility: Scaladex project mapping, published Scala cross-build artifacts, and
     Scala as largest source language
   modules:
-  - org.scalaxb:sbt-scalaxb_sbt2
-  - org.scalaxb:sbt-scalaxb_sbt2.0.0-M4
+  - org.scalaxb:sbt-scalaxb
   - org.scalaxb:scalaxb
   language_evidence:
     Scala: 960372

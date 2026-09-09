@@ -32,8 +32,14 @@ def repo_name(value: object) -> str:
     parts = urlparse(url.removeprefix("scm:git:").removeprefix("git+"))
     if parts.hostname not in ("github.com", "www.github.com"):
         return ""
-    bits = parts.path.strip("/").removesuffix(".git").split("/")
-    return "/".join(bits[:2]).lower() if len(bits) >= 2 else ""
+    bits = parts.path.strip("/").split("/")
+    if len(bits) < 2:
+        return ""
+    repository = bits[1]
+    # Some generated SCM connections append .git to a URL already ending in .git.
+    while repository.endswith(".git"):
+        repository = repository.removesuffix(".git")
+    return (bits[0] + "/" + repository).lower()
 
 
 def connect(path: Path) -> sqlite3.Connection:
@@ -53,8 +59,15 @@ def connect(path: Path) -> sqlite3.Connection:
     CREATE TABLE IF NOT EXISTS artifact_selection(project TEXT REFERENCES projects(id), artifact TEXT,
       dependent_packages_count INTEGER, selected INTEGER NOT NULL, rank INTEGER NOT NULL,
       source TEXT, reason TEXT NOT NULL, PRIMARY KEY(project,artifact));
+    CREATE TABLE IF NOT EXISTS publications(project TEXT REFERENCES projects(id), artifact TEXT,
+      version TEXT, verified INTEGER NOT NULL, cells TEXT NOT NULL, dependencies TEXT NOT NULL,
+      issues TEXT NOT NULL, evidence TEXT NOT NULL, PRIMARY KEY(project,artifact,version));
+    CREATE TABLE IF NOT EXISTS version_coverage(version TEXT PRIMARY KEY, usable INTEGER NOT NULL,
+      complete INTEGER NOT NULL, reasons TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS versions(id TEXT PRIMARY KEY, artifact TEXT NOT NULL REFERENCES artifacts(id),
       number TEXT NOT NULL, fetched INTEGER NOT NULL DEFAULT 0);
+    CREATE TABLE IF NOT EXISTS version_ownership(version TEXT PRIMARY KEY REFERENCES versions(id),
+      project TEXT, status TEXT NOT NULL, evidence TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS edges(id INTEGER PRIMARY KEY, source TEXT REFERENCES versions(id),
       target TEXT REFERENCES versions(id), scope TEXT NOT NULL, optional INTEGER, exact INTEGER NOT NULL,
       evidence TEXT, UNIQUE(source,target,scope,optional));
@@ -77,3 +90,15 @@ def connect(path: Path) -> sqlite3.Connection:
     """)
     db.execute("INSERT OR IGNORE INTO metadata VALUES('schema_version','1')")
     return db
+
+
+def owned_versions(db: sqlite3.Connection) -> str:
+    """Use exact publication ownership in new runs; retain legacy snapshot readability."""
+    enabled = db.execute(
+        "SELECT 1 FROM metadata WHERE key='ownership_policy' AND value='publication-v1'"
+    ).fetchone()
+    if enabled:
+        return (
+            "(SELECT v.*,o.project FROM versions v LEFT JOIN version_ownership o ON o.version=v.id)"
+        )
+    return "(SELECT v.*,a.project FROM versions v JOIN artifacts a ON a.id=v.artifact)"

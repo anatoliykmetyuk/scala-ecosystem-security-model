@@ -11,6 +11,7 @@ import time
 from pathlib import Path
 from typing import Any
 
+from .coverage import project_coverage
 from .map_geometry import prepare_world
 from .map_world import generate_world
 
@@ -25,6 +26,7 @@ def read_snapshot(database: Path) -> dict[str, Any]:
           JOIN ranking r ON r.project=p.id WHERE p.seed=1 ORDER BY p.id"""):
             project = dict(row)
             project["categories"] = json.loads(project["categories"])
+            project["coverage"] = project_coverage(db, project["id"])
             projects.append(project)
         if not projects:
             raise ValueError(

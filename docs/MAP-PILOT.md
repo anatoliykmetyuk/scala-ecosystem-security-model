@@ -293,3 +293,5 @@ The fresh-generation check reproduced all 548 seeded country assignments and pat
 produced the same 786 retained scenery motifs as a saved-world refresh, and confirmed
 that marked worlds are not thinned twice. The original saved world's SHA-256 remains
 `16ae2c0375b491a376a46d444584eedeb1eddd17afd4c141c8bba7f5672890fb`.
+
+Dependency coverage is exported from the current snapshot. Unavailable outgoing evidence uses gray hatching on the exposure layer, with reasons and counts in project details. Other metric colors and verified incoming exposure remain intact; compromise/exposure styling takes precedence. See [METHODOLOGY.md](METHODOLOGY.md#dependency-coverage) for the authoritative meaning of unavailable, partial, and resolved coverage.

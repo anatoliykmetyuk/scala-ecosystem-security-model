@@ -391,3 +391,45 @@ def test_inspection_compromise_mode_and_conditional_overlays(tmp_path: Path) -> 
                 assert box and box["x"] >= 0 and box["x"] + box["width"] <= width
                 assert box["y"] >= 0 and box["y"] + box["height"] <= 844
         browser.close()
+
+
+def test_dependency_coverage_layers_and_incoming_exposure(tmp_path: Path) -> None:
+    from scala_security.data import connect
+
+    database, world = map_fixture(tmp_path)
+    db = connect(database)
+    db.executemany(
+        "INSERT OR IGNORE INTO target_artifacts VALUES(?)",
+        [(r[0],) for r in db.execute("SELECT id FROM artifacts")],
+    )
+    db.execute("UPDATE versions SET fetched=0 WHERE artifact='g:c_3'")
+    db.commit()
+    db.close()
+    model = read_snapshot(database)
+    c = next(p for p in model["projects"] if p["id"] == "scala/c")
+    assert c["coverage"]["status"] == "unavailable"
+    assert c["exposure"] > 0
+    output = tmp_path / "map.html"
+    render_map(database, output, world)
+    with sync_playwright() as p:
+        browser = getattr(p, os.environ.get("MAP_TEST_BROWSER", "chromium")).launch()
+        page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        page.goto(output.as_uri())
+        country = page.locator('[data-project="scala/c"]')
+        assert "coverage-hatch" in country.evaluate("e=>e.style.fill")
+        country.dispatch_event("click")
+        expect(page.locator(".coverage-warning")).to_contain_text("Dependency coverage unavailable")
+        expect(page.locator(".coverage-warning")).to_contain_text("incoming dependants")
+        page.locator('[data-layer="maintenance"]').click()
+        assert "coverage-hatch" not in country.evaluate("e=>e.style.fill")
+        expect(page.locator("#coverage-legend")).to_contain_text("warnings")
+        page.get_by_role("button", name="Compromise this project", exact=True).click()
+        assert "compromised" in country.get_attribute("class")
+        assert page.locator("#exposed-count").inner_text() == "1"
+        expect(page.locator(".coverage-warning")).to_be_visible()
+        page.locator('[data-layer="exposure"]').click()
+        assert "coverage-hatch" not in country.evaluate("e=>getComputedStyle(e).fill")
+        page.get_by_role("button", name="Reset", exact=True).click()
+        assert "coverage-hatch" in country.evaluate("e=>getComputedStyle(e).fill")
+        assert "focused" in country.get_attribute("class")
+        browser.close()

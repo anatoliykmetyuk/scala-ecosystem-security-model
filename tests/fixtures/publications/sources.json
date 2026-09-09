@@ -1,0 +1,22 @@
+{
+  "io.gatling--gatling-core--3.15.1.pom": {
+    "coordinate": "io.gatling:gatling-core",
+    "version": "3.15.1",
+    "source": "https://repo.maven.apache.org/maven2/io/gatling/gatling-core/3.15.1/gatling-core-3.15.1.pom"
+  },
+  "org.scala-lang--scala-library--2.13.18.pom": {
+    "coordinate": "org.scala-lang:scala-library",
+    "version": "2.13.18",
+    "source": "https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.13.18/scala-library-2.13.18.pom"
+  },
+  "com.github.sbt--sbt-web_2.12_1.0--1.5.8.pom": {
+    "coordinate": "com.github.sbt:sbt-web_2.12_1.0",
+    "version": "1.5.8",
+    "source": "https://repo.maven.apache.org/maven2/com/github/sbt/sbt-web_2.12_1.0/1.5.8/sbt-web_2.12_1.0-1.5.8.pom"
+  },
+  "com.thesamet--sbt-protoc_sbt2_3--1.1.0-RC2.pom": {
+    "coordinate": "com.thesamet:sbt-protoc_sbt2_3",
+    "version": "1.1.0-RC2",
+    "source": "https://repo.maven.apache.org/maven2/com/thesamet/sbt-protoc_sbt2_3/1.1.0-RC2/sbt-protoc_sbt2_3-1.1.0-RC2.pom"
+  }
+}

@@ -6,6 +6,7 @@ import httpx
 import pytest
 import yaml
 from test_pipeline import fixture_db
+from test_publication import pom
 
 from scala_security.analyze import analyze, validate
 from scala_security.collect import Collector
@@ -18,6 +19,7 @@ from scala_security.configuration import (
 from scala_security.data import JSON, connect
 from scala_security.http import Fetcher
 from scala_security.seeds import choose_projects, main_sections
+from scala_security.selection import stable_hash
 
 
 def document(repo="scala/subject"):
@@ -101,6 +103,12 @@ def test_runtime_checks_published_coordinates_and_limits_seed_roots(tmp_path):
 
     def handler(request):
         urls.append(str(request.url))
+        if request.url.path.endswith(".pom"):
+            return (
+                httpx.Response(200, text=pom("g:subject_2.13", "2"))
+                if "subject_2.13/" in request.url.path
+                else httpx.Response(404)
+            )
         versions = [
             {"groupId": "g", "artifactId": name, "version": "2"}
             for name in ("subject_2.13", "subject_2.12", "subject_sjs1_3", "other_3")
@@ -114,8 +122,8 @@ def test_runtime_checks_published_coordinates_and_limits_seed_roots(tmp_path):
     assert collector.roots() == ["g:subject_2.13@2"]
     assert {
         tuple(row) for row in db.execute("SELECT artifact,published FROM coordinate_checks")
-    } == {("g:subject_2.13", 1), ("g:subject_3", 0)}
-    assert len(urls) == 2
+    } == {("g:subject_2.13", 1), ("g:subject", 0)}
+    assert len(urls) == 4
 
 
 def test_missing_inventory_does_not_expand_guessed_coordinates(tmp_path):
@@ -173,7 +181,8 @@ def test_committed_seeds_and_offline_plan(monkeypatch, capsys):
     raw = yaml.safe_load(path.read_text())
     config = parse_config(raw)
     assert len(config.projects) > 0
-    assert config.matrix == DEFAULT_MATRIX
+    assert config.matrix["jvm"] == DEFAULT_MATRIX["jvm"]
+    assert "sbt" in config.matrix
     assert not any("artifacts" in p for p in config.projects)
     assert "zio" not in yaml.safe_dump(raw["selection_policy"]).lower()
     assert "com-lihaoyi/mill" not in yaml.safe_dump(raw["selection_policy"])
@@ -240,7 +249,7 @@ def test_forward_never_fetches_external_coordinates(tmp_path):
 
     collector = Collector(db, Fetcher(tmp_path / "evidence", httpx.MockTransport(handler)))
     collector.forward(["g:a_2.13@1"], {"g:a_2.13"})
-    assert len(requests) == 2
+    assert len(requests) == 3
     assert db.execute("SELECT count(*) FROM edges").fetchone()[0] == 0
 
 
@@ -276,6 +285,17 @@ def test_artifact_selection_ranks_published_candidates_across_pages(tmp_path, mi
 
     def handler(request):
         requested.append(str(request.url))
+        if request.url.path.endswith("/versions/latest"):
+            return httpx.Response(
+                200, json=[{"groupId": "g", "artifactId": "m00_2.13", "version": "1"}]
+            )
+        if request.url.path.endswith(".pom"):
+            artifact = request.url.path.split("/")[-3]
+            return (
+                httpx.Response(200, text=pom("g:" + artifact))
+                if artifact.endswith("_2.13")
+                else httpx.Response(404)
+            )
         if request.url.path.endswith("/artifacts"):
             return httpx.Response(
                 200, json=[{"groupId": "g", "artifactId": f"m{i:02}_2.13"} for i in range(54)]
@@ -308,7 +328,7 @@ def test_artifact_selection_ranks_published_candidates_across_pages(tmp_path, mi
     collector = Collector(db, Fetcher(tmp_path / "evidence", httpx.MockTransport(handler)), config)
     selected = collector.seed(config.projects[0])
     assert selected == (
-        [f"g:m{i:02}_2.13" for i in range(50)]
+        sorted([f"g:m{i:02}_2.13" for i in range(54)], key=stable_hash)[:50]
         if missing_metadata
         else [f"g:m{i:02}_2.13" for i in range(52, 2, -1)]
     )
@@ -320,7 +340,7 @@ def test_artifact_selection_ranks_published_candidates_across_pages(tmp_path, mi
         ).fetchone()[0]
         is None
     )
-    assert not any("dependent_packages?" in url or "/versions/" in url for url in requested)
+    assert not any("dependent_packages?" in url for url in requested)
 
 
 def test_reject_old_artifact_cap():
@@ -344,7 +364,8 @@ def test_five_hop_collection_and_sixth_hop_boundary(tmp_path):
         if request.url.path.endswith(".pom"):
             return httpx.Response(200, text="<project/>")
         i = int(request.url.path.split("g:p")[1].split("_")[0])
-        fetched.append(i)
+        if "/versions/" in request.url.path:
+            fetched.append(i)
         return httpx.Response(
             200,
             json={

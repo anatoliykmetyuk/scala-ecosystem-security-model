@@ -227,6 +227,13 @@ def test_latest_project_release_discards_old_artifact(tmp_path):
 def test_offline_collection_to_preview(tmp_path):
     def handler(request):
         path = request.url.path
+        if path.endswith("/packages/g:b_2.13") or path.endswith("/packages/g:c_2.13"):
+            return httpx.Response(
+                200,
+                json={
+                    "repository_url": "https://github.com/scala/" + ("b" if "g:b" in path else "c")
+                },
+            )
         if path.endswith("/artifacts"):
             return httpx.Response(
                 200,
@@ -262,7 +269,20 @@ def test_offline_collection_to_preview(tmp_path):
                 else {"number": "1", "dependencies": []},
             )
         if path.endswith(".pom"):
-            return httpx.Response(200, text="<project/>")
+            from test_publication import dep, pom
+
+            artifact = path.split("/")[-3]
+            if artifact not in ("b_2.13", "c_2.13"):
+                return httpx.Response(404)
+            return httpx.Response(
+                200,
+                text=pom(
+                    "g:" + artifact,
+                    body="<dependencies>" + dep("g:c_2.13", "1") + "</dependencies>"
+                    if artifact == "b_2.13"
+                    else "",
+                ),
+            )
         return httpx.Response(404, json={})
 
     db = connect(tmp_path / "snapshot.sqlite")

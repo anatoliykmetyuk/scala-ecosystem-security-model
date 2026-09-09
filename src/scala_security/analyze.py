@@ -8,7 +8,7 @@ import time
 from datetime import datetime
 
 from .configuration import MAX_HOPS
-from .data import obj
+from .data import obj, owned_versions
 from .graph import paths
 from .scoring import health, value
 
@@ -69,8 +69,8 @@ def analyze(db: sqlite3.Connection) -> None:
         roots = [
             r[0]
             for r in db.execute(
-                """SELECT v.id FROM versions v JOIN artifacts a ON a.id=v.artifact
-          WHERE a.project=? AND v.number=? AND v.fetched=1 ORDER BY v.id""",
+                f"""SELECT v.id FROM {owned_versions(db)} v
+          WHERE v.project=? AND v.number=? AND v.fetched=1 ORDER BY v.id""",
                 (project["id"], project["latest"]),
             )
         ]
@@ -136,11 +136,11 @@ def validate(db: sqlite3.Connection) -> dict[str, int]:
             if i:
                 assert path[i - 1]["target"] == edge["source"]
         start = db.execute(
-            "SELECT a.project,v.number,p.latest FROM versions v JOIN artifacts a ON a.id=v.artifact JOIN projects p ON p.id=a.project WHERE v.id=?",
+            f"SELECT v.project,v.number,p.latest FROM {owned_versions(db)} v JOIN projects p ON p.id=v.project WHERE v.id=?",
             (path[0]["source"],),
         ).fetchone()
         end = db.execute(
-            "SELECT a.project FROM versions v JOIN artifacts a ON a.id=v.artifact WHERE v.id=?",
+            f"SELECT v.project FROM {owned_versions(db)} v WHERE v.id=?",
             (path[-1]["target"],),
         ).fetchone()
         assert start["project"] == row["dependant"] and start["number"] == start["latest"]

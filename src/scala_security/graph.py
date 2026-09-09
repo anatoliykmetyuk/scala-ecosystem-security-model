@@ -7,6 +7,7 @@ from collections import deque
 from dataclasses import dataclass
 
 from .configuration import MAX_HOPS
+from .data import owned_versions
 
 
 @dataclass(frozen=True)
@@ -35,19 +36,23 @@ def paths(
     within: set[str] | None = None,
 ) -> dict[str, list[int]]:
     roots = [root for root in roots if within is None or root.rsplit("@", 1)[0] in within]
+    seeds = {r[0] for r in db.execute("SELECT id FROM projects WHERE seed=1")}
     queue = deque((root, []) for root in roots)
     visited = set(roots)
     found: dict[str, list[int]] = {}
+    version_table = owned_versions(db)
     while queue:
         source, path = queue.popleft()
         if len(path) == max_hops:
             continue
         for row in db.execute(
-            """SELECT e.*, a.project, a.id AS artifact FROM edges e JOIN versions v ON v.id=e.target
-                                 JOIN artifacts a ON a.id=v.artifact WHERE e.source=? ORDER BY e.target,e.scope,e.id""",
+            f"""SELECT e.*, v.project, v.artifact FROM edges e JOIN {version_table} v ON v.id=e.target
+                WHERE e.source=? ORDER BY e.target,e.scope,e.id""",
             (source,),
         ):
-            if within is not None and row["artifact"] not in within:
+            if within is not None and (
+                row["artifact"] not in within or row["project"] not in seeds
+            ):
                 continue
             edge = Edge(
                 row["id"],

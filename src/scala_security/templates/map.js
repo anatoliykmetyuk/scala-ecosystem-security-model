@@ -88,9 +88,10 @@
     projects.forEach((p,i)=>{
       const v=p[layer];
       const t=layer==="exposure"?Math.sqrt(v/maxExposure):layer==="maintenance"||layer==="security"?1-v:v;
-      els[i].style.fill=v==null?"url(#unknown)":color(t);
+      els[i].style.fill=layer==="exposure"&&p.coverage?.status==="unavailable"?"url(#coverage-hatch)":v==null?"url(#unknown)":color(t);
     });
     document.querySelectorAll("[data-layer]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.layer===layer)));$("legend-title").textContent=names[layer];
+    $("coverage-legend").textContent=layer==="exposure"?"▧ Gray: dependency coverage unavailable":"⚠ Dependency coverage warnings in project details";
     const reverse=layer==="maintenance"||layer==="security";
     $("legend-gradient").style.background=`linear-gradient(to right,${(reverse?[...palette].reverse():palette).join(",")})`;
     $("legend-min").textContent="0";$("legend-mid").textContent=fmt(layer==="exposure"?maxExposure/4:.5);
@@ -155,6 +156,14 @@
     for(const [name,v] of [["Exposed Value",p.exposure],["Verified dependants",data.fallout[i].length],["Maintenance",p.maintenance],["Security",p.security],["Project Value",p.value],["Stars",p.stars]]){
       const m=text(metrics,"div","");text(m,"span",name);text(m,"strong",fmt(v));
     }
+    const coverage=p.coverage;
+    if(coverage){
+      const warning=text(box,"div","",`coverage-warning ${coverage.status}`);
+      text(warning,"strong",coverage.status==="unavailable"?"Dependency coverage unavailable: no release artifacts could be analysed.":coverage.status==="partial"?"Partial dependency coverage":"Selected release artifacts analysed");
+      text(warning,"p",`${coverage.usable} usable / ${coverage.roots} release artifacts · ${coverage.selected} selected coordinates · ${coverage.complete} fully resolved within the supported scope.`);
+      if(coverage.reasons.length){const details=text(warning,"details","");text(details,"summary","Evidence details");for(const reason of coverage.reasons)text(details,"p",reason);}
+      text(warning,"p",coverage.status==="complete"?"Zero verified paths means none were established within the analysed scope.":"Missing outgoing evidence limits what this project is known to depend on. Verified incoming dependants and simulation results are preserved.");
+    }
     const action=text(box,"button",compromised.has(i)?"Undo compromise":"Compromise this project","primary");action.prepend($("compromise-mode").querySelector("svg").cloneNode(true));action.onclick=()=>toggleCompromise(i);
     const link=text(box,"a","View repository ↗","repo-link");link.href=`https://github.com/${p.id}`;link.target="_blank";link.rel="noopener";
     if(p.unvalued)text(box,"p",`${p.unvalued} dependants have unknown Value and do not contribute to Exposed Value.`,"small");
@@ -162,6 +171,7 @@
   }
   function showTooltip(i,e){
     const tip=$("tooltip");tip.replaceChildren();text(tip,"strong",projects[i].id);
+    if(projects[i].coverage?.status!=="complete")text(tip,"span",`⚠ Dependency coverage ${projects[i].coverage?.status??"unknown"}; verified incoming dependants still count.`);
     text(tip,"span",`${names[layer]}: ${fmt(projects[i][layer])} · ${data.fallout[i].length} dependants`);
     text(tip,"span",compromiseMode?(compromised.has(i)?"Click to undo compromise":"Click to compromise"):"Click to view project");tip.hidden=false;positionTooltip(e);
   }

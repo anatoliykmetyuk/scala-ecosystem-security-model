@@ -7,10 +7,10 @@ from dataclasses import dataclass
 
 from .data import JSON, obj, rows
 
-SUFFIX = re.compile(r"(?:_(?:sjs|native)[^_]+)?_(?:2\.1[0-3]|3)$")
+SUFFIX = re.compile(r"(?:_2\.12_1\.0|_sbt[^_]+_3|(?:_(?:sjs|native)[^_]+)?_(?:2\.\d+|3))$")
 ARTIFACT_CAP = 50
 MAX_HOPS = 5
-ARTIFACT_SELECTION = "Published matrix coordinates ranked by dependent_packages_count descending; unknown counts last; coordinate-name ties; top 50."
+ARTIFACT_SELECTION = "Published matrix coordinates ranked by dependent_packages_count descending; unknown counts last; cutoff ties balanced across matrix cells with SHA-256 seed scalaland-artifact-selection-v1; top 50."
 
 DEFAULT_MATRIX: dict[str, JSON] = {"jvm": {"scala": ["2.13", "3"]}}
 
@@ -27,6 +27,10 @@ class SeedConfig:
     def coordinates(self, project: dict[str, JSON]) -> list[str]:
         return expand(project["modules"], self.matrix)
 
+    def candidates(self, project: dict[str, JSON]) -> list[str]:
+        """Offline upper bound, including exact unsuffixed probes."""
+        return sorted(set(self.coordinates(project)) | set(module_names(project)))
+
 
 def module_names(project: dict[str, JSON]) -> list[str]:
     raw = project.get("modules")
@@ -42,10 +46,30 @@ def expand(modules: object, matrix: dict[str, JSON]) -> list[str]:
     for module in modules:
         if not isinstance(module, str) or not re.fullmatch(r"[^:\s]+:[^:\s]+", module):
             raise ValueError("Each module must be groupId:moduleName")
-        if SUFFIX.search(module) or re.search(r"_(?:sjs|native)[^_]+(?:_|$)", module):
+        if SUFFIX.search(module) or re.search(r"_(?:sjs|native|sbt)[^_]+(?:_|$)", module):
             raise ValueError(f"Module contains a cross-build suffix: {module}")
         for platform, raw in matrix.items():
             settings = obj(raw)
+            if platform == "sbt":
+                variants = settings.get("variants")
+                if set(settings) != {"variants"} or not isinstance(variants, list) or not variants:
+                    raise ValueError("matrix.sbt.variants must be a nonempty list")
+                seen = set()
+                for variant in variants:
+                    pair = obj(variant)
+                    identity = (pair.get("scala"), pair.get("sbt"))
+                    if set(pair) != {"scala", "sbt"} or identity not in (
+                        ("2.12", "1.0"),
+                        ("3", "2"),
+                    ):
+                        raise ValueError(
+                            "Supported sbt pairs are Scala 2.12/sbt 1.0 and Scala 3/sbt 2"
+                        )
+                    if identity in seen:
+                        raise ValueError("Duplicate sbt variant")
+                    seen.add(identity)
+                    result.add(module + ("_2.12_1.0" if identity == ("2.12", "1.0") else "_sbt2_3"))
+                continue
             expected_keys = {"scala"} if platform == "jvm" else {"scala", "versions"}
             if set(settings) != expected_keys:
                 raise ValueError(f"Invalid settings for matrix.{platform}")
@@ -82,7 +106,7 @@ def modules_for(artifacts: list[str], matrix: dict[str, JSON]) -> list[str]:
             a[: -len(suffix)]
             for a in artifacts
             for suffix in suffixes
-            if a.endswith(suffix) and not re.search(r"_(?:sjs|native)[^_]+$", a[: -len(suffix)])
+            if a.endswith(suffix) and not re.search(r"_(?:sjs|native|sbt)[^_]+$", a[: -len(suffix)])
         }
     )
 

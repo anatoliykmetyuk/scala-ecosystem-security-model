@@ -13,7 +13,7 @@ Current scope: all eligible projects across all 76 subsections, JVM Scala 2.13/3
 
 # Expansion authorized 2026-09-08
 
-Current scope is defined in [CONSTRAINTS.md](CONSTRAINTS.md): JVM Scala 2.13/3, ten eligible projects per subsection, twenty ranked artifacts per project, five hops, closed seed universe. The completed checklist below describes the previous run.
+Current scope is defined in [CONSTRAINTS.md](CONSTRAINTS.md) and [METHODOLOGY.md](METHODOLOGY.md). The completed checklist below is historical and retains the settings of its original run.
 
 - [x] Implement expanded limits and five-hop boundary tests.
 - [x] Refresh eligible subsection selection, collect using reusable evidence and validate the expanded report: 436 projects, 3,251 distinct selected coordinates, 2,370 relationships. See [EXPANDED-RUN.md](EXPANDED-RUN.md).
