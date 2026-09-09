@@ -101,6 +101,9 @@ refresh, changing stars does not move or resize countries. Some countries are sm
 and require zoom or search. Labels progressively appear as space permits; search
 provides access to every project, including countries whose full names do not fit.
 
+The page has no header; the desktop map and sidebar fill the viewport. The question-mark
+button above and to the right of the compass opens “About this world.”
+
 Project search sits at the map’s top left and stays visible at every zoom. Up/Down
 arrows highlight matching projects, Enter navigates to the highlighted result, and
 Escape dismisses the list. Clicking a result also navigates without compromising it.
