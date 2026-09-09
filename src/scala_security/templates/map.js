@@ -92,7 +92,8 @@
       els[i].style.fill=layer==="exposure"&&p.coverage?.status==="unavailable"?"url(#coverage-hatch)":v==null?"url(#unknown)":color(t);
     });
     document.querySelectorAll("[data-layer]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.layer===layer)));$("legend-title").textContent=names[layer];
-    $("coverage-legend").textContent=layer==="exposure"?"▧ Gray: dependency coverage unavailable":"⚠ Dependency coverage warnings in project details";
+    $("unknown-legend").hidden=layer==="exposure";
+    $("coverage-legend").hidden=layer!=="exposure";
     const reverse=layer==="maintenance"||layer==="security";
     $("legend-gradient").style.background=`linear-gradient(to right,${(reverse?[...palette].reverse():palette).join(",")})`;
     $("legend-min").textContent="0";$("legend-mid").textContent=fmt(layer==="exposure"?Math.expm1(exposureLogMax/2):.5);
