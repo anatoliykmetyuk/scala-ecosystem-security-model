@@ -25,6 +25,10 @@
   const compromised = new Set();
   let affected = new Set(), selected = null, hovered = null, layer = "exposure";
   let zoom=1, tx=0, ty=0, drag=null, suppressClick=false;
+  let pendingFrame=0, labelsDirty=true, markerZoom=1, moving=false, settleTimer=0;
+  let pointer=null, linksKey="", fineGeometry=false, inputMatrix=null, viewportScale=1;
+  const detailPaths={land:[],lakes:[],rivers:[]};
+  const labelPriority=()=>[...labels].sort((a,b)=>(b.i===selected)-(a.i===selected)||a.rank-b.rank);
   const width=world.width, height=world.height;
   $("atlas").setAttribute("viewBox",`0 0 ${width} ${height}`);
   const els = [], labels=[];
@@ -47,21 +51,23 @@
   for(let y=80;y<height;y+=85)for(let x=35;x<width;x+=140){
     svg("path",{d:`M${x+(y%3)*12},${y}h12m9,0h5`,stroke:"#476b73","stroke-width":1,opacity:.4},$("sea-details"));
   }
-  world.land.forEach(d=>svg("path",{d,class:"coast"},$("land")));
+  world.land.forEach((d,i)=>detailPaths.land.push(svg("path",{d:world.overview.land[i],class:"coast"},$("land"))));
   projects.forEach((p,i)=>{
     const el=svg("path",{d:country[i].path,id:`country-${i}`,class:"country","data-project":p.id,"aria-label":p.id},$("countries"));
     svg("title",{},el).textContent=p.id;
-    el.addEventListener("pointerenter",e=>{if(drag)return;hovered=i;showTooltip(i,e);drawConnections(i);});
-    el.addEventListener("pointermove",e=>{if(!drag)positionTooltip(e);});
-    el.addEventListener("pointerleave",()=>{hovered=null;$("tooltip").hidden=true;drawConnections(null);});
+    el.addEventListener("pointerenter",e=>{if(drag||moving)return;hovered=i;showTooltip(i,e);drawConnections(i);});
+    el.addEventListener("pointermove",e=>{if(!drag&&!moving)positionTooltip(e);});
+    el.addEventListener("pointerleave",()=>{if(moving)return;hovered=null;$("tooltip").hidden=true;drawConnections(null);});
     el.addEventListener("click",()=>{if(suppressClick)return;selected=i;toggleCompromise(i);});
     els.push(el);
   });
-  world.rivers.forEach(d=>svg("path",{d,class:"river"},$("water")));
-  world.lakes.forEach(d=>svg("path",{d,class:"lake","pointer-events":"none"},$("water")));
-  world.decor.forEach(([kind,x,y,s])=>{
-    const dim=kind==="mountain"?24:18;
-    svg("use",{href:`#${kind}`,x:x-dim*s/2,y:y-dim*s/2,width:dim*s,height:dim*s,opacity:kind==="mountain"?.7:.48},$("scenery"));
+  world.rivers.forEach((d,i)=>detailPaths.rivers.push(svg("path",{d:world.overview.rivers[i],class:"river"},$("water"))));
+  world.lakes.forEach((d,i)=>detailPaths.lakes.push(svg("path",{d:world.overview.lakes[i],class:"lake","pointer-events":"none"},$("water"))));
+  world.scenery.forEach(batch=>{
+    const group=svg("g",{opacity:batch.opacity},$("scenery"));
+    batch.paths.forEach(p=>svg("path",p.stroke?
+      {d:p.d,fill:"none",stroke:p.color,"stroke-width":p.stroke}:
+      {d:p.d,fill:p.color},group));
   });
   // Quiet nautical landmarks in open water, chosen from the world geometry.
   const waterPoint=(x,y)=>!els.some(el=>el.isPointInFill(new DOMPoint(x,y)));
@@ -113,10 +119,10 @@
     }
     $("selected-list").replaceChildren();
     for(const i of compromised){const b=text($("selected-list"),"button",projects[i].id.split("/").at(-1)+" ×");b.setAttribute("aria-label",`Undo compromise ${projects[i].id}`);b.onclick=()=>toggleCompromise(i);}
-    renderDetail();updateLabels();
+    renderDetail();labelsDirty=true;scheduleTransform();
   }
   function toggleCompromise(i){if(compromised.has(i))compromised.delete(i);else compromised.add(i);impact();}
-  function inspect(i,fly=false){selected=i;impact();if(fly){zoom=3.5;tx=width/2-country[i].x*zoom;ty=height/2-country[i].y*zoom;transform();}}
+  function inspect(i,fly=false){selected=i;impact();if(fly){zoom=3.5;tx=width/2-country[i].x*zoom;ty=height/2-country[i].y*zoom;labelsDirty=true;scheduleTransform();}}
   function renderDetail(){
     if(selected==null)return;
     const i=selected,p=projects[i],box=$("project-detail");box.replaceChildren();
@@ -139,7 +145,10 @@
   }
   function positionTooltip(e){const rect=$("atlas").getBoundingClientRect(),tip=$("tooltip");tip.style.left=Math.max(8,Math.min(e.clientX-rect.left+16,rect.width-tip.offsetWidth-10))+"px";tip.style.top=Math.max(8,Math.min(e.clientY-rect.top+16,rect.height-tip.offsetHeight-10))+"px";}
   function drawConnections(i){
-    const group=$("connections");group.replaceChildren();if(i==null||!$("show-links").checked)return;
+    const group=$("connections"), key=`${i}/${$("hops").value}/${$("show-links").checked}`;
+    if(key===linksKey)return;
+    linksKey=key;group.replaceChildren();if(i==null||!$("show-links").checked)return;
+    markerZoom=zoom;
     const a=country[i],depth=Number($("hops").value);
     for(const [j,hops] of data.fallout[i]){
       if(hops>depth)continue;
@@ -150,9 +159,9 @@
     svg("circle",{cx:a.x,cy:a.y,r:4/zoom,fill:"#fa5927",stroke:"#fff1df","stroke-width":1/zoom},group);
   }
   function updateLabels(){
-    const rect=$("atlas").getBoundingClientRect(),scale=Math.min(rect.width/width,rect.height/height)*zoom;
+    const scale=viewportScale*zoom;
     const occupied=[];
-    const priority=[...labels].sort((a,b)=>(b.i===selected)-(a.i===selected)||a.rank-b.rank);
+    const priority=labelPriority();
     for(const {el,i,rank} of priority){
       const c=country[i],size=rank<15?26:13;
       const w=el.textContent.length*size*.54*scale,h=size*scale;
@@ -165,21 +174,52 @@
     }
   }
   function transform(){
+    pendingFrame=0;
     tx=Math.max(width*(1-zoom)-width*.2,Math.min(width*.2,tx));
     ty=Math.max(height*(1-zoom)-height*.2,Math.min(height*.2,ty));
     $("world").setAttribute("transform",`translate(${tx} ${ty}) scale(${zoom})`);
-    document.querySelector(".map-top").hidden = zoom > 1.3;
-    updateLabels();drawConnections(hovered);
+    document.querySelector(".map-top").hidden=zoom>1.3;
+    const fine=zoom>(fineGeometry?2.2:2.5);
+    if(fine!==fineGeometry){
+      fineGeometry=fine;
+      for(const kind of Object.keys(detailPaths))detailPaths[kind].forEach((el,i)=>el.setAttribute("d",(fine?world:world.overview)[kind][i]));
+    }
+    if(labelsDirty){updateLabels();labelsDirty=false;}
+    if(markerZoom!==zoom){
+      const circles=$("connections").querySelectorAll("circle");
+      circles.forEach((c,i)=>{
+        c.setAttribute("r",(i===circles.length-1?4:2.3)/zoom);
+        if(c.hasAttribute("stroke"))c.setAttribute("stroke-width",1/zoom);
+      });
+      markerZoom=zoom;
+    }
   }
-  function zoomAt(factor,x=width/2,y=height/2){const next=Math.max(1,Math.min(9,zoom*factor)),r=next/zoom;tx=x-(x-tx)*r;ty=y-(y-ty)*r;zoom=next;transform();}
-  function local(e){const pt=new DOMPoint(e.clientX,e.clientY);return pt.matrixTransform($("atlas").getScreenCTM().inverse());}
-  $("atlas").addEventListener("wheel",e=>{e.preventDefault();const p=local(e);zoomAt(Math.exp(-e.deltaY*.0015),p.x,p.y);},{passive:false});
+  function scheduleTransform(){if(!pendingFrame)pendingFrame=requestAnimationFrame(transform);}
+  function settleMovement(){
+    if(drag){settleTimer=setTimeout(settleMovement,120);return;}
+    moving=false;$("connections").style.visibility="";
+    const hit=pointer?document.elementFromPoint(pointer.x,pointer.y)?.closest(".country"):null;
+    hovered=hit?Number(hit.id.slice(8)):null;
+    drawConnections(hovered);
+    if(hovered!=null)showTooltip(hovered,{clientX:pointer.x,clientY:pointer.y});
+  }
+  function movement(){
+    moving=true;$("connections").style.visibility="hidden";$("tooltip").hidden=true;
+    clearTimeout(settleTimer);settleTimer=setTimeout(settleMovement,120);
+  }
+  function zoomAt(factor,x=width/2,y=height/2){
+    const next=Math.max(1,Math.min(9,zoom*factor)),r=next/zoom;
+    tx=x-(x-tx)*r;ty=y-(y-ty)*r;labelsDirty ||= next!==zoom;zoom=next;scheduleTransform();
+  }
+  function local(e){inputMatrix ??= $("atlas").getScreenCTM().inverse();return new DOMPoint(e.clientX,e.clientY).matrixTransform(inputMatrix);}
+  $("atlas").addEventListener("wheel",e=>{e.preventDefault();pointer={x:e.clientX,y:e.clientY};movement();const p=local(e);zoomAt(Math.exp(-e.deltaY*.0015),p.x,p.y);},{passive:false});
   $("atlas").addEventListener("pointerdown",e=>{if(e.button!==0)return;const p=local(e);drag={x:p.x,y:p.y,tx,ty,cx:e.clientX,cy:e.clientY,id:e.pointerId};suppressClick=false;});
-  $("atlas").addEventListener("pointermove",e=>{if(!drag)return;if(Math.hypot(e.clientX-drag.cx,e.clientY-drag.cy)>5){suppressClick=true;$("atlas").classList.add("dragging");$("atlas").setPointerCapture(e.pointerId);$("tooltip").hidden=true;const p=local(e);tx=drag.tx+p.x-drag.x;ty=drag.ty+p.y-drag.y;transform();}});
+  $("atlas").addEventListener("pointermove",e=>{pointer={x:e.clientX,y:e.clientY};if(!drag)return;if(Math.hypot(e.clientX-drag.cx,e.clientY-drag.cy)>5){suppressClick=true;$("atlas").classList.add("dragging");$("atlas").setPointerCapture(e.pointerId);$("tooltip").hidden=true;const p=local(e);tx=drag.tx+p.x-drag.x;ty=drag.ty+p.y-drag.y;movement();scheduleTransform();}});
   const finish=()=>{drag=null;$("atlas").classList.remove("dragging");setTimeout(()=>{suppressClick=false;},0);};
-  window.addEventListener("pointerup",finish);window.addEventListener("pointercancel",finish);
+  window.addEventListener("pointermove",e=>{pointer={x:e.clientX,y:e.clientY};});
+  window.addEventListener("pointerup",finish);window.addEventListener("pointercancel",()=>{pointer=null;finish();});
   $("zoom-in").onclick=()=>zoomAt(1.5);$("zoom-out").onclick=()=>zoomAt(1/1.5);
-  $("zoom-fit").onclick=()=>{zoom=1;tx=ty=0;transform();};
+  $("zoom-fit").onclick=()=>{zoom=1;tx=ty=0;labelsDirty=true;scheduleTransform();};
   $("layer").onchange=e=>{layer=e.target.value;recolor();};
   $("reset").onclick=()=>{compromised.clear();impact();};
   $("show-scenery").onchange=e=>{$("scenery").style.display=e.target.checked?"":"none";};
@@ -197,7 +237,12 @@
   $("about-open").onclick=()=>$("about").showModal();$("about-close").onclick=()=>$("about").close();
   $("snapshot-label").textContent=`${projects.length} projects · Snapshot ${data.snapshot.slice(0,8).replace(/^(\d{4})(\d{2})(\d{2})$/,"$1-$2-$3")}`;
   $("scope-label").textContent=`Seed-only exposure · Up to 5 hops · ${data.gaps.toLocaleString()} evidence gaps`;
-  new ResizeObserver(()=>updateLabels()).observe($("atlas"));
-  recolor();impact();transform();
+  window.addEventListener("scroll",()=>{inputMatrix=null;},{capture:true,passive:true});
+  window.addEventListener("resize",()=>{inputMatrix=null;});
+  new ResizeObserver(([entry])=>{
+    viewportScale=Math.min(entry.contentRect.width/width,entry.contentRect.height/height);
+    inputMatrix=null;labelsDirty=true;scheduleTransform();
+  }).observe($("atlas"));
+  recolor();impact();
   document.documentElement.dataset.mapReady="true";
 })();

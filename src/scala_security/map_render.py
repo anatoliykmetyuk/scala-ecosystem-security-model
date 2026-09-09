@@ -11,6 +11,7 @@ import time
 from pathlib import Path
 from typing import Any
 
+from .map_geometry import prepare_world
 from .map_world import generate_world
 
 
@@ -112,7 +113,7 @@ def render_map(
     else:
         world = json.loads(world_path.read_text())
     validate_world(world, model["projects"])
-    model["world"] = world
+    model["world"] = prepare_world(world)
     source = Path(__file__).parent
     html = (source / "templates/map.html").read_text()
     html = html.replace("__CSS__", (source / "templates/map.css").read_text())

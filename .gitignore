@@ -15,3 +15,4 @@ output/
 .playwright-cli/
 *.sqlite*
 .env
+/tasks.md

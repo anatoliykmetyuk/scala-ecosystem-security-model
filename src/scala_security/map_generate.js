@@ -49,13 +49,18 @@ async ({count, seed}) => {
     occupied.add(key);
     decor.push([kind, Math.round(x), Math.round(y), h >= 70 ? 1.3 : 1]);
   }
+  const densityCounts = {};
   return {
     width:graphWidth, height:graphHeight, seed,
     countries,
     land:pack.features.filter(f => f?.land).map(getFeaturePath),
     lakes:pack.features.filter(f => f?.type === "lake").map(getFeaturePath),
     rivers:Array.from(document.querySelectorAll("#rivers path"), p => p.getAttribute("d")),
-    decor,
+    decor: decor.filter(([kind]) => {
+      densityCounts[kind] = (densityCounts[kind] || 0) + 1;
+      return densityCounts[kind] % 2 === 1;
+    }),
+    decor_density: .5,
     cells:pack.cells.i.length
   };
 }

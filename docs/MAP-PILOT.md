@@ -79,8 +79,10 @@ snapshot.sqlite (read-only)
 - `map_world.py`: pinned generator bootstrap and build runtime.
 - `map_generate.js`: small adapter around the pinned Azgaar generation/export functions.
 - `map_render.py`: snapshot export, roster validation, country binding and HTML assembly.
+- `map_geometry.py`: build-time vector scenery batching and overview curve preparation; saved geometry remains unchanged.
 - `templates/map.*`: independent viewer assets, inlined at build time.
-- `scripts/check-map.py`: offline full-dataset smoke test and measurement report.
+- `scripts/check-map.py`: offline full-dataset smoke test and measurement report, with `--browser chromium|firefox`.
+- `scripts/benchmark-map.py`: repeatable sustained pan/zoom workload in either browser.
 
 ## Visual decisions
 
@@ -178,3 +180,95 @@ Azgaar cannot place all capitals, it fails instead of dropping projects.
 - [Uncharted Atlas](https://github.com/mewo2/terrain), procedural fantasy cartography.
 - [Here Dragons Abound](https://heredragonsabound.blogspot.com/), illustrated terrain and label placement.
 - [Scala Center report](https://scala.epfl.ch/records/first-five-years/report), supplied screenshot reference.
+
+## Movement optimization iteration, 2026-09-09
+
+Chrome is the primary viewing browser. Automated checks default to Chromium, with
+Firefox retained as a secondary compatibility test target. Map text selection is
+disabled so dragging across labels pans without highlighting text; sidebar text
+remains selectable.
+
+The viewer batches camera updates with `requestAnimationFrame`. Pure panning reuses
+label layout and connection elements. Coordinate transforms are cached until resize
+or scrolling, and label scale comes from the resize observer rather than repeated
+layout reads during movement. Hover links and the tooltip are suppressed during a
+drag or wheel burst and restored after 120 ms of inactivity at the current pointer
+location. Text outlines, scenery, and simulation markings remain visible.
+
+Forests and mountains are deterministically reduced from 1,572 to 786 motifs on the
+pilot world. New generator exports carry a density marker; old saved worlds are
+thinned only in the derived viewer data, without rewriting the world file. Repeated
+refresh does not thin again. The retained motifs are flattened into 30 vector paths
+in 10 opacity groups. Overlapping symbols retain painter order, and clipping and
+symbol transforms are applied during preparation. Boats remain separate symbols.
+
+The build also prepares overview paths for coastlines, lakes, and rivers. Cubics are
+flattened with a 0.15-world-unit flatness tolerance, then simplified with a 0.35-unit
+polyline tolerance. Unsupported or tiny paths retain their original representation.
+Original curves return above zoom 2.5; overview curves return below zoom 2.2 to avoid
+threshold flicker. Country fills and hit targets remain exact at every zoom, so shared
+country topology is never simplified independently. No raster layers or spatial
+chunking are used. These extra vector paths increase the standalone HTML from about
+1.37 MB to 1.92 MB; refreshing still needs only Python and the saved world.
+
+Three candidates were evaluated and deferred:
+
+- Shared-border extraction was implemented experimentally, then removed after the
+  Firefox comparison favored the existing individual strokes. A smaller number of
+  SVG elements alone did not guarantee faster drawing. No abandoned border code is
+  included in the renderer.
+- Build-time label arrangements were deferred: the instrumented Firefox zoom trial
+  measured 1 ms median and 2 ms p95 for current label layout after redundant updates
+  were removed. This is a small part of the remaining frame cost and preserves fully
+  responsive label behavior without another layout format.
+- Minification was skipped: all three viewer templates total about 34 KB, less than
+  2% of the artifact even before allowing for the fact a minifier cannot remove all
+  of that. JSON is already compact. Adding a minifier dependency would have little
+  effect on this geometry-dominated payload and would not improve drawing smoothness.
+
+Run the verification and movement benchmark with:
+
+```sh
+./scripts/check.sh
+MAP_TEST_BROWSER=firefox uv run pytest tests/test_map.py -q
+uv run python scripts/check-map.py output/ecosystem-map.html --browser firefox
+uv run python scripts/benchmark-map.py output/ecosystem-map.html --browser firefox --output output/map-performance/firefox.json
+uv run python scripts/benchmark-map.py output/ecosystem-map.html --output output/map-performance/chromium.json
+```
+
+Firefox tests require `uv run playwright install firefox`; normal CI continues to use
+Chromium. The movement workload runs three repetitions of 2.5 seconds per gesture,
+with scenery enabled and the two highest-exposure projects compromised (464 affected
+projects). Four input events are issued per animation frame. The zoom trajectory is
+based on elapsed time, so slower runs do not receive a different zoom range. Tests
+record frame interval median/p95/max and long-frame counts. These are headless
+browser scheduling measurements on this machine, not guaranteed display FPS, and
+remaining frame delays are explicitly visible in the results.
+
+Final measured results (median of the three per-run medians/p95s, milliseconds;
+lower is better), macOS 26.6.2 ARM64, 1600 × 1000 viewport:
+
+| Browser / gesture | Before median | After median | Before p95 | After p95 |
+| --- | ---: | ---: | ---: | ---: |
+| Firefox 153 / pan | 83.4 | 50.0 | 133.3 | 66.7 |
+| Firefox 153 / zoom | 166.7 | 50.0 | 200.0 | 83.3 |
+| Chromium 151 / pan | 50.0 | 33.3 | 66.7 | 33.4 |
+| Chromium 151 / zoom | 100.0 | 33.3 | 116.7 | 33.4 |
+
+These results show reduced frame delays, not sustained 60 FPS. The source baseline
+was preserved before editing, and browser runs were sequential. Intermediate Firefox
+ablation runs with shared borders measured about 66 ms pan / 83 ms zoom; omitting
+shared borders favored the simpler renderer. Disabling overview curves in that
+intermediate build increased median intervals to about 75 ms pan / 108 ms zoom.
+The ablations used two repetitions and support design selection rather than a
+precise isolated speedup claim. Raw local reports are in `output/map-performance/`.
+
+Final validation: all 54 ordinary tests passed; the five map tests also passed in
+Firefox. Full-data smoke checks passed offline in both browsers, including exact
+close-zoom curve restoration, multi-compromise union counts, hover-depth filtering,
+search, layer changes, drag-click suppression, and responsive layouts. Overview,
+close-zoom simulation and mobile screenshots were produced for visual review.
+The fresh-generation check reproduced all 548 seeded country assignments and paths,
+produced the same 786 retained scenery motifs as a saved-world refresh, and confirmed
+that marked worlds are not thinned twice. The original saved world's SHA-256 remains
+`16ae2c0375b491a376a46d444584eedeb1eddd17afd4c141c8bba7f5672890fb`.

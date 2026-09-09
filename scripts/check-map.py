@@ -14,10 +14,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("html", type=Path)
     parser.add_argument("--output", type=Path, default=Path("output/map-verification"))
+    parser.add_argument("--browser", choices=["chromium", "firefox"], default="chromium")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        browser = getattr(p, args.browser).launch()
         context = browser.new_context(offline=True, viewport={"width": 1600, "height": 1000})
         page = context.new_page()
         errors, requests = [], []
@@ -57,6 +58,25 @@ def main() -> None:
         page.get_by_role("button", name="Fit whole map").click()
         page.locator("aside").evaluate("el => el.scrollTop = 280")
         page.screenshot(path=str(args.output / "simulation.png"))
+        # Check both detail levels on the actual geometry, including close-zoom artwork.
+        for _ in range(3):
+            page.get_by_role("button", name="Zoom in", exact=True).click()
+        page.wait_for_function(
+            "document.querySelector('#world').getAttribute('transform').includes('scale(3.375)')"
+        )
+        assert (
+            page.locator("#water .river").evaluate_all("els=>els.map(e=>e.getAttribute('d'))")
+            == model["world"]["rivers"]
+        )
+        page.screenshot(path=str(args.output / "close-zoom.png"))
+        page.get_by_role("button", name="Fit whole map").click()
+        page.wait_for_function(
+            "document.querySelector('#world').getAttribute('transform') === 'translate(0 0) scale(1)'"
+        )
+        assert (
+            page.locator("#water .river").evaluate_all("els=>els.map(e=>e.getAttribute('d'))")
+            == model["world"]["overview"]["rivers"]
+        )
         layer_times = []
         for name in ("security", "maintenance", "value", "exposure"):
             start = time.perf_counter()
@@ -103,6 +123,8 @@ def main() -> None:
         assert not errors, errors
         assert all(url.startswith("file:") for url in requests), requests
         metrics = {
+            "browser": args.browser,
+            "browser_version": browser.version,
             "projects": len(projects),
             "html_bytes": args.html.stat().st_size,
             "offline_load_seconds": round(load_seconds, 3),
@@ -115,7 +137,7 @@ def main() -> None:
             "affected_projects": len(affected),
             "hover_connections_5_hops": count5,
             "hover_connections_1_hop": count1,
-            "note": "Single local Chromium smoke run; action timings include Playwright overhead and are not FPS measurements.",
+            "note": "Single local browser smoke run; action timings include Playwright overhead and are not FPS measurements.",
         }
         (args.output / "verification.json").write_text(json.dumps(metrics, indent=2))
         print(json.dumps(metrics, indent=2))
