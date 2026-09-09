@@ -107,7 +107,7 @@ midpoint. Project Value uses its existing 0–1 score. Maintenance and Security 
 0–1 scales with warmer colors for lower scores. Unknown scores are hatched.
 
 Country area and color are separate. Compromised countries use red plus diagonal
-hatching; exposed dependants use a peach tint and outline. This keeps simulation
+hatching; exposed dependants use dark teal interiors with muted phosphor-green hatching and outlines. This keeps simulation
 status distinguishable from the current score layer.
 
 ## Simulation semantics

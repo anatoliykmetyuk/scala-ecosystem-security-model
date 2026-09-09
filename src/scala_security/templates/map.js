@@ -115,7 +115,7 @@
       els[i].classList.toggle("focused",selected===i);
     });
     for(const i of affected){
-      svg("path",{d:country[i].path,fill:compromised.has(i)?"url(#infection)":"#ffb17c","fill-opacity":compromised.has(i)?.8:.28,stroke:"none"},$("exposure-overlay"));
+      svg("path",{d:country[i].path,fill:compromised.has(i)?"url(#infection)":"url(#exposure-hatch)","fill-opacity":compromised.has(i)?.8:.5,stroke:"none"},$("exposure-overlay"));
     }
     $("selected-list").replaceChildren();
     for(const i of compromised){const b=text($("selected-list"),"button",projects[i].id.split("/").at(-1)+" ×");b.setAttribute("aria-label",`Undo compromise ${projects[i].id}`);b.onclick=()=>toggleCompromise(i);}
@@ -154,7 +154,7 @@
       if(hops>depth)continue;
       const b=country[j],dx=b.x-a.x,dy=b.y-a.y;
       svg("path",{d:`M${a.x} ${a.y}Q${(a.x+b.x)/2-dy*.12} ${(a.y+b.y)/2+dx*.12} ${b.x} ${b.y}`,class:"connection"},group);
-      svg("circle",{cx:b.x,cy:b.y,r:2.3/zoom,fill:"#ffcfaa"},group);
+      svg("circle",{cx:b.x,cy:b.y,r:2.3/zoom,fill:"var(--exposure)"},group);
     }
     svg("circle",{cx:a.x,cy:a.y,r:4/zoom,fill:"#fa5927",stroke:"#fff1df","stroke-width":1/zoom},group);
   }
