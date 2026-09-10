@@ -307,6 +307,12 @@ def test_map_detail_buttons_and_all_hop_connections(tmp_path: Path) -> None:
         assert page.locator("#connections path").count() == 0
         for width in (320, 390, 1440):
             page.set_viewport_size({"width": width, "height": 900})
+            if width <= 700:
+                expect(page.locator("#mobile-detail-options #show-scenery")).to_have_count(1)
+                page.locator("#mobile-options-toggle").click()
+                expect(scenery).to_be_visible()
+            else:
+                expect(page.locator(".map-controls #show-scenery")).to_have_count(1)
             for selector in (
                 "#show-scenery",
                 "#show-links",
@@ -315,6 +321,9 @@ def test_map_detail_buttons_and_all_hop_connections(tmp_path: Path) -> None:
             ):
                 box = page.locator(selector).bounding_box()
                 assert box and box["x"] >= 0 and box["x"] + box["width"] <= width
+            if width <= 700:
+                page.keyboard.press("Escape")
+                expect(scenery).not_to_be_visible()
         browser.close()
 
 

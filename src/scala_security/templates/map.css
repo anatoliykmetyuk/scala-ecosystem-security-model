@@ -27,3 +27,31 @@ main{display:block;height:100dvh;min-height:0}.map-stage{height:100dvh;min-heigh
 .map-credit a{pointer-events:auto;color:inherit;text-underline-offset:3px}
 
 .dependency-details{margin:14px 0}.dependency-details>summary{cursor:pointer;color:var(--muted)}
+
+/* Compact controls retain the same buttons and state across viewport changes. */
+#mobile-options-toggle,#impact-toggle{display:none}
+@media(max-width:700px){
+  .map-bottom{flex-wrap:nowrap;gap:8px;bottom:max(35px,env(safe-area-inset-bottom));z-index:6}
+  .map-controls{flex-wrap:nowrap;gap:8px;max-width:none}
+  #mobile-options-toggle{display:block;pointer-events:auto;background:var(--ink);min-height:44px;padding:8px 10px}
+  .map-controls .layer-button,.zoom button{min-width:44px;height:44px}
+  #mobile-options{position:absolute;bottom:calc(100% + 10px);left:0;right:0;max-height:calc(100dvh - 160px);overflow:auto;overscroll-behavior:contain;pointer-events:auto;padding:14px;background:var(--ink);border:1px solid #58777d;border-radius:6px;box-shadow:0 4px 18px #00191e55}
+  #mobile-detail-options,#mobile-layer-options .layer-controls{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  #mobile-layer-options{margin-top:10px}
+  #mobile-options .layer-controls{border:0;padding:0;background:none}
+  #mobile-options .layer-button{width:auto;height:auto;min-height:44px;justify-content:flex-start;gap:8px;padding:8px}
+  #mobile-options .layer-button::after{content:attr(aria-label);font-size:12px;text-align:left}
+  #mobile-options .legend{width:100%;margin-top:12px}
+  .layer-button:hover .layer-tooltip,.layer-button:focus-visible .layer-tooltip{display:none}
+  #shared-exposure,.has-selection.has-impact #shared-exposure{top:76px;left:16px;right:16px;width:auto;max-height:calc(100dvh - 180px);padding:8px 12px;background:var(--ink)}
+  #shared-exposure .impact-heading{margin:0;gap:8px}
+  #shared-exposure .impact-heading h2{display:none}
+  #impact-toggle{display:flex;align-items:center;gap:10px;text-align:left;flex:1;border:0;padding:6px 0;min-height:44px;font-size:13px}
+  .impact-toggle-label{color:var(--muted);font-size:11px}
+  #reset{min-height:44px}
+  .has-selection.has-impact #project-panel{top:150px;max-height:calc(100dvh - 260px)}
+  .has-selection.has-impact:has(#shared-exposure.expanded) #project-panel{visibility:hidden}
+  .has-impact .about-control{display:block}
+  .has-selection .compass,.has-impact .compass{bottom:100px}
+}
+@media(pointer:coarse){#tooltip{display:none!important}}

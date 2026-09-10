@@ -28,6 +28,8 @@
   let pendingFrame=0, labelsDirty=true, markerZoom=1, moving=false, settleTimer=0;
   let showLinks=false, showScenery=true, compromiseMode=false;
   let pointer=null, linksKey="", fineGeometry=false, inputMatrix=null, viewportScale=1;
+  const pointers=new Map();
+  let pinch=null;
   const detailPaths={land:[],lakes:[],rivers:[]};
   const labelPriority=()=>[...labels].sort((a,b)=>(b.i===selected)-(a.i===selected)||a.rank-b.rank);
   const width=world.width, height=world.height;
@@ -57,8 +59,8 @@
   projects.forEach((p,i)=>{
     const el=svg("path",{d:country[i].path,id:`country-${i}`,class:"country","data-project":p.id,"aria-label":p.id},$("countries"));
     svg("title",{},el).textContent=p.id;
-    el.addEventListener("pointerenter",e=>{if(drag||moving)return;hovered=i;showTooltip(i,e);drawConnections(i);});
-    el.addEventListener("pointermove",e=>{if(!drag&&!moving)positionTooltip(e);});
+    el.addEventListener("pointerenter",e=>{if(e.pointerType==="touch"||drag||moving)return;hovered=i;showTooltip(i,e);drawConnections(i);});
+    el.addEventListener("pointermove",e=>{if(e.pointerType!=="touch"&&!drag&&!moving)positionTooltip(e);});
     el.addEventListener("pointerleave",()=>{if(moving)return;hovered=null;$("tooltip").hidden=true;drawConnections(null);});
     el.addEventListener("click",()=>{if(suppressClick)return;if(compromiseMode)toggleCompromise(i);else inspect(i);});
     els.push(el);
@@ -106,6 +108,8 @@
     const exposed=[...affected].filter(i=>!compromised.has(i));
     const known=[...affected].reduce((s,i)=>s+(projects[i].value??0),0);
     const unknown=[...affected].filter(i=>projects[i].value==null).length;
+    $("impact-summary").textContent=`${pct(affected.size,projects.length)}% affected`;
+    if(!compromised.size)setImpactExpanded(false);
     $("affected-percent").textContent=pct(affected.size,projects.length);
     $("compromised-count").textContent=compromised.size;$("exposed-count").textContent=exposed.length;
     $("value-percent").textContent=totalValue?`${pct(known,totalValue)}%`:"Unknown";
@@ -247,11 +251,48 @@
   }
   function local(e){inputMatrix ??= $("atlas").getScreenCTM().inverse();return new DOMPoint(e.clientX,e.clientY).matrixTransform(inputMatrix);}
   $("atlas").addEventListener("wheel",e=>{e.preventDefault();pointer={x:e.clientX,y:e.clientY};movement();const p=local(e);zoomAt(Math.exp(-e.deltaY*.0015),p.x,p.y);},{passive:false});
-  $("atlas").addEventListener("pointerdown",e=>{if(e.button!==0)return;const p=local(e);drag={x:p.x,y:p.y,tx,ty,cx:e.clientX,cy:e.clientY,id:e.pointerId};suppressClick=false;});
-  $("atlas").addEventListener("pointermove",e=>{pointer={x:e.clientX,y:e.clientY};if(!drag)return;if(Math.hypot(e.clientX-drag.cx,e.clientY-drag.cy)>5){suppressClick=true;$("atlas").classList.add("dragging");$("atlas").setPointerCapture(e.pointerId);$("tooltip").hidden=true;const p=local(e);tx=drag.tx+p.x-drag.x;ty=drag.ty+p.y-drag.y;movement();scheduleTransform();}});
-  const finish=()=>{drag=null;$("atlas").classList.remove("dragging");setTimeout(()=>{suppressClick=false;},0);};
-  window.addEventListener("pointermove",e=>{pointer={x:e.clientX,y:e.clientY};});
-  window.addEventListener("pointerup",finish);window.addEventListener("pointercancel",()=>{pointer=null;finish();});
+  function beginGesture(){
+    const points=[...pointers.values()];
+    if(points.length>=2){
+      const [a,b]=points;
+      pinch={x:(a.x+b.x)/2,y:(a.y+b.y)/2,d:Math.hypot(a.x-b.x,a.y-b.y)};
+      drag=null;suppressClick=true;movement();
+    }else if(points.length===1){
+      const p=points[0];drag={...p,tx,ty};pinch=null;
+    }else{drag=null;pinch=null;}
+  }
+  $("atlas").addEventListener("pointerdown",e=>{
+    if(e.button!==0)return;
+    if(!pointers.size)suppressClick=false;
+    pointers.set(e.pointerId,{...local(e).toJSON(),cx:e.clientX,cy:e.clientY});
+    beginGesture();
+  });
+  $("atlas").addEventListener("pointermove",e=>{
+    pointer=e.pointerType==="touch"?null:{x:e.clientX,y:e.clientY};
+    if(!pointers.has(e.pointerId))return;
+    const p=local(e);pointers.set(e.pointerId,{x:p.x,y:p.y,cx:e.clientX,cy:e.clientY});
+    if(pinch){
+      const [a,b]=[...pointers.values()],x=(a.x+b.x)/2,y=(a.y+b.y)/2,d=Math.hypot(a.x-b.x,a.y-b.y);
+      zoomAt(pinch.d>0?d/pinch.d:1,pinch.x,pinch.y);
+      tx+=x-pinch.x;ty+=y-pinch.y;pinch={x,y,d};
+    }else if(drag&&(suppressClick||Math.hypot(e.clientX-drag.cx,e.clientY-drag.cy)>5)){
+      tx=drag.tx+p.x-drag.x;ty=drag.ty+p.y-drag.y;
+    }else return;
+    suppressClick=true;$("atlas").classList.add("dragging");
+    $("atlas").setPointerCapture(e.pointerId);movement();scheduleTransform();
+  });
+  const finish=e=>{
+    if(!pointers.delete(e.pointerId))return;
+    beginGesture();
+    if(!pointers.size){
+      $("atlas").classList.remove("dragging");
+      setTimeout(()=>{suppressClick=false;},0);
+    }
+  };
+  window.addEventListener("pointermove",e=>{pointer=e.pointerType==="touch"?null:{x:e.clientX,y:e.clientY};});
+  window.addEventListener("pointerup",finish);
+  window.addEventListener("pointercancel",e=>{pointer=null;finish(e);});
+  $("atlas").addEventListener("lostpointercapture",e=>{if(e.target===$("atlas"))finish(e);});
   $("zoom-in").onclick=()=>zoomAt(1.5);$("zoom-out").onclick=()=>zoomAt(1/1.5);
   $("zoom-fit").onclick=()=>{zoom=1;tx=ty=0;labelsDirty=true;scheduleTransform();};
   document.querySelectorAll("[data-layer]").forEach(button=>{
@@ -316,6 +357,43 @@
     else if(e.key==="Tab")closeSearch();
   };
   document.addEventListener("pointerdown",e=>{if(!e.target.closest(".map-search"))closeSearch();});
+  const mobileLayout=matchMedia("(max-width: 700px)");
+  const legend=document.querySelector(".legend"), mapBottom=document.querySelector(".map-bottom");
+  const detailControls=document.querySelector('[aria-label="Map details"]');
+  const layerControls=document.querySelector('[aria-label="Map layers"]');
+  const controls=document.querySelector(".map-controls");
+  function setOptions(open){
+    $("mobile-options").hidden=!open;
+    $("mobile-options-toggle").setAttribute("aria-expanded",String(open));
+  }
+  function setImpactExpanded(open){
+    $("shared-exposure").classList.toggle("expanded",open);
+    $("impact-toggle").setAttribute("aria-expanded",String(open));
+    $("impact-toggle").querySelector(".impact-toggle-label").textContent=open?"Less":"Details";
+    $("impact-details").hidden=mobileLayout.matches&&!open;
+  }
+  function arrangeControls(){
+    setOptions(false);setImpactExpanded(false);
+    if(mobileLayout.matches){
+      $("mobile-detail-options").append($("show-scenery"),$("show-links"));
+      $("mobile-layer-options").append(layerControls);
+      $("mobile-legend").append(legend);
+    }else{
+      detailControls.prepend($("show-scenery"),$("show-links"));
+      controls.insertBefore(layerControls,document.querySelector(".zoom"));
+      mapBottom.prepend(legend);
+    }
+  }
+  $("mobile-options-toggle").onclick=()=>setOptions($("mobile-options").hidden);
+  $("impact-toggle").onclick=()=>setImpactExpanded($("impact-toggle").getAttribute("aria-expanded")!=="true");
+  document.addEventListener("pointerdown",e=>{
+    if(!e.target.closest("#mobile-options, #mobile-options-toggle"))setOptions(false);
+  });
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape"&&!$("mobile-options").hidden){setOptions(false);$("mobile-options-toggle").focus();}
+  });
+  mobileLayout.addEventListener("change",arrangeControls);
+  arrangeControls();
   $("about-open").onclick=()=>$("about").showModal();$("about-close").onclick=()=>$("about").close();
   $("snapshot-label").textContent=`${projects.length} projects · Snapshot ${data.snapshot.slice(0,8).replace(/^(\d{4})(\d{2})(\d{2})$/,"$1-$2-$3")}`;
   const collectedAt=new Date(data.collected);
